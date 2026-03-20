@@ -43,5 +43,10 @@ video/*.mp4
 video/*.webm
 video/*.gif
 
+# Electron build outputs
+packages/workstation/dist-electron/
+packages/workstation/release/
+packages/workstation/out/
+
 # Lock files (optional - uncomment if using pnpm)
 # pnpm-lock.yaml

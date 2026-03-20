@@ -12,11 +12,13 @@ import {
   DEFAULT_SCENE_CONFIG,
   type SceneConfig,
   type SceneSnapshot,
+} from '../../../packages/core/src/types/scene';
+import {
   type RenderObjectState,
   DEFAULT_TRANSFORM,
   generateObjectId,
   type Point3D,
-} from '../../../packages/core/src/types/scene';
+} from '../../../packages/core/src/types/core';
 import { FadeInAnimation, MoveAnimation, smooth } from '../../../packages/core/src/types/animation';
 
 // Mock render object for testing

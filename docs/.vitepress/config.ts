@@ -6,7 +6,8 @@ export default defineConfig({
 
   themeConfig: {
     nav: [
-      { text: '指南', link: '/guide/getting-started' },
+      { text: '框架指南', link: '/guide/getting-started' },
+      { text: '视频工作站', link: '/workstation/' },
       { text: 'API', link: '/api/' },
       { text: '示例', link: '/examples/' },
       { text: 'GitHub', link: 'https://github.com/your-username/animaker' },
@@ -66,6 +67,19 @@ export default defineConfig({
             { text: '性能问题', link: '/faq/performance' },
             { text: '渲染问题', link: '/faq/rendering' },
             { text: '故障排除', link: '/faq/troubleshooting' },
+          ],
+        },
+      ],
+      '/workstation/': [
+        {
+          text: '视频工作站',
+          items: [
+            { text: '概述', link: '/workstation/' },
+            { text: '安装指南', link: '/workstation/installation' },
+            { text: '用户手册', link: '/workstation/user-guide' },
+            { text: '项目管理', link: '/workstation/projects' },
+            { text: '编辑器功能', link: '/workstation/editor' },
+            { text: '设置配置', link: '/workstation/settings' },
           ],
         },
       ],
