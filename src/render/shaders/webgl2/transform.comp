@@ -1,0 +1,62 @@
+// AniMaker - Transform Compute Shader (WebGL2/GLSL)
+//
+// This shader demonstrates GPU-based transform computation using transform feedback.
+// Note: WebGL2 doesn't have native compute shaders, so this uses transform feedback
+// as an alternative approach.
+
+#version 300 es
+
+// =============================================================================
+// Precision qualifiers
+// =============================================================================
+
+precision highp float;
+precision highp int;
+
+// =============================================================================
+// Uniforms
+// =============================================================================
+
+uniform mat4 u_transform;
+uniform float u_delta_time;
+
+// =============================================================================
+// Vertex Input (from input buffer)
+// =============================================================================
+
+layout(location = 0) in vec4 a_position;
+layout(location = 1) in vec4 a_rotation;
+layout(location = 2) in vec4 a_scale;
+
+// =============================================================================
+// Vertex Output (to feedback buffer)
+// =============================================================================
+
+out vec4 v_transformed_position;
+out vec4 v_transformed_rotation;
+out vec4 v_transformed_scale;
+
+// =============================================================================
+// Transform Feedback Vertex Shader
+// =============================================================================
+
+void main() {
+  // Example transform: apply rotation over time
+  float angle = u_delta_time * 0.001;
+  float cos_a = cos(angle);
+  float sin_a = sin(angle);
+
+  mat4 rotation = mat4(
+    vec4(cos_a, 0.0, sin_a, 0.0),
+    vec4(0.0, 1.0, 0.0, 0.0),
+    vec4(-sin_a, 0.0, cos_a, 0.0),
+    vec4(0.0, 0.0, 0.0, 1.0)
+  );
+
+  // Apply transform to position
+  v_transformed_position = rotation * a_position;
+
+  // Pass through rotation and scale
+  v_transformed_rotation = a_rotation;
+  v_transformed_scale = a_scale;
+}

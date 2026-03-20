@@ -1,0 +1,48 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "entryPoints": ["../packages/core/src/index.ts"],
+  "out": "../docs/api/reference",
+  "plugin": ["typedoc-plugin-markdown"],
+  "theme": "markdown",
+  "readme": "none",
+  "excludePrivate": true,
+  "excludeProtected": false,
+  "excludeInternal": true,
+  "categorizeByGroup": true,
+  "sort": ["source-order"],
+  "kindSortOrder": [
+    "Document",
+    "Reference",
+    "Class",
+    "Interface",
+    "Enum",
+    "Namespace",
+    "Function",
+    "Variable",
+    "TypeAlias",
+    "Constructor",
+    "Property",
+    "Method",
+    "Accessor"
+  ],
+  "groupOrder": [
+    "Core",
+    "Renderer",
+    "Scene",
+    "Animation",
+    "Graphics",
+    "Utils",
+    "*"
+  ],
+  "categorizeByGroup": true,
+  "defaultCategory": "Other",
+  "categoryOrder": [
+    "Core",
+    "Renderer",
+    "Scene",
+    "Animation",
+    "Graphics",
+    "Utils",
+    "*"
+  ]
+}
