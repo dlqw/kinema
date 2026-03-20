@@ -88,40 +88,67 @@ export interface SceneState {
  * All scene operations are immutable - they return new scene instances.
  */
 export class Scene {
-  private readonly objects: Map<ObjectId, RenderObject>;
-  private readonly currentTime: number;
-  private readonly animationQueue: Array<{
+  private readonly _objects: Map<ObjectId, RenderObject>;
+  private readonly _currentTime: number;
+  private readonly _animationQueue: Array<{
     animation: Animation;
     startTime: number;
   }>;
-  private readonly activeAnimations: Set<Animation>;
+  private readonly _activeAnimations: Set<Animation>;
 
+  /**
+   * Creates a new Scene instance
+   *
+   * @param config - Scene configuration
+   * @param id - Optional scene identifier
+   * @param objects - Internal: objects map for cloning
+   * @param currentTime - Internal: current time for cloning
+   * @param animationQueue - Internal: animation queue for cloning
+   * @param activeAnimations - Internal: active animations for cloning
+   * @internal
+   */
   constructor(
     /** Scene configuration */
     public readonly config: SceneConfig,
     /** Unique scene identifier */
-    public readonly id: string = `scene-${Date.now()}-${Math.random()}`
+    public readonly id: string = `scene-${Date.now()}-${Math.random()}`,
+    objects?: Map<ObjectId, RenderObject>,
+    currentTime?: number,
+    animationQueue?: Array<{ animation: Animation; startTime: number }>,
+    activeAnimations?: Set<Animation>
   ) {
-    this.objects = new Map();
-    this.currentTime = 0;
-    this.animationQueue = [];
-    this.activeAnimations = new Set();
+    this._objects = objects ?? new Map();
+    this._currentTime = currentTime ?? 0;
+    this._animationQueue = animationQueue ?? [];
+    this._activeAnimations = activeAnimations ?? new Set();
   }
 
-  private constructor(
-    config: SceneConfig,
-    id: string,
-    objects: Map<ObjectId, RenderObject>,
-    currentTime: number,
-    animationQueue: Array<{ animation: Animation; startTime: number }>,
-    activeAnimations: Set<Animation>
-  ) {
-    this.config = config;
-    this.id = id;
-    this.objects = objects;
-    this.currentTime = currentTime;
-    this.animationQueue = animationQueue;
-    this.activeAnimations = activeAnimations;
+  /**
+   * Get objects map
+   */
+  get objects(): Map<ObjectId, RenderObject> {
+    return this._objects;
+  }
+
+  /**
+   * Get current time
+   */
+  get currentTime(): number {
+    return this._currentTime;
+  }
+
+  /**
+   * Get animation queue
+   */
+  get animationQueue(): Array<{ animation: Animation; startTime: number }> {
+    return this._animationQueue;
+  }
+
+  /**
+   * Get active animations
+   */
+  get activeAnimations(): Set<Animation> {
+    return this._activeAnimations;
   }
 
   /**
