@@ -339,8 +339,5 @@ export class LoopAnimation extends Animation {
   }
 }
 
-/**
- * Default export
- */
+// Default export
 export default AnimationGroup;
-export { LoopAnimation };

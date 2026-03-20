@@ -208,8 +208,5 @@ export class MultiRotateAnimation extends Animation {
   }
 }
 
-/**
- * Default export
- */
+// Default export
 export default RotateAnimation;
-export { RotateToAnimation, MultiRotateAnimation };

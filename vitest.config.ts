@@ -1,7 +1,14 @@
 import { defineConfig } from 'vitest/config';
 import { coverageConfigDefaults } from 'vitest/config';
+import { resolve } from 'node:path';
 
 export default defineConfig({
+  resolve: {
+    alias: {
+      '@animaker/core': resolve(__dirname, './packages/core/src'),
+      '@animaker/workstation': resolve(__dirname, './packages/workstation/src'),
+    },
+  },
   test: {
     globals: true,
     environment: 'jsdom',

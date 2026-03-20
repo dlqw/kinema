@@ -51,44 +51,44 @@ export abstract class Animation<T extends RenderObject = RenderObject> {
    */
   constructor(
     public readonly target: T,
-    protected readonly config: AnimationConfig
+    protected readonly _config: AnimationConfig
   ) {
-    Object.freeze(config);
+    Object.freeze(_config);
   }
 
   /**
    * Get the animation configuration
    */
   get config(): Readonly<AnimationConfig> {
-    return this.config;
+    return this._config;
   }
 
   /**
    * Get the animation duration in seconds
    */
   get duration(): number {
-    return this.config.duration;
+    return this._config.duration;
   }
 
   /**
    * Get the delay before animation starts
    */
   get delay(): number {
-    return this.config.delay ?? 0;
+    return this._config.delay ?? 0;
   }
 
   /**
    * Check if this animation removes the target on completion
    */
   get removeOnComplete(): boolean {
-    return this.config.removeOnComplete ?? false;
+    return this._config.removeOnComplete ?? false;
   }
 
   /**
    * Get the animation name for debugging
    */
   get name(): string {
-    return this.config.name ?? this.constructor.name;
+    return this._config.name ?? this.constructor.name;
   }
 
   /**
@@ -97,7 +97,7 @@ export abstract class Animation<T extends RenderObject = RenderObject> {
    * @returns Total duration in seconds
    */
   getTotalDuration(): number {
-    return (this.config.delay ?? 0) + this.config.duration;
+    return (this._config.delay ?? 0) + this._config.duration;
   }
 
   /**
@@ -110,7 +110,7 @@ export abstract class Animation<T extends RenderObject = RenderObject> {
    * @returns Interpolation result with object state and completion flag
    */
   interpolate(elapsedTime: number): InterpolationResult<T> {
-    const delay = this.config.delay ?? 0;
+    const delay = this._config.delay ?? 0;
 
     // During delay, return original object
     if (elapsedTime < delay) {
@@ -119,12 +119,12 @@ export abstract class Animation<T extends RenderObject = RenderObject> {
 
     // Calculate progress
     const progress = Math.min(
-      (elapsedTime - delay) / this.config.duration,
+      (elapsedTime - delay) / this._config.duration,
       1
     ) as Alpha;
 
     // Apply easing function
-    const easedAlpha = this.config.easing(progress);
+    const easedAlpha = this._config.easing(progress);
 
     // Perform interpolation
     const result = this.interpolateAt(easedAlpha);
@@ -165,7 +165,7 @@ export abstract class Animation<T extends RenderObject = RenderObject> {
    * Get a string representation
    */
   toString(): string {
-    return `${this.name}(target="${this.target.id}", duration=${this.config.duration}s)`;
+    return `${this.name}(target="${this.target.id}", duration=${this._config.duration}s)`;
   }
 }
 

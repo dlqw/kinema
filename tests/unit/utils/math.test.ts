@@ -121,6 +121,7 @@ describe('MathUtils', () => {
     });
 
     it('should be inverse of degToRad', () => {
+      const degToRad = (degrees: number): number => (degrees * Math.PI) / 180;
       const degrees = 45;
       const converted = radToDeg(degToRad(degrees));
       expect(converted).toBeCloseTo(degrees, 10);

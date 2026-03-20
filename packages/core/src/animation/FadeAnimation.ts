@@ -171,8 +171,5 @@ export class FadeToAnimation extends Animation {
   }
 }
 
-/**
- * Default export
- */
+// Default export
 export default FadeInAnimation;
-export { FadeOutAnimation, FadeToAnimation };

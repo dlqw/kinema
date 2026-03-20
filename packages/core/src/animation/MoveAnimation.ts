@@ -299,8 +299,5 @@ export class PathAnimation extends Animation {
   }
 }
 
-/**
- * Default export
- */
+// Default export
 export default MoveAnimation;
-export { MoveToAnimation, PathAnimation };
