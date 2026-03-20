@@ -8,6 +8,7 @@ export default defineConfig({
     nav: [
       { text: '框架指南', link: '/guide/getting-started' },
       { text: '视频工作站', link: '/workstation/' },
+      { text: '开发者', link: '/development/' },
       { text: 'API', link: '/api/' },
       { text: '示例', link: '/examples/' },
       { text: 'GitHub', link: 'https://github.com/your-username/animaker' },
@@ -80,6 +81,16 @@ export default defineConfig({
             { text: '项目管理', link: '/workstation/projects' },
             { text: '编辑器功能', link: '/workstation/editor' },
             { text: '设置配置', link: '/workstation/settings' },
+          ],
+        },
+      ],
+      '/development/': [
+        {
+          text: '开发者文档',
+          items: [
+            { text: '概述', link: '/development/' },
+            { text: '贡献指南', link: '/development/contributing' },
+            { text: '架构设计', link: '/development/architecture' },
           ],
         },
       ],
