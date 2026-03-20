@@ -1,0 +1,46 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build outputs
+dist/
+build/
+*.tsbuildinfo
+
+# Test coverage
+coverage/
+.nyc_output/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Claude-related
+.claude/
+
+# Temporary files
+*.log
+*.tmp
+.tmp/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Video rendering temp files
+.temp-frames/
+output/
+video/*.mp4
+video/*.webm
+video/*.gif
+
+# Lock files (optional - uncomment if using pnpm)
+# pnpm-lock.yaml

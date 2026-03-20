@@ -1,0 +1,191 @@
+name: Dependencies
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - 'package.json'
+      - 'package-lock.json'
+      - 'pnpm-lock.yaml'
+      - 'yarn.lock'
+  schedule:
+    - cron: '0 0 * * 0'  # Weekly on Sunday
+  workflow_dispatch:
+
+jobs:
+  audit:
+    name: Dependency Audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Run npm audit
+        run: npm audit --production
+        continue-on-error: true
+
+      - name: Run npm audit (all dependencies)
+        run: npm audit --audit-level=moderate
+        continue-on-error: true
+
+      - name: Upload audit results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: npm-audit-results
+          path: npm-audit-results.json
+          retention-days: 30
+
+  update:
+    name: Update Dependencies
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Check for updates
+        run: |
+          echo "Checking for dependency updates..."
+          npx npm-check-updates -u
+          echo "Update check complete"
+
+      - name: Install updated dependencies
+        run: npm ci
+
+      - name: Run tests with updated dependencies
+        run: npm test
+        continue-on-error: true
+
+      - name: Create Pull Request
+        if: failure()
+        uses: peter-evans/create-pull-request@v6
+        with:
+          title: 'chore: update dependencies'
+          body: 'Automated dependency update'
+          branch: 'deps/update-dependencies'
+          commit-message: 'chore: update dependencies'
+          labels: dependencies, automated
+
+  lockfile-lint:
+    name: Lockfile Lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install lockfile-lint
+        run: npm install -g lockfile-lint
+
+      - name: Run lockfile lint
+        run: |
+          if [ -f "package-lock.json" ]; then
+            lockfile-lint --path package-lock.json \
+              --allowed-hosts npm \
+              --allowed-schemes https: \
+              --empty-hostname false
+          elif [ -f "pnpm-lock.yaml" ]; then
+            lockfile-lint --path pnpm-lock.yaml \
+              --allowed-hosts npm \
+              --allowed-schemes https: \
+              --empty-hostname false
+          elif [ -f "yarn.lock" ]; then
+            lockfile-lint --path yarn.lock \
+              --allowed-hosts npm \
+              --allowed-schemes https: \
+              --empty-hostname false
+          fi
+
+  analyze-size:
+    name: Bundle Size Analysis
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build project
+        run: npm run build
+
+      - name: Analyze bundle size
+        run: |
+          echo "Analyzing bundle sizes..."
+          du -sh dist/**/* 2>/dev/null || du -sh dist/* 2>/dev/null
+          echo "Bundle size analysis complete"
+
+      - name: Comment PR with size changes
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            // Add bundle size comparison logic here
+            console.log('Bundle size analysis would be commented on PR');
+
+  license-check:
+    name: License Check
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install license-checker
+        run: npm install -g license-checker
+
+      - name: Check licenses
+        run: |
+          license-checker --production --failOn "GPL"
+          echo "License check passed"
+
+      - name: Generate license report
+        run: |
+          license-checker --production --json > license-report.json
+          echo "License report generated"
+
+      - name: Upload license report
+        uses: actions/upload-artifact@v4
+        with:
+          name: license-report
+          path: license-report.json
+          retention-days: 90

@@ -1,0 +1,147 @@
+/**
+ * AniMaker 文档自定义样式
+ */
+
+:root {
+  --animaker-primary: #3498db;
+  --animaker-secondary: #e74c3c;
+  --animaker-accent: #9b59b6;
+  --animaker-bg: #1e1e1e;
+  --animaker-text: #e0e0e0;
+}
+
+/* VPS（VitePress）变量覆盖 */
+:root {
+  --vp-c-brand: var(--animaker-primary);
+  --vp-c-brand-light: #5dade2;
+  --vp-c-brand-dark: #2874a6;
+  --vp-home-hero-name-color: var(--animaker-primary);
+  --vp-home-hero-text-background: linear-gradient(
+    120deg,
+    var(--animaker-primary),
+    var(--animaker-accent)
+  );
+}
+
+/* 代码块样式 */
+.vp-code-group .tabs {
+  background-color: var(--animaker-bg);
+  border-radius: 8px;
+}
+
+/* API 表格样式 */
+.api-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+}
+
+.api-table th,
+.api-table td {
+  padding: 0.75rem;
+  text-align: left;
+  border-bottom: 1px solid #333;
+}
+
+.api-table th {
+  background-color: var(--animaker-bg);
+  font-weight: 600;
+}
+
+.api-table tr:hover {
+  background-color: rgba(52, 152, 219, 0.1);
+}
+
+/* 代码标签样式 */
+.code-tag {
+  display: inline-block;
+  padding: 0.2rem 0.5rem;
+  background-color: #2d2d2d;
+  border-radius: 4px;
+  font-family: var(--vp-font-family-mono);
+  font-size: 0.85em;
+  color: var(--animaker-primary);
+}
+
+/* 特性卡片 */
+.feature-card {
+  padding: 1.5rem;
+  border-radius: 12px;
+  background-color: var(--animaker-bg);
+  border: 1px solid #333;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.feature-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(52, 152, 219, 0.2);
+}
+
+.feature-icon {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+/* 警告框 */
+.alert {
+  padding: 1rem 1.25rem;
+  border-radius: 8px;
+  margin: 1rem 0;
+  border-left: 4px solid;
+}
+
+.alert-info {
+  background-color: rgba(52, 152, 219, 0.1);
+  border-color: var(--animaker-primary);
+}
+
+.alert-warning {
+  background-color: rgba(241, 196, 15, 0.1);
+  border-color: #f1c40f;
+}
+
+.alert-error {
+  background-color: rgba(231, 76, 60, 0.1);
+  border-color: var(--animaker-secondary);
+}
+
+/* 版本标签 */
+.version-tag {
+  display: inline-block;
+  padding: 0.2rem 0.5rem;
+  background-color: var(--animaker-accent);
+  color: white;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+/* 示例预览 */
+.example-preview {
+  border: 1px solid #333;
+  border-radius: 8px;
+  overflow: hidden;
+  margin: 1rem 0;
+}
+
+.example-preview canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.example-code {
+  background-color: var(--animaker-bg);
+  padding: 1rem;
+}
+
+/* 响应式调整 */
+@media (max-width: 768px) {
+  .feature-card {
+    padding: 1rem;
+  }
+
+  .api-table {
+    font-size: 0.9rem;
+  }
+}
