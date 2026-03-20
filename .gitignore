@@ -24,6 +24,7 @@ Thumbs.db
 
 # Claude-related
 .claude/
+.claude.md
 
 # Temporary files
 *.log
