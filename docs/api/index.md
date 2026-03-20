@@ -2,6 +2,13 @@
 
 完整的 AniMaker API 文档。
 
+## 快速导航
+
+- [完整 API 文档（HTML）](./html/index.html) - TypeDoc 自动生成的完整 API 参考
+- [核心 API](#核心-api) - 主要类和接口概述
+- [工厂函数](#工厂函数) - 快速创建对象的工具函数
+- [缓动函数](#缓动函数) - 动画缓动效果
+
 ## 核心 API
 
 ### Animator
@@ -579,3 +586,91 @@ interface TweenConfig {
 type AnimatorEvent = 'play' | 'pause' | 'stop' | 'update' | 'complete';
 type TweenEvent = 'start' | 'update' | 'complete' | 'stop';
 ```
+
+## 工厂函数
+
+AniMaker 提供了便捷的工厂函数来快速创建对象：
+
+### 形状工厂
+
+```typescript
+// 创建圆形
+Circle(config?: CircleConfig): Circle
+
+// 创建矩形
+Rectangle(config?: RectangleConfig): Rectangle
+
+// 创建多边形
+Polygon(config?: PolygonConfig): Polygon
+
+// 创建线条
+Line(config?: LineConfig): Line
+
+// 创建弧形
+Arc(config?: ArcConfig): Arc
+
+// 创建路径
+Path(config?: PathConfig): Path
+```
+
+### 动画工厂
+
+```typescript
+// 淡入动画
+fade(duration: number): AnimationBuilder
+
+// 移动动画
+move(to: Vector2, duration: number): AnimationBuilder
+
+// 旋转动画
+rotate(angle: number, duration: number): AnimationBuilder
+
+// 缩放动画
+scale(scale: Vector2, duration: number): AnimationBuilder
+
+// 并行动画
+parallel(...animations: Animation[]): AnimationGroup
+
+// 序列动画
+sequence(...animations: Animation[]): AnimationGroup
+```
+
+### 场景工厂
+
+```typescript
+// 创建标准场景
+createScene(config?: SceneConfig): Scene
+
+// 创建高清场景
+createHDScene(): Scene
+
+// 顺序执行动画
+animateSequentially(animations: Animation[]): Timeline
+```
+
+## 使用示例
+
+```typescript
+import { Scene, Circle, Rectangle, fade, move, createScene } from 'animaker';
+
+// 创建场景
+const scene = createScene({ width: 1920, height: 1080 });
+
+// 使用工厂函数创建对象
+const circle = Circle({ x: 100, y: 100, radius: 50, color: '#ff0000' });
+const rect = Rectangle({ x: 300, y: 100, width: 100, height: 100, color: '#00ff00' });
+
+// 添加到场景
+scene.add(circle, rect);
+
+// 使用工厂函数创建动画
+move(circle, { x: 500, y: 500 }, 1000).start();
+fade(rect, 0, 500).delay(1000).start();
+```
+
+## 更多文档
+
+- [完整 API 文档（HTML）](./html/index.html) - 查看所有类、接口、函数的详细文档
+- [框架指南](../guide/getting-started.md) - 快速开始使用 AniMaker
+- [示例代码](../examples/) - 实战示例
+

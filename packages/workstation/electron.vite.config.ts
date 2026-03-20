@@ -24,6 +24,7 @@ export default defineConfig({
     resolve: {
       alias: {
         '@': resolve('src/renderer'),
+        '@stores': resolve('src/stores'),
         '@animaker/core': resolve('../core/src')
       }
     },

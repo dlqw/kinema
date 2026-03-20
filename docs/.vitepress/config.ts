@@ -45,6 +45,13 @@ export default defineConfig({
       ],
       '/api/': [
         {
+          text: 'API 文档',
+          items: [
+            { text: 'API 概览', link: '/api/' },
+            { text: '完整 API 文档（HTML）', link: '/api/html/index.html' },
+          ],
+        },
+        {
           text: '核心 API',
           items: [
             { text: '核心类型', link: '/api/core' },

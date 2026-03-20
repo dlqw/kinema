@@ -1,76 +1,107 @@
-import { useState, useEffect } from 'react'
+/**
+ * AniMaker Workstation - Main Application
+ *
+ * Root component with i18n and theme support.
+ */
+
+import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
+import { useThemeStore } from '../../stores'
 import './App.css'
+import '../../i18n' // Initialize i18n
 
 function App() {
-  const [theme, setTheme] = useState('dark')
-  const [locale, setLocale] = useState('en')
+  const { t, i18n } = useTranslation()
+  const { effectiveTheme, toggleTheme } = useThemeStore()
+  const [version, setVersion] = useState('0.1.0')
 
   useEffect(() => {
-    // Load initial settings
-    window.api?.getTheme?.().then(setTheme).catch(() => setTheme('dark'))
-    window.api?.getLocale?.().then(setLocale).catch(() => setLocale('en'))
-
-    // Listen for theme changes
-    const unsubscribeTheme = window.api?.onThemeChange?.((newTheme: string) => {
-      setTheme(newTheme)
-    })
-
-    // Listen for locale changes
-    const unsubscribeLocale = window.api?.onLocaleChange?.((newLocale: string) => {
-      setLocale(newLocale)
-    })
-
-    return () => {
-      unsubscribeTheme?.()
-      unsubscribeLocale?.()
-    }
+    // Version is hardcoded for now
+    // TODO: Get version from main process via IPC
   }, [])
 
-  const toggleTheme = async () => {
-    const newTheme = theme === 'dark' ? 'light' : 'dark'
-    await window.api?.setTheme?.(newTheme)
+  const changeLanguage = (lang: string) => {
+    i18n.changeLanguage(lang)
   }
 
   return (
-    <div className={`app ${theme}`}>
+    <div className={`app theme-${effectiveTheme}`}>
       <header className="app-header">
-        <h1>AniMaker Workstation v0.1.0</h1>
-        <div className="controls">
-          <button onClick={toggleTheme}>
-            {theme === 'dark' ? '☀️ Light' : '🌙 Dark'}
+        <div className="app-title">
+          <h1>{t('app.name')}</h1>
+          <span className="version">v{version}</span>
+        </div>
+
+        <nav className="app-nav">
+          <button>{t('menu.file')}</button>
+          <button>{t('menu.edit')}</button>
+          <button>{t('menu.view')}</button>
+          <button>{t('menu.help')}</button>
+        </nav>
+
+        <div className="app-controls">
+          {/* Language Selector */}
+          <select
+            value={i18n.language}
+            onChange={(e) => changeLanguage(e.target.value)}
+            className="control-select"
+          >
+            <option value="en">{t('language.english')}</option>
+            <option value="zh">{t('language.chinese')}</option>
+          </select>
+
+          {/* Theme Toggle */}
+          <button onClick={toggleTheme} className="control-btn">
+            {effectiveTheme === 'dark' ? '☀️' : '🌙'}
+            <span className="control-label">
+              {t(`theme.${effectiveTheme}`)}
+            </span>
           </button>
-          <span>Locale: {locale}</span>
         </div>
       </header>
 
       <main className="app-main">
-        <div className="welcome-panel">
-          <h2>Welcome to AniMaker</h2>
-          <p>High-performance 2D animation rendering framework</p>
+        <div className="welcome-screen">
+          <div className="welcome-content">
+            <h2>{t('welcome.title')}</h2>
+            <p className="subtitle">{t('welcome.subtitle', { version })}</p>
 
-          <div className="features">
-            <div className="feature-card">
-              <h3>🎬 Project Management</h3>
-              <p>Create, open, and save animation projects</p>
+            <div className="action-buttons">
+              <button className="primary">{t('welcome.newProject')}</button>
+              <button>{t('welcome.openProject')}</button>
             </div>
-            <div className="feature-card">
-              <h3>🎨 Animation Editor</h3>
-              <p>Edit animations with timeline control</p>
-            </div>
-            <div className="feature-card">
-              <h3>🎥 Video Export</h3>
-              <p>Export to MP4, WebM, or GIF formats</p>
-            </div>
-            <div className="feature-card">
-              <h3>🌐 Internationalization</h3>
-              <p>Multi-language support</p>
+
+            <div className="features-grid">
+              <div className="feature-card">
+                <div className="feature-icon">🎬</div>
+                <h3>{t('menu.file')}</h3>
+                <p>Project Management</p>
+              </div>
+              <div className="feature-card">
+                <div className="feature-icon">🎨</div>
+                <h3>Animation</h3>
+                <p>Timeline Editor</p>
+              </div>
+              <div className="feature-card">
+                <div className="feature-icon">🎥</div>
+                <h3>Export</h3>
+                <p>MP4, WebM, GIF</p>
+              </div>
+              <div className="feature-card">
+                <div className="feature-icon">🌐</div>
+                <h3>i18n</h3>
+                <p>Multi-language</p>
+              </div>
             </div>
           </div>
         </div>
       </main>
 
       <footer className="app-footer">
-        <p>AniMaker v0.1.0 - Development Phase</p>
+        <span>{t('status.ready')}</span>
+        <span className="footer-info">
+          AniMaker v{version} | {t(`theme.${effectiveTheme}`)} | {i18n.language === 'en' ? 'English' : '中文'}
+        </span>
       </footer>
     </div>
   )
