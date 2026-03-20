@@ -1,0 +1,34 @@
+{
+  "app": {
+    "name": "AniMaker",
+    "title": "AniMaker 视频工作站"
+  },
+  "menu": {
+    "file": "文件",
+    "edit": "编辑",
+    "view": "视图",
+    "help": "帮助"
+  },
+  "welcome": {
+    "title": "欢迎使用 AniMaker",
+    "subtitle": "视频工作站 v{{version}}",
+    "newProject": "新建项目",
+    "openProject": "打开项目",
+    "recentProjects": "最近项目"
+  },
+  "theme": {
+    "light": "亮色",
+    "dark": "暗色",
+    "system": "跟随系统"
+  },
+  "language": {
+    "english": "English",
+    "chinese": "中文"
+  },
+  "status": {
+    "ready": "就绪",
+    "loading": "加载中...",
+    "saving": "保存中...",
+    "saved": "已保存"
+  }
+}
