@@ -1,0 +1,24 @@
+{
+  "appId": "com.animaker.workstation",
+  "productName": "AniMaker Workstation",
+  "directories": {
+    "output": "release"
+  },
+  "files": [
+    "dist-electron",
+    "dist"
+  ],
+  "win": {
+    "target": ["nsis"],
+    "icon": "resources/icon.png"
+  },
+  "mac": {
+    "target": ["dmg"],
+    "icon": "resources/icon.png"
+  },
+  "linux": {
+    "target": ["AppImage"],
+    "icon": "resources/icon.png",
+    "category": "Graphics"
+  }
+}
