@@ -20,11 +20,11 @@ Each release note file should include:
 
 ## Example
 
-See [v1.0.0.md](./v1.0.0.md) for an example of a complete release note.
+See [v0.1.0.md](./v0.1.0.md) for an example of a complete release note.
 
 ## Current Release
 
-- **[v1.0.0](./v1.0.0.md)** - Initial stable release (March 19, 2026)
+- **[v0.1.0](./v0.1.0.md)** - Initial development release (March 20, 2026)
 
 ## Archive
 

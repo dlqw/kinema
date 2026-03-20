@@ -96,14 +96,14 @@ export abstract class Animation<T extends RenderObject = RenderObject> {
     /** Target object to animate */
     public readonly target: T,
     /** Animation configuration */
-    protected readonly config: AnimationConfig
+    protected readonly _config: AnimationConfig
   ) {}
 
   /**
    * Get the animation configuration
    */
   get config(): Readonly<AnimationConfig> {
-    return this.config;
+    return this._config;
   }
 
   /**

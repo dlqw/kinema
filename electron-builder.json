@@ -1,0 +1,54 @@
+{
+  "appId": "com.animaker.app",
+  "productName": "AniMaker",
+  "copyright": "Copyright © 2025 AniMaker Team",
+  "directories": {
+    "output": "release",
+    "buildResources": "build"
+  },
+  "files": [
+    "electron/out/**/*",
+    "electron/.vite/**/*",
+    "package.json"
+  ],
+  "win": {
+    "target": [
+      {
+        "target": "nsis",
+        "arch": [
+          "x64",
+          "arm64"
+        ]
+      }
+    ],
+    "icon": "build/icon.ico"
+  },
+  "mac": {
+    "target": [
+      {
+        "target": "dmg",
+        "arch": [
+          "x64",
+          "arm64",
+          "universal"
+        ]
+      }
+    ],
+    "icon": "build/icon.icns",
+    "category": "public.app-category.graphics-design"
+  },
+  "linux": {
+    "target": [
+      "AppImage",
+      "deb"
+    ],
+    "icon": "build/icons",
+    "category": "Graphics"
+  },
+  "nsis": {
+    "oneClick": false,
+    "allowToChangeInstallationDirectory": true,
+    "createDesktopShortcut": true,
+    "createStartMenuShortcut": true
+  }
+}
