@@ -28,7 +28,9 @@
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",
     "docs:preview": "vitepress preview docs",
-    "docs:api": "typedoc --options docs/typedoc.config.json"
+    "docs:api": "typedoc --options docs/typedoc.config.json",
+    "workstation:dev": "cd packages/workstation && npm run dev",
+    "workstation:build": "cd packages/workstation && npm run build"
   },
   "keywords": [
     "animation",
@@ -46,12 +48,17 @@
   "license": "MIT",
   "devDependencies": {
     "@changesets/cli": "^2.27.1",
+    "@electron-toolkit/tsconfig": "^2.0.0",
     "@playwright/test": "^1.45.0",
     "@types/node": "^20.19.37",
     "@typescript-eslint/eslint-plugin": "^8.0.0",
     "@typescript-eslint/parser": "^8.0.0",
     "@vitest/coverage-v8": "^2.0.0",
     "@vitest/ui": "^2.0.0",
+    "cross-env": "^10.1.0",
+    "electron": "^41.0.3",
+    "electron-builder": "^26.8.1",
+    "electron-vite": "^5.0.0",
     "eslint": "^9.0.0",
     "eslint-config-prettier": "^9.0.0",
     "eslint-plugin-import": "^2.29.0",
