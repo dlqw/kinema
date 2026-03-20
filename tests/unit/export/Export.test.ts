@@ -16,6 +16,10 @@ import {
   type FrameEncoderOptions,
   type EncodedFrame,
 } from '../../../packages/core/src/export/FrameEncoder';
+import { setupCanvasMock } from '../../mocks/canvas.mock';
+
+// Setup canvas mock before tests
+setupCanvasMock();
 
 // Mock RenderObject for testing
 class MockRenderObject {
@@ -148,38 +152,7 @@ describe('CanvasFrameEncoder', () => {
   let testObjects: MockRenderObject[];
 
   beforeEach(() => {
-    // Mock DOM environment
-    global.HTMLCanvasElement = class HTMLCanvasElement {
-      width = 800;
-      height = 600;
-      getContext() {
-        return {
-          clearRect: vi.fn(),
-          fillStyle: '',
-          fillRect: vi.fn(),
-          save: vi.fn(),
-          restore: vi.fn(),
-          globalAlpha: 1,
-          translate: vi.fn(),
-          beginPath: vi.fn(),
-          arc: vi.fn(),
-          fill: vi.fn(),
-          toBlob: vi.fn((callback: any) => {
-            callback(new Blob(['test'], { type: 'image/png' }));
-          }),
-        };
-      }
-    } as any;
-
-    global.document = {
-      createElement: vi.fn((tag: string) => {
-        if (tag === 'canvas') {
-          return new HTMLCanvasElement();
-        }
-        return {};
-      }),
-    } as any;
-
+    // Canvas mock is already set up by the import
     const options: FrameEncoderOptions = {
       format: 'png',
       quality: 0.9,
