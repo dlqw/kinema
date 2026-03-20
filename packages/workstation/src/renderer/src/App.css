@@ -1,112 +1,305 @@
+/**
+ * AniMaker Workstation - Main Styles
+ *
+ * Theme-aware styles with CSS custom properties.
+ */
+
+/* ============================================================================
+   CSS Variables - Theme System
+   ============================================================================ */
+
+/* Dark Theme (Default) */
+.app.theme-dark {
+  --color-bg-primary: #1e1e1e;
+  --color-bg-secondary: #252526;
+  --color-bg-tertiary: #2d2d30;
+  --color-bg-hover: #3e3e42;
+  --color-border: #454545;
+  --color-text-primary: #ffffff;
+  --color-text-secondary: #cccccc;
+  --color-text-muted: #858585;
+  --color-accent: #007acc;
+  --color-accent-hover: #005a9e;
+  --color-success: #4ec9b0;
+  --color-warning: #ce9178;
+  --color-error: #f48771;
+}
+
+/* Light Theme */
+.app.theme-light {
+  --color-bg-primary: #ffffff;
+  --color-bg-secondary: #f3f3f3;
+  --color-bg-tertiary: #e8e8e8;
+  --color-bg-hover: #d4d4d4;
+  --color-border: #d4d4d4;
+  --color-text-primary: #1e1e1e;
+  --color-text-secondary: #3e3e3e;
+  --color-text-muted: #757575;
+  --color-accent: #0066cc;
+  --color-accent-hover: #0052a3;
+  --color-success: #2da44e;
+  --color-warning: #d29922;
+  --color-error: #cf222e;
+}
+
+/* ============================================================================
+   Base Styles
+   ============================================================================ */
+
 .app {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  transition: background-color 0.3s, color 0.3s;
+  background-color: var(--color-bg-primary);
+  color: var(--color-text-primary);
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-.app.dark {
-  background-color: #1e1e1e;
-  color: #ffffff;
-}
-
-.app.light {
-  background-color: #ffffff;
-  color: #1e1e1e;
-}
+/* ============================================================================
+   Header
+   ============================================================================ */
 
 .app-header {
-  padding: 1rem 2rem;
   display: flex;
+  align-items: center;
   justify-content: space-between;
-  align-items: center;
-  border-bottom: 1px solid rgba(128, 128, 128, 0.2);
+  height: 56px;
+  padding: 0 20px;
+  background-color: var(--color-bg-secondary);
+  border-bottom: 1px solid var(--color-border);
 }
 
-.app-header h1 {
-  margin: 0;
-  font-size: 1.5rem;
-}
-
-.controls {
+.app-title {
   display: flex;
-  gap: 1rem;
   align-items: center;
+  gap: 12px;
 }
 
-.controls button {
-  padding: 0.5rem 1rem;
-  border: none;
+.app-title h1 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.app-title .version {
+  font-size: 12px;
+  color: var(--color-text-muted);
+  padding: 2px 8px;
+  background-color: var(--color-bg-tertiary);
   border-radius: 4px;
-  cursor: pointer;
-  background-color: #3b82f6;
-  color: white;
-  font-size: 0.9rem;
-  transition: background-color 0.2s;
 }
 
-.controls button:hover {
-  background-color: #2563eb;
+.app-nav {
+  display: flex;
+  gap: 4px;
 }
+
+.app-nav button {
+  padding: 6px 12px;
+  border: none;
+  background: transparent;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background-color 0.15s ease;
+}
+
+.app-nav button:hover {
+  background-color: var(--color-bg-hover);
+}
+
+.app-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.control-select {
+  padding: 6px 10px;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  background-color: var(--color-bg-tertiary);
+  color: var(--color-text-primary);
+  cursor: pointer;
+}
+
+.control-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  background-color: var(--color-bg-tertiary);
+  color: var(--color-text-primary);
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.control-btn:hover {
+  background-color: var(--color-bg-hover);
+}
+
+.control-label {
+  font-size: 13px;
+}
+
+/* ============================================================================
+   Main Content
+   ============================================================================ */
 
 .app-main {
   flex: 1;
-  padding: 2rem;
-  overflow-y: auto;
+  overflow: auto;
 }
 
-.welcome-panel {
-  max-width: 1200px;
-  margin: 0 auto;
+.welcome-screen {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - 56px - 32px);
+  padding: 40px;
+}
+
+.welcome-content {
+  max-width: 800px;
   text-align: center;
 }
 
-.welcome-panel h2 {
-  font-size: 2rem;
-  margin-bottom: 1rem;
+.welcome-content h2 {
+  font-size: 32px;
+  margin-bottom: 8px;
+  color: var(--color-text-primary);
 }
 
-.welcome-panel p {
-  color: rgba(128, 128, 128, 1);
-  margin-bottom: 2rem;
+.welcome-content .subtitle {
+  font-size: 16px;
+  color: var(--color-text-muted);
+  margin-bottom: 32px;
 }
 
-.features {
+.action-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: 48px;
+}
+
+.action-buttons button {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 6px;
+  font-size: 15px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.action-buttons button.primary {
+  background-color: var(--color-accent);
+  color: white;
+}
+
+.action-buttons button.primary:hover {
+  background-color: var(--color-accent-hover);
+}
+
+.action-buttons button:not(.primary) {
+  background-color: var(--color-bg-tertiary);
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-border);
+}
+
+.action-buttons button:not(.primary):hover {
+  background-color: var(--color-bg-hover);
+}
+
+/* ============================================================================
+   Features Grid
+   ============================================================================ */
+
+.features-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 1.5rem;
-  margin-top: 2rem;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 20px;
 }
 
 .feature-card {
-  padding: 1.5rem;
+  padding: 20px;
   border-radius: 8px;
-  background-color: rgba(128, 128, 128, 0.1);
-  transition: transform 0.2s, background-color 0.2s;
+  background-color: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .feature-card:hover {
   transform: translateY(-2px);
-  background-color: rgba(128, 128, 128, 0.2);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.feature-icon {
+  font-size: 32px;
+  margin-bottom: 8px;
 }
 
 .feature-card h3 {
-  margin: 0 0 0.5rem 0;
-  font-size: 1.25rem;
+  margin: 0 0 4px 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-text-primary);
 }
 
 .feature-card p {
   margin: 0;
-  color: rgba(128, 128, 128, 1);
+  font-size: 13px;
+  color: var(--color-text-muted);
 }
+
+/* ============================================================================
+   Footer
+   ============================================================================ */
 
 .app-footer {
-  padding: 1rem 2rem;
-  text-align: center;
-  border-top: 1px solid rgba(128, 128, 128, 0.2);
-  color: rgba(128, 128, 128, 1);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 32px;
+  padding: 0 20px;
+  background-color: var(--color-bg-secondary);
+  border-top: 1px solid var(--color-border);
+  font-size: 12px;
+  color: var(--color-text-muted);
 }
 
-.app-footer p {
-  margin: 0;
+.footer-info {
+  display: flex;
+  gap: 12px;
+}
+
+/* ============================================================================
+   Responsive
+   ============================================================================ */
+
+@media (max-width: 768px) {
+  .app-header {
+    flex-wrap: wrap;
+    height: auto;
+    padding: 12px;
+  }
+
+  .app-nav {
+    display: none;
+  }
+
+  .app-controls {
+    margin-left: auto;
+  }
+
+  .features-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .action-buttons {
+    flex-direction: column;
+  }
 }

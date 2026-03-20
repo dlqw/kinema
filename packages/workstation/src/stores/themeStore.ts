@@ -56,7 +56,7 @@ export const useThemeStore = create<ThemeState>()(
       },
 
       toggleTheme: () => {
-        const { mode, effectiveTheme } = get()
+        const { effectiveTheme } = get()
         const newMode = effectiveTheme === 'dark' ? 'light' : 'dark'
         applyTheme(newMode)
         set({ mode: newMode, effectiveTheme: newMode })
