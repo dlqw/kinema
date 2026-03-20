@@ -7,7 +7,24 @@
     "file": "File",
     "edit": "Edit",
     "view": "View",
-    "help": "Help"
+    "help": "Help",
+    "file_new": "New Project",
+    "file_open": "Open Project",
+    "file_save": "Save Project",
+    "file_saveAs": "Save As...",
+    "file_export": "Export Video",
+    "edit_undo": "Undo",
+    "edit_redo": "Redo",
+    "edit_cut": "Cut",
+    "edit_copy": "Copy",
+    "edit_paste": "Paste",
+    "edit_delete": "Delete",
+    "view_timeline": "Timeline",
+    "view_properties": "Properties",
+    "view_preview": "Preview",
+    "help_documentation": "Documentation",
+    "help_shortcuts": "Keyboard Shortcuts",
+    "help_about": "About"
   },
   "welcome": {
     "title": "Welcome to AniMaker",
@@ -22,13 +39,112 @@
     "system": "System"
   },
   "language": {
+    "title": "Language",
     "english": "English",
-    "chinese": "中文"
+    "chinese": "中文",
+    "select": "Select Language"
   },
   "status": {
     "ready": "Ready",
     "loading": "Loading...",
     "saving": "Saving...",
-    "saved": "Saved"
+    "saved": "Saved",
+    "error": "Error",
+    "success": "Success"
+  },
+  "project": {
+    "title": "Project Management",
+    "create": "Create Project",
+    "open": "Open Project",
+    "save": "Save Project",
+    "close": "Close Project",
+    "settings": "Project Settings",
+    "properties": "Project Properties",
+    "name": "Project Name",
+    "location": "Location",
+    "resolution": "Resolution",
+    "frameRate": "Frame Rate",
+    "duration": "Duration",
+    "backgroundColor": "Background Color",
+    "new": {
+      "title": "New Project",
+      "nameLabel": "Project Name",
+      "namePlaceholder": "My Animation",
+      "locationLabel": "Location",
+      "locationPlaceholder": "/path/to/projects",
+      "browse": "Browse...",
+      "create": "Create",
+      "creating": "Creating..."
+    },
+    "error": {
+      "nameRequired": "Project name is required",
+      "locationRequired": "Location is required",
+      "createFailed": "Failed to create project"
+    }
+  },
+  "common": {
+    "cancel": "Cancel",
+    "ok": "OK",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "browse": "Browse"
+  },
+  "timeline": {
+    "title": "Timeline",
+    "play": "Play",
+    "pause": "Pause",
+    "stop": "Stop",
+    "previousFrame": "Previous Frame",
+    "nextFrame": "Next Frame",
+    "currentTime": "Current Time",
+    "totalTime": "Total Time",
+    "zoomIn": "Zoom In",
+    "zoomOut": "Zoom Out",
+    "addTrack": "Add Track",
+    "addKeyframe": "Add Keyframe",
+    "deleteKeyframe": "Delete Keyframe"
+  },
+  "preview": {
+    "title": "Preview",
+    "fitToWindow": "Fit to Window",
+    "actualSize": "Actual Size",
+    "zoomIn": "Zoom In",
+    "zoomOut": "Zoom Out",
+    "fullscreen": "Fullscreen"
+  },
+  "properties": {
+    "title": "Properties",
+    "position": "Position",
+    "size": "Size",
+    "rotation": "Rotation",
+    "opacity": "Opacity",
+    "color": "Color",
+    "stroke": "Stroke",
+    "strokeWidth": "Stroke Width",
+    "fill": "Fill"
+  },
+  "export": {
+    "title": "Export Video",
+    "format": "Format",
+    "resolution": "Resolution",
+    "frameRate": "Frame Rate",
+    "quality": "Quality",
+    "destination": "Destination",
+    "startExport": "Start Export",
+    "cancelExport": "Cancel",
+    "progress": "Export Progress",
+    "complete": "Export Complete",
+    "failed": "Export Failed"
+  },
+  "features": {
+    "projectManagement": "Project Management",
+    "projectManagementDesc": "Create and manage your video projects",
+    "animation": "Animation",
+    "animationDesc": "Timeline-based animation editor",
+    "export": "Export",
+    "exportDesc": "Export to MP4, WebM, GIF formats",
+    "i18n": "Multi-language",
+    "i18nDesc": "Support for English and Chinese"
   }
 }

@@ -88,6 +88,7 @@ export default defineConfig({
             { text: '项目管理', link: '/workstation/projects' },
             { text: '编辑器功能', link: '/workstation/editor' },
             { text: '设置配置', link: '/workstation/settings' },
+            { text: '国际化', link: '/workstation/i18n' },
           ],
         },
       ],

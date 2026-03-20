@@ -12,15 +12,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - electron-vite 构建系统配置
 - React + TypeScript 前端框架设置
 - 视频工作站完整文档体系
+- **国际化系统**: 基于 i18next 的多语言支持
+  - 支持英文和中文界面
+  - 语言偏好持久化（Zustand store）
+  - UI 语言选择器
+  - 完整的菜单和界面文本翻译
 
 ### Changed
 - 统一项目版本号为 v0.1.0（开发阶段）
 - 更新文档结构，分离框架文档和工作站文档
+- 扩展翻译文件，覆盖所有主要 UI 文本
 
 ### Technical
 - 初始化 Git 仓库，配置 .gitignore
 - 创建 Git 分支策略文档
 - 建立视频工作站文档目录结构
+- 创建 languageStore 管理语言偏好
 
 ## [0.1.0] - 2026-03-20
 

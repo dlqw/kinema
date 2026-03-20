@@ -7,7 +7,24 @@
     "file": "文件",
     "edit": "编辑",
     "view": "视图",
-    "help": "帮助"
+    "help": "帮助",
+    "file_new": "新建项目",
+    "file_open": "打开项目",
+    "file_save": "保存项目",
+    "file_saveAs": "另存为...",
+    "file_export": "导出视频",
+    "edit_undo": "撤销",
+    "edit_redo": "重做",
+    "edit_cut": "剪切",
+    "edit_copy": "复制",
+    "edit_paste": "粘贴",
+    "edit_delete": "删除",
+    "view_timeline": "时间轴",
+    "view_properties": "属性面板",
+    "view_preview": "预览窗口",
+    "help_documentation": "文档",
+    "help_shortcuts": "快捷键",
+    "help_about": "关于"
   },
   "welcome": {
     "title": "欢迎使用 AniMaker",
@@ -22,13 +39,112 @@
     "system": "跟随系统"
   },
   "language": {
+    "title": "语言",
     "english": "English",
-    "chinese": "中文"
+    "chinese": "中文",
+    "select": "选择语言"
   },
   "status": {
     "ready": "就绪",
     "loading": "加载中...",
     "saving": "保存中...",
-    "saved": "已保存"
+    "saved": "已保存",
+    "error": "错误",
+    "success": "成功"
+  },
+  "project": {
+    "title": "项目管理",
+    "create": "创建项目",
+    "open": "打开项目",
+    "save": "保存项目",
+    "close": "关闭项目",
+    "settings": "项目设置",
+    "properties": "项目属性",
+    "name": "项目名称",
+    "location": "保存位置",
+    "resolution": "分辨率",
+    "frameRate": "帧率",
+    "duration": "时长",
+    "backgroundColor": "背景颜色",
+    "new": {
+      "title": "新建项目",
+      "nameLabel": "项目名称",
+      "namePlaceholder": "我的动画",
+      "locationLabel": "保存位置",
+      "locationPlaceholder": "/path/to/projects",
+      "browse": "浏览...",
+      "create": "创建",
+      "creating": "创建中..."
+    },
+    "error": {
+      "nameRequired": "请输入项目名称",
+      "locationRequired": "请选择保存位置",
+      "createFailed": "创建项目失败"
+    }
+  },
+  "common": {
+    "cancel": "取消",
+    "ok": "确定",
+    "save": "保存",
+    "delete": "删除",
+    "edit": "编辑",
+    "browse": "浏览"
+  },
+  "timeline": {
+    "title": "时间轴",
+    "play": "播放",
+    "pause": "暂停",
+    "stop": "停止",
+    "previousFrame": "上一帧",
+    "nextFrame": "下一帧",
+    "currentTime": "当前时间",
+    "totalTime": "总时长",
+    "zoomIn": "放大",
+    "zoomOut": "缩小",
+    "addTrack": "添加轨道",
+    "addKeyframe": "添加关键帧",
+    "deleteKeyframe": "删除关键帧"
+  },
+  "preview": {
+    "title": "预览",
+    "fitToWindow": "适应窗口",
+    "actualSize": "实际大小",
+    "zoomIn": "放大",
+    "zoomOut": "缩小",
+    "fullscreen": "全屏"
+  },
+  "properties": {
+    "title": "属性",
+    "position": "位置",
+    "size": "尺寸",
+    "rotation": "旋转",
+    "opacity": "不透明度",
+    "color": "颜色",
+    "stroke": "描边",
+    "strokeWidth": "描边宽度",
+    "fill": "填充"
+  },
+  "export": {
+    "title": "导出视频",
+    "format": "格式",
+    "resolution": "分辨率",
+    "frameRate": "帧率",
+    "quality": "质量",
+    "destination": "保存位置",
+    "startExport": "开始导出",
+    "cancelExport": "取消导出",
+    "progress": "导出进度",
+    "complete": "导出完成",
+    "failed": "导出失败"
+  },
+  "features": {
+    "projectManagement": "项目管理",
+    "projectManagementDesc": "创建和管理您的视频项目",
+    "animation": "动画编辑",
+    "animationDesc": "基于时间轴的动画编辑器",
+    "export": "视频导出",
+    "exportDesc": "导出为 MP4、WebM、GIF 格式",
+    "i18n": "多语言支持",
+    "i18nDesc": "支持英文和中文界面"
   }
 }
