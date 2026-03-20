@@ -446,7 +446,7 @@ export class OcclusionCuller {
 
       // Large objects become occluders
       if (this.isLargeObject(obj)) {
-        occluders.push.getBounds?.() || this.boundsFromSphere(obj.bounds));
+        occluders.push(obj.getBounds?.() || this.boundsFromSphere(obj.bounds));
       }
     }
 
