@@ -13,7 +13,7 @@ import type {
   RenderContext,
 } from './types';
 
-import { CapabilityDetector } from './Capability';
+import { CapabilityDetector, RenderAPI } from './Capability';
 import { RenderStatsCollector } from './RenderStats';
 import { RenderContextImpl } from './RenderContext';
 
