@@ -6,7 +6,8 @@
 
 import { ipcMain, dialog, BrowserWindow, app } from 'electron'
 import { join } from 'node:path'
-import { writeFile, readFile, mkdir, existsSync } from 'node:fs/promises'
+import { writeFile, readFile, mkdir } from 'node:fs/promises'
+import { existsSync } from 'node:fs'
 
 // Project state management
 interface ProjectState {

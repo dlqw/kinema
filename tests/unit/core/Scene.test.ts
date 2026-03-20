@@ -69,6 +69,19 @@ class MockRenderObject {
     newStyles.set(key, value);
     return new MockRenderObject({ ...this.state, styles: newStyles });
   }
+
+  // For animation compatibility
+  interpolate(alpha: number): { object: MockRenderObject; complete: boolean } {
+    return { object: this, complete: false };
+  }
+
+  getTotalDuration(): number {
+    return 1;
+  }
+
+  isRemover(): boolean {
+    return false;
+  }
 }
 
 describe('Scene', () => {

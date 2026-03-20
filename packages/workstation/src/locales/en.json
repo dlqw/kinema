@@ -1,0 +1,34 @@
+{
+  "app": {
+    "name": "AniMaker",
+    "title": "AniMaker Video Workstation"
+  },
+  "menu": {
+    "file": "File",
+    "edit": "Edit",
+    "view": "View",
+    "help": "Help"
+  },
+  "welcome": {
+    "title": "Welcome to AniMaker",
+    "subtitle": "Video Workstation v{{version}}",
+    "newProject": "New Project",
+    "openProject": "Open Project",
+    "recentProjects": "Recent Projects"
+  },
+  "theme": {
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System"
+  },
+  "language": {
+    "english": "English",
+    "chinese": "中文"
+  },
+  "status": {
+    "ready": "Ready",
+    "loading": "Loading...",
+    "saving": "Saving...",
+    "saved": "Saved"
+  }
+}

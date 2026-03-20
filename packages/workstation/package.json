@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "description": "AniMaker Video Workstation - Electron desktop application",
   "private": true,
-  "main": "dist-electron/main/index.js",
+  "main": "out/main/index.js",
   "type": "module",
   "scripts": {
     "dev": "electron-vite dev",

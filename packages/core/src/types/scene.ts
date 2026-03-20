@@ -296,18 +296,26 @@ export class Scene {
 
     const newObjects = new Map(this.objects);
     const newActiveAnimations = new Set<Animation>();
+    const animationsToProcess: Animation[] = [];
 
-    // Process queued animations
+    // Process queued animations - add to process list
     for (const { animation, startTime } of this.animationQueue) {
       if (startTime >= this.currentTime && startTime < targetTime) {
-        newActiveAnimations.add(animation);
+        animationsToProcess.push(animation);
       }
     }
 
-    // Update active animations
+    // Also include currently active animations
     for (const animation of this.activeAnimations) {
-      const animationStartTime = this.currentTime - animation.getTotalDuration();
-      const elapsedTime = targetTime - animationStartTime;
+      animationsToProcess.push(animation);
+    }
+
+    // Update all animations that need processing
+    for (const animation of animationsToProcess) {
+      // Calculate animation start time relative to scene time
+      const animationScheduleTime = this.currentTime;
+      const elapsedTime = targetTime - animationScheduleTime;
+
       const { object, complete } = animation.interpolate(elapsedTime);
 
       if (!complete) {
@@ -320,7 +328,7 @@ export class Scene {
       }
     }
 
-    // Filter animation queue
+    // Filter animation queue - remove processed animations
     const newQueue = this.animationQueue.filter(
       ({ startTime }) => startTime >= targetTime
     );

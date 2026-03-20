@@ -1,17 +1,18 @@
 import { app, BrowserWindow, shell } from 'electron'
 import { join } from 'node:path'
-import { electronApp, optimizer, is } from '@electron-toolkit/utils'
-import icon from '../../resources/icon.png?asset'
+import { electronApp, is } from '@electron-toolkit/utils'
 import './ipc-handlers' // Import IPC handlers
+
+// Main window reference for second-instance handling
+let mainWindow: BrowserWindow | null = null
 
 function createWindow(): void {
   // Create the browser window
-  const mainWindow = new BrowserWindow({
+  mainWindow = new BrowserWindow({
     width: 1280,
     height: 720,
     show: false,
     autoHideMenuBar: true,
-    ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
       sandbox: false,
