@@ -7,8 +7,8 @@ declare global {
       // Project management
       createProject: (name: string, path: string) => Promise<any>
       openProject: (path: string) => Promise<any>
-      saveProject: () => Promise<void>
-      closeProject: () => Promise<void>
+      saveProject: () => Promise<{ success: boolean; path?: string; error?: string; canceled?: boolean }>
+      closeProject: () => Promise<{ success: boolean }>
 
       // Video operations
       renderVideo: (config: any) => Promise<string>

@@ -6,3 +6,9 @@
 
 export { useThemeStore } from './themeStore'
 export type { ThemeMode } from './themeStore'
+
+export { useProjectStore } from './projectStore'
+export type { ProjectInfo, ProjectState } from './projectStore'
+
+export { useLanguageStore } from './languageStore'
+export type { LanguageCode } from './languageStore'
