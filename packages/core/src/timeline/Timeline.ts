@@ -141,6 +141,17 @@ export class Timeline {
   }
 
   /**
+   * Resume playback
+   */
+  resume(): void {
+    if (this.state === PlaybackState.Playing) return;
+
+    this.state = PlaybackState.Playing;
+    this.lastFrameTime = performance.now();
+    this.startTick();
+  }
+
+  /**
    * Stop playback and reset to beginning
    */
   stop(): void {

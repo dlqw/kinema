@@ -24,6 +24,24 @@ export default defineConfig({
     }
   },
   renderer: {
+    root: resolve(__dirname, 'electron/renderer'),
+    resolve: {
+      alias: {
+        '@': resolve(__dirname, 'electron/renderer/src'),
+        '@shared': resolve(__dirname, 'electron/shared')
+      }
+    },
+    plugins: [react()],
+    build: {
+      rollupOptions: {
+        input: {
+          index: resolve(__dirname, 'electron/renderer/index.html')
+        }
+      }
+    }
+  }
+})
+  renderer: {
     resolve: {
       alias: {
         '@': resolve(__dirname, 'electron/renderer/src'),
