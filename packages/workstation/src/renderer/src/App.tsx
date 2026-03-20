@@ -4,7 +4,6 @@
  * Root component with i18n and theme support.
  */
 
-import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useThemeStore } from '../../stores'
 import './App.css'
@@ -13,12 +12,7 @@ import '../../i18n' // Initialize i18n
 function App() {
   const { t, i18n } = useTranslation()
   const { effectiveTheme, toggleTheme } = useThemeStore()
-  const [version, setVersion] = useState('0.1.0')
-
-  useEffect(() => {
-    // Version is hardcoded for now
-    // TODO: Get version from main process via IPC
-  }, [])
+  const version = '0.1.0'
 
   const changeLanguage = (lang: string) => {
     i18n.changeLanguage(lang)
