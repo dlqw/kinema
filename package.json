@@ -1,9 +1,9 @@
 {
   "name": "animaker",
   "version": "0.1.0",
-  "description": "High-performance 2D animation rendering framework",
+  "description": "High-performance 2D animation rendering framework + Electron workstation",
   "type": "module",
-  "main": "./dist/index.js",
+  "main": "./electron/out/main/index.js",
   "types": "./dist/index.d.ts",
   "scripts": {
     "build": "tsc",

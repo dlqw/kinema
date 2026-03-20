@@ -110,7 +110,7 @@ export abstract class Animation<T extends RenderObject = RenderObject> {
    * Get the total duration including delay
    */
   getTotalDuration(): number {
-    return (this.config.delay ?? 0) + this.config.duration;
+    return (this._config.delay ?? 0) + this._config.duration;
   }
 
   /**
@@ -120,7 +120,7 @@ export abstract class Animation<T extends RenderObject = RenderObject> {
    * @returns Interpolation result with object state and completion status
    */
   interpolate(elapsedTime: number): InterpolationResult<T> {
-    const delay = this.config.delay ?? 0;
+    const delay = this._config.delay ?? 0;
 
     // Return original object during delay
     if (elapsedTime < delay) {
@@ -129,12 +129,12 @@ export abstract class Animation<T extends RenderObject = RenderObject> {
 
     // Calculate progress
     const progress = Math.min(
-      (elapsedTime - delay) / this.config.duration,
+      (elapsedTime - delay) / this._config.duration,
       1
     ) as Alpha;
 
     // Apply easing function
-    const easedAlpha = this.config.easing(progress);
+    const easedAlpha = this._config.easing(progress);
 
     // Perform interpolation
     const result = this.interpolateAt(easedAlpha);
@@ -158,14 +158,14 @@ export abstract class Animation<T extends RenderObject = RenderObject> {
    * Check if this animation removes the target on completion
    */
   isRemover(): boolean {
-    return this.config.removeOnComplete ?? false;
+    return this._config.removeOnComplete ?? false;
   }
 
   /**
    * Get animation name or class name
    */
   getName(): string {
-    return this.config.name ?? this.constructor.name;
+    return this._config.name ?? this.constructor.name;
   }
 }
 
@@ -196,7 +196,7 @@ export class AnimationBuilder<T extends Animation> {
     return new AnimationBuilder(
       this.AnimationClass,
       this.target,
-      { ...this.config, duration: seconds }
+      { ...this._config, duration: seconds }
     );
   }
 
@@ -209,7 +209,7 @@ export class AnimationBuilder<T extends Animation> {
     return new AnimationBuilder(
       this.AnimationClass,
       this.target,
-      { ...this.config, easing }
+      { ...this._config, easing }
     );
   }
 
@@ -222,7 +222,7 @@ export class AnimationBuilder<T extends Animation> {
     return new AnimationBuilder(
       this.AnimationClass,
       this.target,
-      { ...this.config, delay: seconds }
+      { ...this._config, delay: seconds }
     );
   }
 
@@ -235,7 +235,7 @@ export class AnimationBuilder<T extends Animation> {
     return new AnimationBuilder(
       this.AnimationClass,
       this.target,
-      { ...this.config, removeOnComplete: value }
+      { ...this._config, removeOnComplete: value }
     );
   }
 
@@ -248,7 +248,7 @@ export class AnimationBuilder<T extends Animation> {
     return new AnimationBuilder(
       this.AnimationClass,
       this.target,
-      { ...this.config, name }
+      { ...this._config, name }
     );
   }
 
@@ -263,7 +263,7 @@ export class AnimationBuilder<T extends Animation> {
 
     return new this.AnimationClass(
       this.target,
-      { ...defaults, ...this.config } as AnimationConfig
+      { ...defaults, ...this._config } as AnimationConfig
     );
   }
 }
@@ -440,7 +440,7 @@ export class AnimationGroup extends Animation {
   }
 
   private interpolateSequence(alpha: Alpha): RenderObject {
-    const totalDuration = this.config.duration;
+    const totalDuration = this._config.duration;
     const currentTime = alpha * totalDuration;
 
     let accumulatedTime = 0;
@@ -465,7 +465,7 @@ export class AnimationGroup extends Animation {
 
   private interpolateLagged(alpha: Alpha): RenderObject {
     const lag = 0.1; // Default lag between animations
-    const totalDuration = this.config.duration;
+    const totalDuration = this._config.duration;
     const currentTime = alpha * totalDuration;
 
     let result = this.target;
