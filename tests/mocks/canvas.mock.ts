@@ -3,9 +3,37 @@
  * Provides HTMLCanvasElement and related APIs for Node.js test environment
  */
 
-import { vi } from 'vitest';
-
 export function setupCanvasMock() {
+  // Mock ImageData if not available (Node.js environment)
+  if (typeof ImageData === 'undefined') {
+    class MockImageData {
+      data: Uint8ClampedArray;
+      width: number;
+      height: number;
+
+      constructor(widthOrData: number | Uint8ClampedArray, height?: number) {
+        if (typeof widthOrData === 'number') {
+          this.width = widthOrData;
+          this.height = height ?? widthOrData;
+          this.data = new Uint8ClampedArray(this.width * this.height * 4);
+        } else {
+          this.data = widthOrData;
+          this.width = height ?? Math.sqrt(widthOrData.length / 4) | 0;
+          this.height = (widthOrData.length / 4 / this.width) | 0;
+        }
+      }
+    }
+    (globalThis as any).ImageData = MockImageData;
+  }
+
+  // Mock ImageBitmap if not available
+  if (typeof ImageBitmap === 'undefined') {
+    (globalThis as any).ImageBitmap = class MockImageBitmap {
+      width = 100;
+      height = 100;
+    };
+  }
+
   // Mock HTMLCanvasElement
   class MockCanvasRenderingContext2D {
     fillStyle = '';
@@ -25,28 +53,30 @@ export function setupCanvasMock() {
     textBaseline = 'alphabetic' as const;
     direction = 'ltr' as const;
 
-    // Transformation matrix
-    private transform = [1, 0, 0, 1, 0, 0];
+    // Canvas reference (public to avoid TS4094)
+    canvas: MockCanvas;
 
-    constructor(private canvas: MockCanvas) {}
+    constructor(canvas: MockCanvas) {
+      this.canvas = canvas;
+    }
 
-    clearRect(x: number, y: number, w: number, h: number): void {
+    clearRect(_x: number, _y: number, _w: number, _h: number): void {
       // Mock implementation
     }
 
-    fillRect(x: number, y: number, w: number, h: number): void {
+    fillRect(_x: number, _y: number, _w: number, _h: number): void {
       // Mock implementation
     }
 
-    strokeRect(x: number, y: number, w: number, h: number): void {
+    strokeRect(_x: number, _y: number, _w: number, _h: number): void {
       // Mock implementation
     }
 
-    fillText(text: string, x: number, y: number, maxWidth?: number): void {
+    fillText(_text: string, _x: number, _y: number, _maxWidth?: number): void {
       // Mock implementation
     }
 
-    strokeText(text: string, x: number, y: number, maxWidth?: number): void {
+    strokeText(_text: string, _x: number, _y: number, _maxWidth?: number): void {
       // Mock implementation
     }
 
@@ -62,27 +92,27 @@ export function setupCanvasMock() {
       // Mock implementation
     }
 
-    moveTo(x: number, y: number): void {
+    moveTo(_x: number, _y: number): void {
       // Mock implementation
     }
 
-    lineTo(x: number, y: number): void {
+    lineTo(_x: number, _y: number): void {
       // Mock implementation
     }
 
-    quadraticCurveTo(cpx: number, cpy: number, x: number, y: number): void {
+    quadraticCurveTo(_cpx: number, _cpy: number, _x: number, _y: number): void {
       // Mock implementation
     }
 
-    bezierCurveTo(cp1x: number, cp1y: number, cp2x: number, cp2y: number, x: number, y: number): void {
+    bezierCurveTo(_cp1x: number, _cp1y: number, _cp2x: number, _cp2y: number, _x: number, _y: number): void {
       // Mock implementation
     }
 
-    arc(x: number, y: number, radius: number, startAngle: number, endAngle: number, anticlockwise?: boolean): void {
+    arc(_x: number, _y: number, _radius: number, _startAngle: number, _endAngle: number, _anticlockwise?: boolean): void {
       // Mock implementation
     }
 
-    rect(x: number, y: number, w: number, h: number): void {
+    rect(_x: number, _y: number, _w: number, _h: number): void {
       // Mock implementation
     }
 
@@ -94,23 +124,23 @@ export function setupCanvasMock() {
       // Mock implementation
     }
 
-    translate(x: number, y: number): void {
+    translate(_x: number, _y: number): void {
       // Mock implementation
     }
 
-    rotate(angle: number): void {
+    rotate(_angle: number): void {
       // Mock implementation
     }
 
-    scale(x: number, y: number): void {
+    scale(_x: number, _y: number): void {
       // Mock implementation
     }
 
-    transform(a: number, b: number, c: number, d: number, e: number, f: number): void {
+    transform(_a: number, _b: number, _c: number, _d: number, _e: number, _f: number): void {
       // Mock implementation
     }
 
-    setTransform(a: number, b: number, c: number, d: number, e: number, f: number): void {
+    setTransform(_a: number, _b: number, _c: number, _d: number, _e: number, _f: number): void {
       // Mock implementation
     }
 
@@ -122,47 +152,47 @@ export function setupCanvasMock() {
       return new ImageData(sw, sh);
     }
 
-    getImageData(sx: number, sy: number, sw: number, sh: number): ImageData {
+    getImageData(_sx: number, _sy: number, sw: number, sh: number): ImageData {
       return new ImageData(sw, sh);
     }
 
-    putImageData(imageData: ImageData, dx: number, dy: number): void {
+    putImageData(_imageData: ImageData, _dx: number, _dy: number): void {
       // Mock implementation
     }
 
-    drawImage(image: CanvasImageSource, dx: number, dy: number, dw?: number, dh?: number, sx?: number, sy?: number, sw?: number, sh?: number): void {
+    drawImage(_image: CanvasImageSource, _dx: number, _dy: number, _dw?: number, _dh?: number, _sx?: number, _sy?: number, _sw?: number, _sh?: number): void {
       // Mock implementation
     }
 
-    createPattern(image: CanvasImageSource, repetition: string): CanvasPattern | null {
+    createPattern(_image: CanvasImageSource, _repetition: string): CanvasPattern | null {
       return null;
     }
 
-    createLinearGradient(x0: number, y0: number, x1: number, y1: number): CanvasGradient {
+    createLinearGradient(_x0: number, _y0: number, _x1: number, _y1: number): CanvasGradient {
       return {
-        addColorStop(offset: number, color: string): void {
+        addColorStop(_offset: number, _color: string): void {
           // Mock implementation
         },
-      } as any;
+      } as CanvasGradient;
     }
 
-    createRadialGradient(x0: number, y0: number, r0: number, x1: number, y1: number, r1: number): CanvasGradient {
+    createRadialGradient(_x0: number, _y0: number, _r0: number, _x1: number, _y1: number, _r1: number): CanvasGradient {
       return {
-        addColorStop(offset: number, color: string): void {
+        addColorStop(_offset: number, _color: string): void {
           // Mock implementation
         },
-      } as any;
+      } as CanvasGradient;
     }
 
     clip(): void {
       // Mock implementation
     }
 
-    isPointInPath(path: Path2D, x: number, y: number): boolean {
+    isPointInPath(_path: Path2D, _x: number, _y: number): boolean {
       return false;
     }
 
-    isPointInStroke(path: Path2D, x: number, y: number): boolean {
+    isPointInStroke(_path: Path2D, _x: number, _y: number): boolean {
       return false;
     }
   }
@@ -178,7 +208,7 @@ export function setupCanvasMock() {
       return null;
     }
 
-    toBlob(callback: (blob: Blob | null) => void, type?: string, quality?: number): void {
+    toBlob(callback: (blob: Blob | null) => void, type?: string, _quality?: number): void {
       // Simulate async blob creation
       setTimeout(() => {
         const mockData = new Uint8Array([0x89, 0x50, 0x4E, 0x47]); // PNG header
@@ -187,13 +217,49 @@ export function setupCanvasMock() {
       }, 0);
     }
 
-    toDataURL(type?: string, quality?: number): string {
+    toDataURL(type?: string, _quality?: number): string {
       return `data:${type || 'image/png'};base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QD0ADQG0UnwjGQAAAABJRU5ErkJggg==`;
+    }
+
+    captureStream(_frameRate?: number): MediaStream {
+      // Return a mock MediaStream
+      return new MockMediaStream();
+    }
+  }
+
+  // Mock MediaStream
+  class MockMediaStream {
+    active = true;
+    id = 'mock-stream-' + Math.random().toString(36).slice(2);
+
+    getTracks(): MediaStreamTrack[] {
+      return [new MockMediaStreamTrack()];
+    }
+
+    getVideoTracks(): MediaStreamTrack[] {
+      return [new MockMediaStreamTrack()];
+    }
+
+    getAudioTracks(): MediaStreamTrack[] {
+      return [];
+    }
+  }
+
+  // Mock MediaStreamTrack
+  class MockMediaStreamTrack {
+    kind: 'video' | 'audio' = 'video';
+    id = 'mock-track-' + Math.random().toString(36).slice(2);
+    enabled = true;
+    muted = false;
+    readyState: 'live' | 'ended' = 'live';
+
+    stop(): void {
+      this.readyState = 'ended';
     }
   }
 
   // Set up global mocks
-  global.HTMLCanvasElement = MockCanvas as any;
+  global.HTMLCanvasElement = MockCanvas as unknown as typeof HTMLCanvasElement;
 
   // Mock document.createElement
   if (!global.document) {
@@ -202,20 +268,51 @@ export function setupCanvasMock() {
         if (tag === 'canvas') {
           return new MockCanvas();
         }
+        if (tag === 'a') {
+          return {
+            href: '',
+            download: '',
+            click: () => {},
+            remove: () => {},
+          };
+        }
         return {};
       },
-    } as any;
+      body: {
+        appendChild: () => {},
+        removeChild: () => {},
+      } as any,
+    } as unknown as Document;
   }
+
+  // Mock URL.createObjectURL and URL.revokeObjectURL
+  if (typeof global.URL === 'undefined' || !global.URL.createObjectURL) {
+    const MockURL = class URL {
+      static createObjectURL(_blob: Blob): string {
+        return `blob:mock-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+      }
+      static revokeObjectURL(_url: string): void {
+        // No-op
+      }
+    };
+    global.URL = MockURL as any;
+  }
+
+  // Set up global MediaStream mocks
+  (globalThis as any).MediaStream = MockMediaStream;
+  (globalThis as any).MediaStreamTrack = MockMediaStreamTrack;
 
   return {
     MockCanvas,
     MockCanvasRenderingContext2D,
+    MockMediaStream,
+    MockMediaStreamTrack,
   };
 }
 
 export function cleanupCanvasMock() {
   // Clean up mocks if needed
-  delete (global as any).HTMLCanvasElement;
+  delete (global as unknown as { HTMLCanvasElement?: unknown }).HTMLCanvasElement;
 }
 
 // Auto-setup for test environment
