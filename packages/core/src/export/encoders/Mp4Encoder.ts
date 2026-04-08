@@ -50,7 +50,11 @@ let ffmpegLoadPromise: Promise<void> | null = null;
  * Check if FFmpeg.wasm is available
  */
 function isFFmpegAvailable(): boolean {
-  return ffmpegInstance !== null || typeof (globalThis as any).FFmpeg !== 'undefined';
+  return (
+    typeof (globalThis as any).ffmpeg !== 'undefined' ||
+    typeof (globalThis as any).FFmpegWASM !== 'undefined' ||
+    ffmpegInstance !== null
+  );
 }
 
 /**
@@ -87,7 +91,7 @@ async function getFFmpeg(): Promise<FFmpegInterface | null> {
  */
 async function loadFFmpeg(
   config?: FFmpegLoadOptions,
-  onProgress?: (progress: number) => void
+  onProgress?: (progress: number) => void,
 ): Promise<FFmpegInterface | null> {
   // Return existing promise if loading
   if (ffmpegLoadPromise) {
@@ -105,12 +109,21 @@ async function loadFFmpeg(
   }
 
   // Start loading
-  ffmpegLoadPromise = ffmpeg.load({
-    coreURL: config?.coreURL,
-    wasmURL: config?.wasmURL,
-    workerURL: config?.workerURL,
+  const loadOptions: FFmpegLoadOptions = {
     log: config?.log ?? false,
-  });
+  };
+
+  if (config?.coreURL !== undefined) {
+    loadOptions.coreURL = config.coreURL;
+  }
+  if (config?.wasmURL !== undefined) {
+    loadOptions.wasmURL = config.wasmURL;
+  }
+  if (config?.workerURL !== undefined) {
+    loadOptions.workerURL = config.workerURL;
+  }
+
+  ffmpegLoadPromise = ffmpeg.load(loadOptions);
 
   // Setup progress handler
   if (onProgress) {
@@ -239,11 +252,11 @@ export class Mp4Encoder implements Encoder<MP4EncoderOptions> {
     if (status.loadingRequired) {
       this.loading = true;
       try {
-        this.ffmpeg = await loadFFmpeg({
-          coreURL: config?.coreURL,
-          wasmURL: config?.wasmURL,
-          workerURL: config?.workerURL,
-        }, this.loadProgressCallback);
+        const loadConfig: { coreURL?: string; wasmURL?: string; workerURL?: string } = {};
+        if (config?.coreURL !== undefined) loadConfig.coreURL = config.coreURL;
+        if (config?.wasmURL !== undefined) loadConfig.wasmURL = config.wasmURL;
+        if (config?.workerURL !== undefined) loadConfig.workerURL = config.workerURL;
+        this.ffmpeg = await loadFFmpeg(loadConfig, this.loadProgressCallback);
 
         if (!this.ffmpeg) {
           throw new Error('Failed to initialize FFmpeg.wasm');
@@ -281,7 +294,7 @@ export class Mp4Encoder implements Encoder<MP4EncoderOptions> {
   async encode(
     frames: ImageData[],
     options: MP4EncoderOptions,
-    onProgress?: EncoderProgressCallback
+    onProgress?: EncoderProgressCallback,
   ): Promise<Blob> {
     const mergedOptions = { ...this.options, ...options };
     this.aborted = false;
@@ -312,7 +325,7 @@ export class Mp4Encoder implements Encoder<MP4EncoderOptions> {
         throw new Error('Encoding was aborted');
       }
 
-      const frame = frames[i];
+      const frame = frames[i]!;
       const pngData = await this.imageDataToPNG(frame);
       const fileName = `input_${i.toString().padStart(6, '0')}.png`;
 
@@ -320,7 +333,7 @@ export class Mp4Encoder implements Encoder<MP4EncoderOptions> {
       frameFiles.push(fileName);
 
       // Report progress (0-70% for frame writing)
-      onProgress?.((i + 1) / totalFrames * 0.7);
+      onProgress?.(((i + 1) / totalFrames) * 0.7);
     }
 
     // Report progress - encoding
@@ -354,14 +367,21 @@ export class Mp4Encoder implements Encoder<MP4EncoderOptions> {
     try {
       // Execute FFmpeg command
       await this.ffmpeg.exec([
-        '-framerate', '30', // Default to 30fps
-        '-i', inputPattern,
-        '-c:v', ffmpegCodec,
-        '-b:v', String(bitrate),
-        '-g', String(gopSize),
-        '-pix_fmt', 'yuv420p',
-        '-movflags', '+faststart',
-        'output.mp4'
+        '-framerate',
+        '30', // Default to 30fps
+        '-i',
+        inputPattern,
+        '-c:v',
+        ffmpegCodec,
+        '-b:v',
+        String(bitrate),
+        '-g',
+        String(gopSize),
+        '-pix_fmt',
+        'yuv420p',
+        '-movflags',
+        '+faststart',
+        'output.mp4',
       ]);
 
       // Report progress - reading output
@@ -390,8 +410,7 @@ export class Mp4Encoder implements Encoder<MP4EncoderOptions> {
       onProgress?.(1);
 
       // Create blob
-      return new Blob([data.buffer], { type: 'video/mp4' });
-
+      return new Blob([new Uint8Array(data.buffer as ArrayBuffer)], { type: 'video/mp4' });
     } finally {
       this.ffmpeg.off('progress', progressHandler);
     }
@@ -415,14 +434,18 @@ export class Mp4Encoder implements Encoder<MP4EncoderOptions> {
 
     // Convert to blob
     return new Promise((resolve, reject) => {
-      canvas.toBlob(async (blob) => {
+      canvas.toBlob((blob) => {
         if (!blob) {
           reject(new Error('Failed to convert frame to PNG'));
           return;
         }
 
-        const arrayBuffer = await blob.arrayBuffer();
-        resolve(new Uint8Array(arrayBuffer));
+        void blob
+          .arrayBuffer()
+          .then((arrayBuffer) => {
+            resolve(new Uint8Array(arrayBuffer));
+          })
+          .catch(reject);
       }, 'image/png');
     });
   }
@@ -440,6 +463,8 @@ export class Mp4Encoder implements Encoder<MP4EncoderOptions> {
   dispose(): void {
     this.abort();
     this.ffmpeg = null;
+    ffmpegInstance = null;
+    ffmpegLoadPromise = null;
   }
 }
 

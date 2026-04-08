@@ -7,8 +7,14 @@
  */
 
 import type { Scene } from '../types';
-import { Exporter, ExportConfig, ExportProgress, ExportResult } from './Exporter';
-import { FrameEncoder, EncodedFrame, CanvasFrameEncoder } from './FrameEncoder';
+import { Exporter, ExportProgress, ExportResult } from './Exporter';
+import type { ExportConfig } from './Exporter';
+import {
+  FrameEncoder,
+  EncodedFrame,
+  CanvasFrameEncoder,
+  type FrameEncoderOptions,
+} from './FrameEncoder';
 
 /**
  * Image sequence export configuration
@@ -60,10 +66,14 @@ export class ImageExporter extends Exporter {
 
   constructor(config: ImageExportConfig) {
     super(config);
-    this.encoder = new CanvasFrameEncoder({
-      format: config.format,
-      backgroundColor: config.backgroundColor
-    });
+    const encoderOptions: FrameEncoderOptions = {};
+    if (config.format !== undefined) {
+      encoderOptions.format = config.format;
+    }
+    if (config.backgroundColor !== undefined) {
+      encoderOptions.backgroundColor = config.backgroundColor;
+    }
+    this.encoder = new CanvasFrameEncoder(encoderOptions);
   }
 
   /**
@@ -71,10 +81,12 @@ export class ImageExporter extends Exporter {
    */
   async export(
     scene: Scene,
-    progressCallback?: (progress: ExportProgress) => void
+    progressCallback?: (progress: ExportProgress) => void,
   ): Promise<ImageExportResult> {
     this.validateConfig();
-    this.progressCallback = progressCallback;
+    if (progressCallback !== undefined) {
+      this.progressCallback = progressCallback;
+    }
     this.resetCancel();
 
     try {
@@ -92,18 +104,19 @@ export class ImageExporter extends Exporter {
         if (this.cancelled) {
           return {
             success: false,
-            error: 'Export was cancelled'
+            frameCount: 0,
+            error: 'Export was cancelled',
           };
         }
 
-        const time = startTime + (i / fps);
+        const time = startTime + i / fps;
         const frameNumber = i;
 
         // Render and encode frame
         const encoded = await this.encoder.encodeFrame(
           this.renderFrame(scene, time),
           time,
-          frameNumber
+          frameNumber,
         );
 
         // Save frame (in browser, would trigger download; in Node.js, would write to disk)
@@ -119,7 +132,7 @@ export class ImageExporter extends Exporter {
           currentFrame,
           totalFrames: frameCount,
           progress: currentFrame / frameCount,
-          operation: 'Encoding frames'
+          operation: 'Encoding frames',
         });
       }
 
@@ -127,13 +140,13 @@ export class ImageExporter extends Exporter {
         success: true,
         output: config.output,
         frameCount,
-        frames
+        frames,
       };
-
     } catch (error) {
       return {
         success: false,
-        error: error instanceof Error ? error.message : String(error)
+        frameCount: 0,
+        error: error instanceof Error ? error.message : String(error),
       };
     }
   }
@@ -189,10 +202,14 @@ export class SingleImageExporter extends Exporter {
 
   constructor(config: ExportConfig & { time?: number; format?: 'png' | 'jpeg' | 'webp' }) {
     super(config);
-    this.encoder = new CanvasFrameEncoder({
-      format: config.format,
-      backgroundColor: config.backgroundColor
-    });
+    const encoderOptions: FrameEncoderOptions = {};
+    if (config.format !== undefined) {
+      encoderOptions.format = config.format;
+    }
+    if (config.backgroundColor !== undefined) {
+      encoderOptions.backgroundColor = config.backgroundColor;
+    }
+    this.encoder = new CanvasFrameEncoder(encoderOptions);
   }
 
   /**
@@ -200,10 +217,12 @@ export class SingleImageExporter extends Exporter {
    */
   async export(
     scene: Scene,
-    progressCallback?: (progress: ExportProgress) => void
+    progressCallback?: (progress: ExportProgress) => void,
   ): Promise<ExportResult> {
     this.validateConfig();
-    this.progressCallback = progressCallback;
+    if (progressCallback !== undefined) {
+      this.progressCallback = progressCallback;
+    }
     this.resetCancel();
 
     try {
@@ -213,14 +232,10 @@ export class SingleImageExporter extends Exporter {
         currentFrame: 1,
         totalFrames: 1,
         progress: 0.5,
-        operation: 'Rendering frame'
+        operation: 'Rendering frame',
       });
 
-      const encoded = await this.encoder.encodeFrame(
-        this.renderFrame(scene, time),
-        time,
-        0
-      );
+      const encoded = await this.encoder.encodeFrame(this.renderFrame(scene, time), time, 0);
 
       // Download the image
       const fileName = this.config.output;
@@ -230,19 +245,18 @@ export class SingleImageExporter extends Exporter {
         currentFrame: 1,
         totalFrames: 1,
         progress: 1,
-        operation: 'Complete'
+        operation: 'Complete',
       });
 
       return {
         success: true,
         output: fileName,
-        size: encoded.data.size
+        size: encoded.data instanceof ArrayBuffer ? encoded.data.byteLength : encoded.data.size,
       };
-
     } catch (error) {
       return {
         success: false,
-        error: error instanceof Error ? error.message : String(error)
+        error: error instanceof Error ? error.message : String(error),
       };
     }
   }
@@ -291,11 +305,11 @@ export async function exportAsImage(
     time?: number;
     format?: 'png' | 'jpeg' | 'webp';
     quality?: number;
-  } = {}
+  } = {},
 ): Promise<ExportResult> {
   const exporter = new SingleImageExporter({
     output,
-    ...options
+    ...options,
   });
 
   return exporter.export(scene);
@@ -326,11 +340,11 @@ export async function exportAsImageSequence(
     format?: 'png' | 'jpeg' | 'webp';
     quality?: number;
     startTime?: number;
-  } = {}
+  } = {},
 ): Promise<ImageExportResult> {
   const exporter = new ImageExporter({
     output,
-    ...options
+    ...options,
   });
 
   return exporter.export(scene);
@@ -340,4 +354,3 @@ export async function exportAsImageSequence(
  * Default export
  */
 export default ImageExporter;
-export { SingleImageExporter, exportAsImage, exportAsImageSequence };

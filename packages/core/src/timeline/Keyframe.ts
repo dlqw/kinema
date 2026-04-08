@@ -6,7 +6,7 @@
  * @module timeline/Keyframe
  */
 
-import type { RenderObject, Transform } from '../types';
+import type { RenderObject, Transform, Point3D } from '../types';
 
 /**
  * Keyframe interpolation types
@@ -15,7 +15,7 @@ export enum KeyframeInterpolation {
   Linear = 'linear',
   Step = 'step',
   Smooth = 'smooth',
-  Cubic = 'cubic'
+  Cubic = 'cubic',
 }
 
 /**
@@ -55,7 +55,7 @@ export class KeyframeTrack {
 
   constructor(
     public readonly property: string,
-    public readonly target: RenderObject
+    public readonly target: RenderObject,
   ) {}
 
   /**
@@ -74,14 +74,16 @@ export class KeyframeTrack {
     options: {
       interpolation?: KeyframeInterpolation;
       easing?: KeyframeEasing;
-    } = {}
+    } = {},
   ): KeyframeTrack {
     const keyframe: KeyframeDefinition = {
       time,
       transform,
       interpolation: options.interpolation ?? KeyframeInterpolation.Linear,
-      easing: options.easing
     };
+    if (options.easing !== undefined) {
+      keyframe.easing = options.easing;
+    }
 
     this.keyframes.set(time, keyframe);
     return this;
@@ -99,8 +101,7 @@ export class KeyframeTrack {
    * Get all keyframes sorted by time
    */
   getKeyframes(): KeyframeDefinition[] {
-    return Array.from(this.keyframes.values())
-      .sort((a, b) => a.time - b.time);
+    return Array.from(this.keyframes.values()).sort((a, b) => a.time - b.time);
   }
 
   /**
@@ -118,24 +119,27 @@ export class KeyframeTrack {
 
     if (times.length === 0) return undefined;
 
+    const firstTime = times[0]!;
+    const lastTime = times[times.length - 1]!;
+
     // Before first keyframe
-    if (time <= times[0]) {
-      return this.keyframes.get(times[0])?.transform;
+    if (time <= firstTime) {
+      return this.keyframes.get(firstTime)?.transform;
     }
 
     // After last keyframe
-    if (time >= times[times.length - 1]) {
-      return this.keyframes.get(times[times.length - 1])?.transform;
+    if (time >= lastTime) {
+      return this.keyframes.get(lastTime)?.transform;
     }
 
     // Find surrounding keyframes
     let i = 0;
-    while (i < times.length - 1 && times[i + 1] <= time) {
+    while (i < times.length - 1 && times[i + 1]! <= time) {
       i++;
     }
 
-    const startTime = times[i];
-    const endTime = times[i + 1];
+    const startTime = times[i]!;
+    const endTime = times[i + 1]!;
     const startKeyframe = this.keyframes.get(startTime)!;
     const endKeyframe = this.keyframes.get(endTime)!;
 
@@ -144,16 +148,14 @@ export class KeyframeTrack {
     const progress = (time - startTime) / duration;
 
     // Apply easing
-    const easedProgress = startKeyframe.easing
-      ? startKeyframe.easing(progress)
-      : progress;
+    const easedProgress = startKeyframe.easing ? startKeyframe.easing(progress) : progress;
 
     // Interpolate based on method
     return this.interpolate(
       startKeyframe.transform,
       endKeyframe.transform,
       easedProgress,
-      startKeyframe.interpolation ?? KeyframeInterpolation.Linear
+      startKeyframe.interpolation ?? KeyframeInterpolation.Linear,
     );
   }
 
@@ -164,7 +166,7 @@ export class KeyframeTrack {
     start: Partial<Transform>,
     end: Partial<Transform>,
     t: number,
-    method: KeyframeInterpolation
+    method: KeyframeInterpolation,
   ): Partial<Transform> {
     switch (method) {
       case KeyframeInterpolation.Step:
@@ -188,40 +190,62 @@ export class KeyframeTrack {
   private linearInterpolate(
     start: Partial<Transform>,
     end: Partial<Transform>,
-    t: number
+    t: number,
   ): Partial<Transform> {
     const lerp = (s: number | undefined, e: number | undefined): number | undefined => {
-      if (s === undefined || e === undefined) return s;
+      if (s === undefined || e === undefined) return undefined;
       return s + (e - s) * t;
     };
 
-    return {
-      position: {
-        x: lerp(start.position?.x, end.position?.x),
-        y: lerp(start.position?.y, end.position?.y),
-        z: lerp(start.position?.z, end.position?.z)
-      },
-      rotation: {
-        x: lerp(start.rotation?.x, end.rotation?.x),
-        y: lerp(start.rotation?.y, end.rotation?.y),
-        z: lerp(start.rotation?.z, end.rotation?.z)
-      },
-      scale: {
-        x: lerp(start.scale?.x, end.scale?.x),
-        y: lerp(start.scale?.y, end.scale?.y),
-        z: lerp(start.scale?.z, end.scale?.z)
-      },
-      opacity: lerp(start.opacity, end.opacity)
+    const lerpPoint = (s: Point3D | undefined, e: Point3D | undefined): Point3D | undefined => {
+      if (s === undefined && e === undefined) return undefined;
+      if (s === undefined) return e;
+      if (e === undefined) return s;
+      return {
+        x: lerp(s.x, e.x) ?? 0,
+        y: lerp(s.y, e.y) ?? 0,
+        z: lerp(s.z, e.z) ?? 0,
+      };
     };
-  }
 
+    // Use type assertion to work around readonly properties
+    const result = {} as {
+      position?: Point3D;
+      rotation?: Point3D;
+      scale?: Point3D;
+      opacity?: number;
+    };
+
+    // Only add properties that exist in either start or end
+    if (start.position !== undefined || end.position !== undefined) {
+      const pos = lerpPoint(start.position, end.position);
+      if (pos) result.position = pos;
+    }
+
+    if (start.rotation !== undefined || end.rotation !== undefined) {
+      const rot = lerpPoint(start.rotation, end.rotation);
+      if (rot) result.rotation = rot;
+    }
+
+    if (start.scale !== undefined || end.scale !== undefined) {
+      const sc = lerpPoint(start.scale, end.scale);
+      if (sc) result.scale = sc;
+    }
+
+    const opacity = lerp(start.opacity, end.opacity);
+    if (opacity !== undefined) {
+      result.opacity = opacity;
+    }
+
+    return result as Partial<Transform>;
+  }
   /**
    * Smooth interpolation (S-curve)
    */
   private smoothInterpolate(
     start: Partial<Transform>,
     end: Partial<Transform>,
-    t: number
+    t: number,
   ): Partial<Transform> {
     const smooth = (v: number): number => v * v * (3 - 2 * v);
     return this.linearInterpolate(start, end, smooth(t));
@@ -233,10 +257,9 @@ export class KeyframeTrack {
   private cubicInterpolate(
     start: Partial<Transform>,
     end: Partial<Transform>,
-    t: number
+    t: number,
   ): Partial<Transform> {
-    const cubic = (v: number): number =>
-      v * v * v * (v * (v * 6 - 15) + 10);
+    const cubic = (v: number): number => v * v * v * (v * (v * 6 - 15) + 10);
     return this.linearInterpolate(start, end, cubic(t));
   }
 
@@ -257,9 +280,12 @@ export class KeyframeTrack {
   getRange(): { min: number; max: number } | undefined {
     const times = this.getTimes();
     if (times.length === 0) return undefined;
+    const first = times[0];
+    const last = times[times.length - 1];
+    if (first === undefined || last === undefined) return undefined;
     return {
-      min: times[0],
-      max: times[times.length - 1]
+      min: first,
+      max: last,
     };
   }
 }
@@ -334,7 +360,7 @@ export class KeyframeManager {
   evaluate(time: number): Partial<Transform> {
     const result: Partial<Transform> = {};
 
-    for (const [property, track] of this.tracks) {
+    for (const [_property, track] of this.tracks) {
       const value = track.evaluate(time);
       if (value) {
         Object.assign(result, value);
@@ -373,35 +399,57 @@ export function createKeyframes(
     transform: Partial<Transform>;
     interpolation?: KeyframeInterpolation;
     easing?: KeyframeEasing;
-  }>
+  }>,
 ): KeyframeManager {
   const manager = new KeyframeManager(target);
 
   // Group keyframes by property
-  const byProperty = new Map<string, typeof keyframes>();
+  const byProperty = new Map<
+    string,
+    Array<{
+      time: number;
+      transform: Partial<Transform>;
+      interpolation?: KeyframeInterpolation;
+      easing?: KeyframeEasing;
+    }>
+  >();
 
   for (const kf of keyframes) {
-    for (const property of Object.keys(kf.transform)) {
-      if (!byProperty.has(property)) {
-        byProperty.set(property, []);
+    for (const _property of Object.keys(kf.transform)) {
+      if (!byProperty.has(_property)) {
+        byProperty.set(_property, []);
       }
-      byProperty.get(property)!.push({
+      const entry: {
+        time: number;
+        transform: Partial<Transform>;
+        interpolation?: KeyframeInterpolation;
+        easing?: KeyframeEasing;
+      } = {
         time: kf.time,
-        transform: { [property]: kf.transform[property as keyof Transform] },
-        interpolation: kf.interpolation,
-        easing: kf.easing
-      });
+        transform: { [_property]: kf.transform[_property as keyof Transform] },
+      };
+      if (kf.interpolation !== undefined) {
+        entry.interpolation = kf.interpolation;
+      }
+      if (kf.easing !== undefined) {
+        entry.easing = kf.easing;
+      }
+      byProperty.get(_property)!.push(entry);
     }
   }
 
   // Add to tracks
-  for (const [property, kfs] of byProperty) {
-    const track = manager.getTrack(property);
+  for (const [_property, kfs] of byProperty) {
+    const track = manager.getTrack(_property);
     for (const kf of kfs) {
-      track.at(kf.time, kf.transform as Partial<Transform>, {
-        interpolation: kf.interpolation,
-        easing: kf.easing
-      });
+      const opts: { interpolation?: KeyframeInterpolation; easing?: KeyframeEasing } = {};
+      if (kf.interpolation !== undefined) {
+        opts.interpolation = kf.interpolation;
+      }
+      if (kf.easing !== undefined) {
+        opts.easing = kf.easing;
+      }
+      track.at(kf.time, kf.transform as Partial<Transform>, opts);
     }
   }
 
@@ -412,4 +460,3 @@ export function createKeyframes(
  * Default export
  */
 export default KeyframeTrack;
-export { KeyframeManager, createKeyframes };

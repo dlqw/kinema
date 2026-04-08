@@ -159,7 +159,7 @@ export class WebMEncoder implements Encoder<WebMEncoderOptions> {
   async encode(
     frames: ImageData[],
     options: WebMEncoderOptions,
-    onProgress?: EncoderProgressCallback
+    onProgress?: EncoderProgressCallback,
   ): Promise<Blob> {
     const mergedOptions = { ...this.options, ...options };
     this.aborted = false;
@@ -180,8 +180,8 @@ export class WebMEncoder implements Encoder<WebMEncoderOptions> {
     const mimeType = CODEC_MIME_TYPES[codec];
 
     // Setup canvas
-    const width = mergedOptions.width ?? frames[0].width;
-    const height = mergedOptions.height ?? frames[0].height;
+    const width = mergedOptions.width ?? frames[0]!.width;
+    const height = mergedOptions.height ?? frames[0]!.height;
 
     this.setupCanvas(width, height);
 
@@ -237,7 +237,7 @@ export class WebMEncoder implements Encoder<WebMEncoderOptions> {
   private async processFrames(
     frames: ImageData[],
     options: WebMEncoderOptions,
-    onProgress?: EncoderProgressCallback
+    onProgress?: EncoderProgressCallback,
   ): Promise<void> {
     const frameDelay = options.keyframeInterval ? 1000 / 30 : 33; // ~30fps default
 
@@ -258,7 +258,7 @@ export class WebMEncoder implements Encoder<WebMEncoderOptions> {
       }
 
       // Draw frame
-      this.ctx!.putImageData(frame, 0, 0);
+      this.ctx!.putImageData(frame!, 0, 0);
 
       // Report progress
       if (onProgress) {
@@ -291,7 +291,7 @@ export class WebMEncoder implements Encoder<WebMEncoderOptions> {
    * Delay helper
    */
   private delay(ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 
   /**
@@ -336,9 +336,11 @@ export const webMEncoderCapabilities: EncoderCapability = {
     if (typeof MediaRecorder === 'undefined') {
       return false;
     }
-    return MediaRecorder.isTypeSupported('video/webm;codecs=vp9') ||
-           MediaRecorder.isTypeSupported('video/webm;codecs=vp8') ||
-           MediaRecorder.isTypeSupported('video/webm;codecs=av1');
+    return (
+      MediaRecorder.isTypeSupported('video/webm;codecs=vp9') ||
+      MediaRecorder.isTypeSupported('video/webm;codecs=vp8') ||
+      MediaRecorder.isTypeSupported('video/webm;codecs=av1')
+    );
   },
 };
 

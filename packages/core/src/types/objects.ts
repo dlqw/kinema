@@ -28,7 +28,7 @@ export enum GeometryType {
   Curve = 'curve',
   Arc = 'arc',
   Ellipse = 'ellipse',
-  Path = 'path'
+  Path = 'path',
 }
 
 /**
@@ -74,6 +74,12 @@ export interface RenderObjectState {
   readonly z_index: number;
   readonly styles: ReadonlyMap<string, unknown>;
   readonly parentId?: ObjectId;
+  /** Position in 3D space */
+  readonly position: Point3D;
+  /** Rotation in 3D space */
+  readonly rotation: Point3D;
+  /** Scale in 3D space */
+  readonly scale: Point3D;
 }
 
 /**
@@ -88,9 +94,7 @@ export interface RenderObjectState {
  * All render objects are immutable - state changes return new instances.
  */
 export abstract class RenderObject {
-  protected constructor(
-    protected readonly state: RenderObjectState
-  ) {}
+  protected constructor(protected readonly state: RenderObjectState) {}
 
   /**
    * Get the unique identifier
@@ -168,7 +172,7 @@ export abstract class RenderObject {
    */
   withOpacity(opacity: number): RenderObject {
     return this.withTransform({
-      opacity: Math.max(0, Math.min(1, opacity))
+      opacity: Math.max(0, Math.min(1, opacity)),
     });
   }
 
@@ -178,7 +182,7 @@ export abstract class RenderObject {
   withZIndex(z: number): RenderObject {
     return this.withNewState({
       ...this.state,
-      z_index: z
+      z_index: z,
     });
   }
 
@@ -188,7 +192,7 @@ export abstract class RenderObject {
   show(): RenderObject {
     return this.withNewState({
       ...this.state,
-      visible: true
+      visible: true,
     });
   }
 
@@ -198,7 +202,7 @@ export abstract class RenderObject {
   hide(): RenderObject {
     return this.withNewState({
       ...this.state,
-      visible: false
+      visible: false,
     });
   }
 
@@ -210,7 +214,7 @@ export abstract class RenderObject {
     newStyles.set(key, value);
     return this.withNewState({
       ...this.state,
-      styles: newStyles
+      styles: newStyles,
     });
   }
 
@@ -220,7 +224,7 @@ export abstract class RenderObject {
   protected withNewState(newState: Partial<RenderObjectState>): RenderObject {
     return new (this.constructor as any)({
       ...this.state,
-      ...newState
+      ...newState,
     });
   }
 }
@@ -240,7 +244,7 @@ export class VectorObject extends RenderObject {
     public readonly geometryType: GeometryType,
     public readonly points: ReadonlyArray<Point3D>,
     public readonly stroke?: StrokeStyle,
-    public readonly fill?: FillStyle
+    public readonly fill?: FillStyle,
   ) {
     super(state);
   }
@@ -253,12 +257,12 @@ export class VectorObject extends RenderObject {
     return new VectorObject(
       {
         ...this.state,
-        transform: { ...this.state.transform, ...transform }
+        transform: { ...this.state.transform, ...transform },
       },
       this.geometryType,
       this.points,
       this.stroke,
-      this.fill
+      this.fill,
     );
   }
 
@@ -267,30 +271,30 @@ export class VectorObject extends RenderObject {
       return {
         min: { x: 0, y: 0, z: 0 },
         max: { x: 0, y: 0, z: 0 },
-        center: { x: 0, y: 0, z: 0 }
+        center: { x: 0, y: 0, z: 0 },
       };
     }
 
-    const xs = this.points.map(p => p.x);
-    const ys = this.points.map(p => p.y);
-    const zs = this.points.map(p => p.z);
+    const xs = this.points.map((p) => p.x);
+    const ys = this.points.map((p) => p.y);
+    const zs = this.points.map((p) => p.z);
 
     return {
       min: {
         x: Math.min(...xs),
         y: Math.min(...ys),
-        z: Math.min(...zs)
+        z: Math.min(...zs),
       },
       max: {
         x: Math.max(...xs),
         y: Math.max(...ys),
-        z: Math.max(...zs)
+        z: Math.max(...zs),
       },
       center: {
         x: (Math.min(...xs) + Math.max(...xs)) / 2,
         y: (Math.min(...ys) + Math.max(...ys)) / 2,
-        z: (Math.min(...zs) + Math.max(...zs)) / 2
-      }
+        z: (Math.min(...zs) + Math.max(...zs)) / 2,
+      },
     };
   }
 
@@ -313,7 +317,7 @@ export class VectorObject extends RenderObject {
     radius: number,
     center: Point3D = { x: 0, y: 0, z: 0 },
     stroke?: StrokeStyle,
-    fill?: FillStyle
+    fill?: FillStyle,
   ): VectorObject {
     const points: Point3D[] = [];
     const segments = 64;
@@ -322,7 +326,7 @@ export class VectorObject extends RenderObject {
       points.push({
         x: center.x + radius * Math.cos(angle),
         y: center.y + radius * Math.sin(angle),
-        z: center.z
+        z: center.z,
       });
     }
 
@@ -333,16 +337,19 @@ export class VectorObject extends RenderObject {
           position: center,
           rotation: { x: 0, y: 0, z: 0 },
           scale: { x: 1, y: 1, z: 1 },
-          opacity: 1
+          opacity: 1,
         },
         visible: true,
         z_index: 0,
-        styles: new Map()
+        styles: new Map(),
+        position: center,
+        rotation: { x: 0, y: 0, z: 0 },
+        scale: { x: 1, y: 1, z: 1 },
       },
       GeometryType.Circle,
       points,
       stroke,
-      fill
+      fill,
     );
   }
 
@@ -354,7 +361,7 @@ export class VectorObject extends RenderObject {
     height: number,
     center: Point3D = { x: 0, y: 0, z: 0 },
     stroke?: StrokeStyle,
-    fill?: FillStyle
+    fill?: FillStyle,
   ): VectorObject {
     const hw = width / 2;
     const hh = height / 2;
@@ -366,32 +373,31 @@ export class VectorObject extends RenderObject {
           position: center,
           rotation: { x: 0, y: 0, z: 0 },
           scale: { x: 1, y: 1, z: 1 },
-          opacity: 1
+          opacity: 1,
         },
         visible: true,
         z_index: 0,
-        styles: new Map()
+        styles: new Map(),
+        position: center,
+        rotation: { x: 0, y: 0, z: 0 },
+        scale: { x: 1, y: 1, z: 1 },
       },
       GeometryType.Rectangle,
       [
         { x: center.x - hw, y: center.y - hh, z: center.z },
         { x: center.x + hw, y: center.y - hh, z: center.z },
         { x: center.x + hw, y: center.y + hh, z: center.z },
-        { x: center.x - hw, y: center.y + hh, z: center.z }
+        { x: center.x - hw, y: center.y + hh, z: center.z },
       ],
       stroke,
-      fill
+      fill,
     );
   }
 
   /**
    * Create a line
    */
-  static line(
-    start: Point3D,
-    end: Point3D,
-    stroke: StrokeStyle
-  ): VectorObject {
+  static line(start: Point3D, end: Point3D, stroke: StrokeStyle): VectorObject {
     return new VectorObject(
       {
         id: generateObjectId('line'),
@@ -399,15 +405,18 @@ export class VectorObject extends RenderObject {
           position: { x: 0, y: 0, z: 0 },
           rotation: { x: 0, y: 0, z: 0 },
           scale: { x: 1, y: 1, z: 1 },
-          opacity: 1
+          opacity: 1,
         },
         visible: true,
         z_index: 0,
-        styles: new Map()
+        styles: new Map(),
+        position: { x: 0, y: 0, z: 0 },
+        rotation: { x: 0, y: 0, z: 0 },
+        scale: { x: 1, y: 1, z: 1 },
       },
       GeometryType.Line,
       [start, end],
-      stroke
+      stroke,
     );
   }
 }
@@ -426,7 +435,7 @@ export class TextObject extends RenderObject {
     state: RenderObjectState,
     public readonly text: string,
     public readonly font: FontConfig,
-    public readonly color: string
+    public readonly color: string,
   ) {
     super(state);
   }
@@ -439,11 +448,11 @@ export class TextObject extends RenderObject {
     return new TextObject(
       {
         ...this.state,
-        transform: { ...this.state.transform, ...transform }
+        transform: { ...this.state.transform, ...transform },
       },
       this.text,
       this.font,
-      this.color
+      this.color,
     );
   }
 
@@ -458,14 +467,14 @@ export class TextObject extends RenderObject {
       min: {
         x: position.x - estimatedWidth / 2,
         y: position.y - estimatedHeight / 2,
-        z: position.z
+        z: position.z,
       },
       max: {
         x: position.x + estimatedWidth / 2,
         y: position.y + estimatedHeight / 2,
-        z: position.z
+        z: position.z,
       },
-      center: position
+      center: position,
     };
   }
 
@@ -482,11 +491,7 @@ export class TextObject extends RenderObject {
   /**
    * Create a text object
    */
-  static create(
-    text: string,
-    font: FontConfig,
-    color: string = '#ffffff'
-  ): TextObject {
+  static create(text: string, font: FontConfig, color: string = '#ffffff'): TextObject {
     return new TextObject(
       {
         id: generateObjectId('text'),
@@ -494,15 +499,18 @@ export class TextObject extends RenderObject {
           position: { x: 0, y: 0, z: 0 },
           rotation: { x: 0, y: 0, z: 0 },
           scale: { x: 1, y: 1, z: 1 },
-          opacity: 1
+          opacity: 1,
         },
         visible: true,
         z_index: 0,
-        styles: new Map()
+        styles: new Map(),
+        position: { x: 0, y: 0, z: 0 },
+        rotation: { x: 0, y: 0, z: 0 },
+        scale: { x: 1, y: 1, z: 1 },
       },
       text,
       font,
-      color
+      color,
     );
   }
 
@@ -510,12 +518,7 @@ export class TextObject extends RenderObject {
    * Change the text
    */
   withText(newText: string): TextObject {
-    return new TextObject(
-      this.state,
-      newText,
-      this.font,
-      this.color
-    );
+    return new TextObject(this.state, newText, this.font, this.color);
   }
 }
 
@@ -531,7 +534,7 @@ export class TextObject extends RenderObject {
 export class GroupObject extends RenderObject {
   constructor(
     state: RenderObjectState,
-    public readonly children: ReadonlyArray<RenderObject>
+    public readonly children: ReadonlyArray<RenderObject>,
   ) {
     super(state);
   }
@@ -544,9 +547,9 @@ export class GroupObject extends RenderObject {
     return new GroupObject(
       {
         ...this.state,
-        transform: { ...this.state.transform, ...transform }
+        transform: { ...this.state.transform, ...transform },
       },
-      this.children
+      this.children,
     );
   }
 
@@ -555,43 +558,40 @@ export class GroupObject extends RenderObject {
       return {
         min: { x: 0, y: 0, z: 0 },
         max: { x: 0, y: 0, z: 0 },
-        center: { x: 0, y: 0, z: 0 }
+        center: { x: 0, y: 0, z: 0 },
       };
     }
 
-    const boxes = this.children.map(c => c.getBoundingBox());
+    const boxes = this.children.map((c) => c.getBoundingBox());
 
     return {
       min: {
-        x: Math.min(...boxes.map(b => b.min.x)),
-        y: Math.min(...boxes.map(b => b.min.y)),
-        z: Math.min(...boxes.map(b => b.min.z))
+        x: Math.min(...boxes.map((b) => b.min.x)),
+        y: Math.min(...boxes.map((b) => b.min.y)),
+        z: Math.min(...boxes.map((b) => b.min.z)),
       },
       max: {
-        x: Math.max(...boxes.map(b => b.max.x)),
-        y: Math.max(...boxes.map(b => b.max.y)),
-        z: Math.max(...boxes.map(b => b.max.z))
+        x: Math.max(...boxes.map((b) => b.max.x)),
+        y: Math.max(...boxes.map((b) => b.max.y)),
+        z: Math.max(...boxes.map((b) => b.max.z)),
       },
       center: {
         x: 0,
         y: 0,
-        z: 0
-      }
+        z: 0,
+      },
     };
   }
 
   containsPoint(point: Point3D): boolean {
-    return this.children.some(c => c.containsPoint(point));
+    return this.children.some((c) => c.containsPoint(point));
   }
 
   /**
    * Add a child object
    */
   addChild(child: RenderObject): GroupObject {
-    return new GroupObject(
-      this.state,
-      [...this.children, child]
-    );
+    return new GroupObject(this.state, [...this.children, child]);
   }
 
   /**
@@ -600,7 +600,7 @@ export class GroupObject extends RenderObject {
   removeChild(childId: ObjectId): GroupObject {
     return new GroupObject(
       this.state,
-      this.children.filter(c => c.getState().id !== childId)
+      this.children.filter((c) => c.getState().id !== childId),
     );
   }
 
@@ -622,13 +622,16 @@ export class GroupObject extends RenderObject {
           position: { x: 0, y: 0, z: 0 },
           rotation: { x: 0, y: 0, z: 0 },
           scale: { x: 1, y: 1, z: 1 },
-          opacity: 1
+          opacity: 1,
         },
         visible: true,
         z_index: 0,
-        styles: new Map()
+        styles: new Map(),
+        position: { x: 0, y: 0, z: 0 },
+        rotation: { x: 0, y: 0, z: 0 },
+        scale: { x: 1, y: 1, z: 1 },
       },
-      []
+      [],
     );
   }
 

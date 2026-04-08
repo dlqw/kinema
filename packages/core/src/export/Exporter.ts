@@ -103,10 +103,7 @@ export abstract class Exporter {
    * @param progressCallback - Optional progress callback
    * @returns Promise resolving to export result
    */
-  abstract export(
-    scene: Scene,
-    progressCallback?: ProgressCallback
-  ): Promise<ExportResult>;
+  abstract export(scene: Scene, progressCallback?: ProgressCallback): Promise<ExportResult>;
 
   /**
    * Cancel the current export operation
@@ -136,7 +133,11 @@ export abstract class Exporter {
    */
   protected reportProgress(progress: ExportProgress): void {
     if (this.progressCallback && !this.cancelled) {
-      this.progressCallback(progress);
+      try {
+        this.progressCallback(progress);
+      } catch {
+        // Progress observers must never break the export pipeline.
+      }
     }
   }
 
@@ -149,7 +150,7 @@ export abstract class Exporter {
   protected getDimensions(scene: Scene): { width: number; height: number } {
     return {
       width: this.config.width ?? scene.config.width,
-      height: this.config.height ?? scene.config.height
+      height: this.config.height ?? scene.config.height,
     };
   }
 

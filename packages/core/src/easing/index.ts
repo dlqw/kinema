@@ -7,7 +7,7 @@
  * @module easing
  */
 
-import type { Alpha, EasingFunction } from '../types';
+import type { EasingFunction } from '../types';
 
 // ============================================================================
 // Linear Easing
@@ -64,14 +64,12 @@ export const easeInQuart: EasingFunction = (alpha) => alpha * alpha * alpha * al
 /**
  * Quintic ease in
  */
-export const easeInQuint: EasingFunction = (alpha) =>
-  alpha * alpha * alpha * alpha * alpha;
+export const easeInQuint: EasingFunction = (alpha) => alpha * alpha * alpha * alpha * alpha;
 
 /**
  * Sine ease in
  */
-export const easeInSine: EasingFunction = (alpha) =>
-  1 - Math.cos((alpha * Math.PI) / 2);
+export const easeInSine: EasingFunction = (alpha) => 1 - Math.cos((alpha * Math.PI) / 2);
 
 /**
  * Exponential ease in
@@ -82,8 +80,7 @@ export const easeInExpo: EasingFunction = (alpha) =>
 /**
  * Circular ease in
  */
-export const easeInCirc: EasingFunction = (alpha) =>
-  1 - Math.sqrt(1 - alpha * alpha);
+export const easeInCirc: EasingFunction = (alpha) => 1 - Math.sqrt(1 - alpha * alpha);
 
 // ============================================================================
 // Ease Out Functions
@@ -97,20 +94,17 @@ export const easeOut: EasingFunction = (alpha) => alpha * (2 - alpha);
 /**
  * Cubic ease out
  */
-export const easeOutCubic: EasingFunction = (alpha) =>
-  1 - Math.pow(1 - alpha, 3);
+export const easeOutCubic: EasingFunction = (alpha) => 1 - Math.pow(1 - alpha, 3);
 
 /**
  * Quartic ease out
  */
-export const easeOutQuart: EasingFunction = (alpha) =>
-  1 - Math.pow(1 - alpha, 4);
+export const easeOutQuart: EasingFunction = (alpha) => 1 - Math.pow(1 - alpha, 4);
 
 /**
  * Quintic ease out
  */
-export const easeOutQuint: EasingFunction = (alpha) =>
-  1 - Math.pow(1 - alpha, 5);
+export const easeOutQuint: EasingFunction = (alpha) => 1 - Math.pow(1 - alpha, 5);
 
 /**
  * Sine ease out
@@ -126,8 +120,7 @@ export const easeOutExpo: EasingFunction = (alpha) =>
 /**
  * Circular ease out
  */
-export const easeOutCirc: EasingFunction = (alpha) =>
-  Math.sqrt(1 - Math.pow(alpha - 1, 2));
+export const easeOutCirc: EasingFunction = (alpha) => Math.sqrt(1 - Math.pow(alpha - 1, 2));
 
 // ============================================================================
 // Ease In Out Functions
@@ -143,9 +136,7 @@ export const easeInOut: EasingFunction = (alpha) =>
  * Cubic ease in out
  */
 export const easeInOutCubic: EasingFunction = (alpha) =>
-  alpha < 0.5
-    ? 4 * alpha * alpha * alpha
-    : 1 - Math.pow(-2 * alpha + 2, 3) / 2;
+  alpha < 0.5 ? 4 * alpha * alpha * alpha : 1 - Math.pow(-2 * alpha + 2, 3) / 2;
 
 /**
  * Quartic ease in out
@@ -157,15 +148,12 @@ export const easeInOutQuart: EasingFunction = (alpha) =>
  * Quintic ease in out
  */
 export const easeInOutQuint: EasingFunction = (alpha) =>
-  alpha < 0.5
-    ? 16 * alpha * alpha * alpha * alpha * alpha
-    : 1 - Math.pow(-2 * alpha + 2, 5) / 2;
+  alpha < 0.5 ? 16 * alpha * alpha * alpha * alpha * alpha : 1 - Math.pow(-2 * alpha + 2, 5) / 2;
 
 /**
  * Sine ease in out
  */
-export const easeInOutSine: EasingFunction = (alpha) =>
-  -(Math.cos(Math.PI * alpha) - 1) / 2;
+export const easeInOutSine: EasingFunction = (alpha) => -(Math.cos(Math.PI * alpha) - 1) / 2;
 
 /**
  * Exponential ease in out
@@ -174,10 +162,10 @@ export const easeInOutExpo: EasingFunction = (alpha) =>
   alpha === 0
     ? 0
     : alpha === 1
-    ? 1
-    : alpha < 0.5
-    ? Math.pow(2, 20 * alpha - 10) / 2
-    : (2 - Math.pow(2, -20 * alpha + 10)) / 2;
+      ? 1
+      : alpha < 0.5
+        ? Math.pow(2, 20 * alpha - 10) / 2
+        : (2 - Math.pow(2, -20 * alpha + 10)) / 2;
 
 /**
  * Circular ease in out
@@ -199,8 +187,8 @@ export const elastic: EasingFunction = (alpha) => {
   return alpha === 0
     ? 0
     : alpha === 1
-    ? 1
-    : -Math.pow(2, 10 * alpha - 10) * Math.sin((alpha * 10 - 10.75) * c4);
+      ? 1
+      : -Math.pow(2, 10 * alpha - 10) * Math.sin((alpha * 10 - 10.75) * c4);
 };
 
 /**
@@ -237,8 +225,7 @@ export const bounce: EasingFunction = (alpha) => {
 /**
  * There and back - animation goes forward then reverses
  */
-export const thereAndBack: EasingFunction = (alpha) =>
-  alpha < 0.5 ? 2 * alpha : 2 - 2 * alpha;
+export const thereAndBack: EasingFunction = (alpha) => (alpha < 0.5 ? 2 * alpha : 2 - 2 * alpha);
 
 /**
  * There and back with pause
@@ -271,19 +258,20 @@ export function custom(fn: (alpha: number) => number): EasingFunction {
 /**
  * Create a cubic bezier easing function
  *
- * @param p1x - First control point x
- * @param p1y - First control point y
- * @param p2x - Second control point x
- * @param p2y - Second control point y
+ * @param _p1x - First control point x
+ * @param _p1y - First control point y
+ * @param _p2x - Second control point x
+ * @param _p2y - Second control point y
  * @returns Cubic bezier easing function
  */
 export function cubicBezier(
-  p1x: number,
-  p1y: number,
-  p2x: number,
-  p2y: number
+  _p1x: number,
+  _p1y: number,
+  _p2x: number,
+  _p2y: number,
 ): EasingFunction {
   // Simplified implementation - full version would use Newton-Raphson
+  // Parameters are reserved for future implementation
   return custom((alpha) => smooth(alpha));
 }
 
@@ -301,7 +289,7 @@ export const easeInFunctions = {
   quint: easeInQuint,
   sine: easeInSine,
   expo: easeInExpo,
-  circ: easeInCirc
+  circ: easeInCirc,
 } as const;
 
 /**
@@ -314,7 +302,7 @@ export const easeOutFunctions = {
   quint: easeOutQuint,
   sine: easeOutSine,
   expo: easeOutExpo,
-  circ: easeOutCirc
+  circ: easeOutCirc,
 } as const;
 
 /**
@@ -327,7 +315,7 @@ export const easeInOutFunctions = {
   quint: easeInOutQuint,
   sine: easeInOutSine,
   expo: easeInOutExpo,
-  circ: easeInOutCirc
+  circ: easeInOutCirc,
 } as const;
 
 /**
@@ -338,7 +326,7 @@ export const specialFunctions = {
   back,
   bounce,
   thereAndBack,
-  thereAndBackWithPause
+  thereAndBackWithPause,
 } as const;
 
 /**
@@ -352,5 +340,5 @@ export default {
   easeInOut,
   elastic,
   back,
-  bounce
+  bounce,
 };

@@ -50,7 +50,7 @@ export class AnimationGroup extends Animation {
     target: RenderObject,
     animations: ReadonlyArray<Animation>,
     compositionType: CompositionType = 'parallel' as CompositionType,
-    config: AnimationConfig = {}
+    config: AnimationConfig = {},
   ) {
     const totalDuration = calculateTotalDuration(animations, compositionType);
     super(target, { ...config, duration: totalDuration });
@@ -78,7 +78,7 @@ export class AnimationGroup extends Animation {
    * @param alpha - Progress value [0, 1]
    * @returns Interpolated object state
    */
-  protected interpolateAt(alpha: Alpha): RenderObject {
+  protected override interpolateAt(alpha: Alpha): RenderObject {
     const compositionType = (this as any).compositionType as CompositionType;
 
     switch (compositionType) {
@@ -111,7 +111,7 @@ export class AnimationGroup extends Animation {
    * Sequential interpolation - animations in order
    */
   private interpolateSequence(alpha: Alpha): RenderObject {
-    const totalDuration = this.config.duration;
+    const totalDuration = this.config.duration ?? 1;
     const currentTime = alpha * totalDuration;
 
     let accumulatedTime = 0;
@@ -139,8 +139,8 @@ export class AnimationGroup extends Animation {
    */
   private interpolateLagged(alpha: Alpha): RenderObject {
     // Get lag from config or use default
-    const lag = (this.config as any).lag ?? 0.1;
-    const totalDuration = this.config.duration;
+    const lag = this.config.lag ?? 0.1;
+    const totalDuration = this.config.duration ?? 1;
     const currentTime = alpha * totalDuration;
 
     let result = this.target;
@@ -171,7 +171,7 @@ export class AnimationGroup extends Animation {
   static parallel(
     target: RenderObject,
     animations: ReadonlyArray<Animation>,
-    config: AnimationConfig = {}
+    config: AnimationConfig = {},
   ): AnimationGroup {
     return new AnimationGroup(target, animations, 'parallel' as CompositionType, config);
   }
@@ -187,7 +187,7 @@ export class AnimationGroup extends Animation {
   static sequence(
     target: RenderObject,
     animations: ReadonlyArray<Animation>,
-    config: AnimationConfig = {}
+    config: AnimationConfig = {},
   ): AnimationGroup {
     return new AnimationGroup(target, animations, 'Sequence' as CompositionType, config);
   }
@@ -205,11 +205,11 @@ export class AnimationGroup extends Animation {
     target: RenderObject,
     animations: ReadonlyArray<Animation>,
     lag: number = 0.1,
-    config: AnimationConfig = {}
+    config: AnimationConfig = {},
   ): AnimationGroup {
     return new AnimationGroup(target, animations, 'Lagged' as CompositionType, {
       ...config,
-      lag
+      lag,
     });
   }
 
@@ -224,14 +224,14 @@ export class AnimationGroup extends Animation {
       this.target,
       [...this.animations, animation],
       (this as any).compositionType,
-      this.config
+      this.config,
     );
   }
 
   /**
    * Get a string representation
    */
-  toString(): string {
+  override toString(): string {
     const compositionType = (this as any).compositionType as CompositionType;
     return `AnimationGroup(type=${compositionType}, count=${this.animations.length})`;
   }
@@ -242,7 +242,7 @@ export class AnimationGroup extends Animation {
  */
 function calculateTotalDuration(
   animations: ReadonlyArray<Animation>,
-  type: CompositionType
+  type: CompositionType,
 ): number {
   if (animations.length === 0) return 0;
 
@@ -250,12 +250,12 @@ function calculateTotalDuration(
     case 'parallel' as CompositionType:
     case 'Lagged' as CompositionType:
       // Duration is the longest animation duration
-      return Math.max(...animations.map(a => a.getTotalDuration()));
+      return Math.max(...animations.map((a) => a.getTotalDuration()));
     case 'Sequence' as CompositionType:
       // Duration is sum of all animation durations
       return animations.reduce((sum, a) => sum + a.getTotalDuration(), 0);
     default:
-      return Math.max(...animations.map(a => a.getTotalDuration()));
+      return Math.max(...animations.map((a) => a.getTotalDuration()));
   }
 }
 
@@ -270,8 +270,7 @@ function calculateTotalDuration(
  */
 export class LoopAnimation extends Animation {
   private readonly baseAnimation: Animation;
-  private readonly loopCount: number;
-  private readonly isInfinite: boolean;
+  private _loopCount: number;
 
   /**
    * Creates a new LoopAnimation
@@ -285,25 +284,38 @@ export class LoopAnimation extends Animation {
     target: RenderObject,
     baseAnimation: Animation,
     loopCount: number,
-    config: AnimationConfig = {}
+    config: AnimationConfig = {},
   ) {
     const totalDuration = baseAnimation.getTotalDuration() * loopCount;
     super(target, { ...config, duration: totalDuration });
     this.baseAnimation = baseAnimation;
-    this.loopCount = loopCount;
-    this.isInfinite = false;
+    this._loopCount = loopCount;
+  }
+
+  /**
+   * Get the loop count
+   */
+  get loopCount(): number {
+    return this._loopCount;
+  }
+
+  /**
+   * Check if this is an infinite loop
+   */
+  get isInfinite(): boolean {
+    return this._loopCount === Infinity;
   }
 
   /**
    * Interpolate with looping
    */
-  protected interpolateAt(alpha: Alpha): RenderObject {
-    const loopProgress = alpha * this.loopCount;
+  protected override interpolateAt(alpha: Alpha): RenderObject {
+    const loopProgress = alpha * this._loopCount;
     const currentLoop = Math.floor(loopProgress);
     const loopAlpha = loopProgress - currentLoop;
 
     const { object } = this.baseAnimation.interpolate(
-      loopAlpha * this.baseAnimation.getTotalDuration()
+      loopAlpha * this.baseAnimation.getTotalDuration(),
     );
 
     return object;
@@ -316,10 +328,7 @@ export class LoopAnimation extends Animation {
    * @param loopCount - Number of loops
    * @returns A new LoopAnimation
    */
-  static create(
-    baseAnimation: Animation,
-    loopCount: number
-  ): LoopAnimation {
+  static create(baseAnimation: Animation, loopCount: number): LoopAnimation {
     return new LoopAnimation(baseAnimation.target, baseAnimation, loopCount);
   }
 
@@ -333,8 +342,7 @@ export class LoopAnimation extends Animation {
    */
   static infinite(baseAnimation: Animation): LoopAnimation {
     const anim = new LoopAnimation(baseAnimation.target, baseAnimation, 1);
-    (anim as any).isInfinite = true;
-    (anim as any).loopCount = Infinity;
+    anim._loopCount = Infinity;
     return anim;
   }
 }
@@ -343,4 +351,3 @@ export class LoopAnimation extends Animation {
  * Default export
  */
 export default AnimationGroup;
-export { LoopAnimation };

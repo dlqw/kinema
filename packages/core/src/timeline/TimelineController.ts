@@ -7,8 +7,14 @@
  * @module timeline/TimelineController
  */
 
-import type { Scene, Animation } from '../types';
-import { Timeline, TimelineConfig, PlaybackState, TimelineDirection, TimelineEventType, TimelineEventListener } from './Timeline';
+import {
+  Timeline,
+  PlaybackState,
+  TimelineDirection,
+  TimelineEventType,
+  TimelineEventListener,
+} from './Timeline';
+import type { TimelineConfig } from './Timeline';
 
 /**
  * Controller state snapshot for undo/redo
@@ -394,7 +400,7 @@ export class TimelineController {
   }
 
   // ==========================================================================
-= // Keyframes and Markers
+  // Keyframes and Markers
   // ==========================================================================
 
   /**
@@ -490,7 +496,7 @@ export class TimelineController {
       state: this.timeline.getState(),
       direction: this.timeline.getDirection(),
       speed: this.timeline.getSpeed(),
-      loop: this.timeline.isLooping()
+      loop: this.timeline.isLooping(),
     };
 
     this.stateHistory.push(state);
@@ -528,18 +534,20 @@ export class TimelineController {
    * Add event listener for specific type
    */
   on(type: TimelineEventType, listener: TimelineEventListener): void;
-  on(listener: TimelineEventListener): void;
-  on(type: any, listener: any): any {
-    if (typeof type === 'string' && typeof listener === 'function') {
+  on(
+    typeOrListener: TimelineEventListener | TimelineEventType,
+    listener?: TimelineEventListener,
+  ): void {
+    if (typeof typeOrListener === 'string' && typeof listener === 'function') {
       // Typed listener
       this.timeline.on((event) => {
-        if (event.type === type) {
+        if (event.type === typeOrListener) {
           listener(event);
         }
       });
-    } else if (typeof listener === 'function') {
+    } else if (typeof typeOrListener === 'function') {
       // Generic listener
-      this.timeline.on(listener);
+      this.timeline.on(typeOrListener);
     }
   }
 
@@ -585,7 +593,7 @@ export class TimelineController {
       state: this.timeline.getState(),
       direction: this.timeline.getDirection(),
       speed: this.timeline.getSpeed(),
-      loop: this.timeline.isLooping()
+      loop: this.timeline.isLooping(),
     };
   }
 
@@ -615,7 +623,7 @@ export class TimelineController {
       current,
       duration,
       remaining: Math.max(0, duration - current),
-      progress: current / duration
+      progress: current / duration,
     };
   }
 
@@ -634,7 +642,7 @@ export class TimelineController {
       current,
       total,
       remaining: Math.max(0, total - current),
-      progress: current / total
+      progress: current / total,
     };
   }
 

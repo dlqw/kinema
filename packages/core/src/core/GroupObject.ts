@@ -7,13 +7,7 @@
  * @module core/GroupObject
  */
 
-import type {
-  ObjectId,
-  Point3D,
-  BoundingBox,
-  Transform,
-  RenderObjectState
-} from '../types';
+import type { ObjectId, Point3D, BoundingBox, Transform, RenderObjectState } from '../types';
 import { RenderObject } from './RenderObject';
 import { mergeBoundingBoxes } from '../types/utils';
 
@@ -46,7 +40,7 @@ export class GroupObject extends RenderObject {
    */
   constructor(
     state: RenderObjectState,
-    public readonly children: ReadonlyArray<RenderObject>
+    public readonly children: ReadonlyArray<RenderObject>,
   ) {
     super(state);
     Object.freeze(children);
@@ -56,7 +50,7 @@ export class GroupObject extends RenderObject {
       if ((child as any).state.parentId === undefined) {
         (child as any).state = {
           ...(child as any).state,
-          parentId: state.id
+          parentId: state.id,
         };
       }
     }
@@ -83,9 +77,9 @@ export class GroupObject extends RenderObject {
     return new GroupObject(
       {
         ...this.state,
-        transform: { ...this.state.transform, ...transform }
+        transform: { ...this.state.transform, ...transform },
       },
-      this.children
+      this.children,
     );
   }
 
@@ -101,14 +95,15 @@ export class GroupObject extends RenderObject {
       return {
         min: { x: 0, y: 0, z: 0 },
         max: { x: 0, y: 0, z: 0 },
-        center: { x: 0, y: 0, z: 0 }
+        center: { x: 0, y: 0, z: 0 },
       };
     }
 
     // Merge bounding boxes of all children
-    return this.children.reduce((combined, child) => {
+    const firstChild = this.children[0]!;
+    return this.children.slice(1).reduce((combined, child) => {
       return mergeBoundingBoxes(combined, child.getBoundingBox());
-    }, this.children[0].getBoundingBox());
+    }, firstChild.getBoundingBox());
   }
 
   /**
@@ -120,7 +115,7 @@ export class GroupObject extends RenderObject {
    * @returns True if the point is inside any child
    */
   containsPoint(point: Point3D): boolean {
-    return this.children.some(child => child.containsPoint(point));
+    return this.children.some((child) => child.containsPoint(point));
   }
 
   // ==========================================================================
@@ -152,7 +147,7 @@ export class GroupObject extends RenderObject {
    */
   findById(id: ObjectId): RenderObject | undefined {
     // Check direct children
-    const directChild = this.children.find(c => c.id === id);
+    const directChild = this.children.find((c) => c.id === id);
     if (directChild) return directChild;
 
     // Search nested groups
@@ -190,12 +185,8 @@ export class GroupObject extends RenderObject {
    * @param constructor - The class constructor to filter by
    * @returns Array of matching objects
    */
-  getObjectsOfType<T extends RenderObject>(
-    constructor: new (...args: any[]) => T
-  ): T[] {
-    return this.getAllObjects().filter(
-      obj => obj instanceof constructor
-    ) as T[];
+  getObjectsOfType<T extends RenderObject>(constructor: new (...args: any[]) => T): T[] {
+    return this.getAllObjects().filter((obj) => obj instanceof constructor) as T[];
   }
 
   /**
@@ -205,10 +196,7 @@ export class GroupObject extends RenderObject {
    * @returns A new GroupObject with the child added
    */
   addChild(child: RenderObject): GroupObject {
-    return new GroupObject(
-      this.state,
-      [...this.children, child]
-    );
+    return new GroupObject(this.state, [...this.children, child]);
   }
 
   /**
@@ -218,10 +206,7 @@ export class GroupObject extends RenderObject {
    * @returns A new GroupObject with the children added
    */
   addChildren(...children: RenderObject[]): GroupObject {
-    return new GroupObject(
-      this.state,
-      [...this.children, ...children]
-    );
+    return new GroupObject(this.state, [...this.children, ...children]);
   }
 
   /**
@@ -233,7 +218,7 @@ export class GroupObject extends RenderObject {
   removeChild(childId: ObjectId): GroupObject {
     return new GroupObject(
       this.state,
-      this.children.filter(c => c.id !== childId)
+      this.children.filter((c) => c.id !== childId),
     );
   }
 
@@ -247,7 +232,7 @@ export class GroupObject extends RenderObject {
     const idsToRemove = new Set(childIds);
     return new GroupObject(
       this.state,
-      this.children.filter(c => !idsToRemove.has(c.id))
+      this.children.filter((c) => !idsToRemove.has(c.id)),
     );
   }
 
@@ -301,7 +286,7 @@ export class GroupObject extends RenderObject {
    */
   findObjectsAtPoint(point: Point3D): RenderObject[] {
     return this.children
-      .filter(child => child.containsPoint(point))
+      .filter((child) => child.containsPoint(point))
       .sort((a, b) => a.zIndex - b.zIndex);
   }
 
@@ -341,10 +326,7 @@ export class GroupObject extends RenderObject {
    * @returns A new GroupObject with reversed children
    */
   reverseChildren(): GroupObject {
-    return new GroupObject(
-      this.state,
-      [...this.children].reverse()
-    );
+    return new GroupObject(this.state, [...this.children].reverse());
   }
 
   /**
@@ -355,7 +337,7 @@ export class GroupObject extends RenderObject {
   sortChildrenByZIndex(): GroupObject {
     return new GroupObject(
       this.state,
-      [...this.children].sort((a, b) => a.zIndex - b.zIndex)
+      [...this.children].sort((a, b) => a.zIndex - b.zIndex),
     );
   }
 
@@ -376,10 +358,10 @@ export class GroupObject extends RenderObject {
           position: position ?? { x: 0, y: 0, z: 0 },
           rotation: { x: 0, y: 0, z: 0 },
           scale: { x: 1, y: 1, z: 1 },
-          opacity: 1
-        }
+          opacity: 1,
+        },
       }),
-      []
+      [],
     );
   }
 
@@ -405,25 +387,28 @@ export class GroupObject extends RenderObject {
     }
 
     // Calculate combined bounding box
-    const bbox = objects.reduce(
-      (combined, obj) => mergeBoundingBoxes(combined, obj.getBoundingBox()),
-      objects[0].getBoundingBox()
-    );
+    const firstObject = objects[0]!;
+    const bbox = objects
+      .slice(1)
+      .reduce(
+        (combined, obj) => mergeBoundingBoxes(combined, obj.getBoundingBox()),
+        firstObject.getBoundingBox(),
+      );
 
     // Calculate offset to center
     const offset = {
       x: -bbox.center.x,
       y: -bbox.center.y,
-      z: -bbox.center.z
+      z: -bbox.center.z,
     };
 
     // Shift all objects by offset
-    const shifted = objects.map(obj =>
+    const shifted = objects.map((obj) =>
       obj.withPosition(
         obj.transform.position.x + offset.x,
         obj.transform.position.y + offset.y,
-        obj.transform.position.z + offset.z
-      )
+        obj.transform.position.z + offset.z,
+      ),
     );
 
     return GroupObject.from(...shifted);
@@ -439,7 +424,7 @@ export class GroupObject extends RenderObject {
   static row(objects: RenderObject[], spacing: number = 10): GroupObject {
     let xOffset = 0;
 
-    const arranged = objects.map(obj => {
+    const arranged = objects.map((obj) => {
       const bbox = obj.getBoundingBox();
       const width = bbox.max.x - bbox.min.x;
       const newObj = obj.withPosition(xOffset + width / 2, 0, 0);
@@ -460,7 +445,7 @@ export class GroupObject extends RenderObject {
   static column(objects: RenderObject[], spacing: number = 10): GroupObject {
     let yOffset = 0;
 
-    const arranged = objects.map(obj => {
+    const arranged = objects.map((obj) => {
       const bbox = obj.getBoundingBox();
       const height = bbox.max.y - bbox.min.y;
       const newObj = obj.withPosition(0, yOffset + height / 2, 0);
@@ -479,16 +464,14 @@ export class GroupObject extends RenderObject {
    * @param spacing - Spacing between objects
    * @returns A new GroupObject with objects arranged in a grid
    */
-  static grid(
-    objects: RenderObject[],
-    columns: number,
-    spacing: number = 10
-  ): GroupObject {
+  static grid(objects: RenderObject[], columns: number, spacing: number = 10): GroupObject {
     const arranged: RenderObject[] = [];
-    const maxSize = Math.max(...objects.map(obj => {
-      const bbox = obj.getBoundingBox();
-      return Math.max(bbox.max.x - bbox.min.x, bbox.max.y - bbox.min.y);
-    }));
+    const maxSize = Math.max(
+      ...objects.map((obj) => {
+        const bbox = obj.getBoundingBox();
+        return Math.max(bbox.max.x - bbox.min.x, bbox.max.y - bbox.min.y);
+      }),
+    );
 
     objects.forEach((obj, index) => {
       const col = index % columns;
@@ -508,21 +491,21 @@ export class GroupObject extends RenderObject {
   /**
    * Get a JSON-serializable representation
    */
-  toJSON(): Record<string, unknown> {
+  override toJSON(): Record<string, unknown> {
     return {
       ...super.toJSON(),
       childCount: this.children.length,
-      children: this.children.map(c => ({
+      children: this.children.map((c) => ({
         id: c.id,
-        type: c.constructor.name
-      }))
+        type: c.constructor.name,
+      })),
     };
   }
 
   /**
    * Get a string representation
    */
-  toString(): string {
+  override toString(): string {
     return `GroupObject(id="${this.state.id}", children=${this.children.length})`;
   }
 }

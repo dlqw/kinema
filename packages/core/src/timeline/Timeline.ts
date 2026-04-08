@@ -7,14 +7,12 @@
  * @module timeline/Timeline
  */
 
-import type { Scene, Animation } from '../types';
-
 /**
  * Timeline direction
  */
 export enum TimelineDirection {
   Forward = 1,
-  Backward = -1
+  Backward = -1,
 }
 
 /**
@@ -24,7 +22,7 @@ export enum PlaybackState {
   Stopped = 'stopped',
   Playing = 'playing',
   Paused = 'paused',
-  Seeking = 'seeking'
+  Seeking = 'seeking',
 }
 
 /**
@@ -37,7 +35,7 @@ export enum TimelineEventType {
   Seek = 'seek',
   Keyframe = 'keyframe',
   Marker = 'marker',
-  Loop = 'loop'
+  Loop = 'loop',
 }
 
 /**
@@ -101,7 +99,7 @@ export class Timeline {
     this.config = {
       timeScale: 1,
       loop: false,
-      ...config
+      ...config,
     };
   }
 
@@ -121,7 +119,7 @@ export class Timeline {
 
     this.emit({
       type: TimelineEventType.Play,
-      time: this.currentTime
+      time: this.currentTime,
     });
   }
 
@@ -136,7 +134,7 @@ export class Timeline {
 
     this.emit({
       type: TimelineEventType.Pause,
-      time: this.currentTime
+      time: this.currentTime,
     });
   }
 
@@ -161,7 +159,7 @@ export class Timeline {
 
     this.emit({
       type: TimelineEventType.Stop,
-      time: this.currentTime
+      time: this.currentTime,
     });
   }
 
@@ -175,7 +173,7 @@ export class Timeline {
     this.emit({
       type: TimelineEventType.Seek,
       time: this.currentTime,
-      data: { previousTime }
+      data: { previousTime },
     });
 
     this.checkKeyframes(previousTime, this.currentTime);
@@ -301,18 +299,20 @@ export class Timeline {
    * Reverse playback direction
    */
   reverse(): void {
-    this.direction = this.direction === TimelineDirection.Forward
-      ? TimelineDirection.Backward
-      : TimelineDirection.Forward;
+    this.direction =
+      this.direction === TimelineDirection.Forward
+        ? TimelineDirection.Backward
+        : TimelineDirection.Forward;
   }
 
   /**
    * Toggle forward/backward playback
    */
   toggleDirection(): void {
-    this.direction = this.direction === TimelineDirection.Forward
-      ? TimelineDirection.Backward
-      : TimelineDirection.Forward;
+    this.direction =
+      this.direction === TimelineDirection.Forward
+        ? TimelineDirection.Backward
+        : TimelineDirection.Forward;
   }
 
   // ==========================================================================
@@ -361,8 +361,8 @@ export class Timeline {
 
     for (const [time, keyframe] of this.keyframes) {
       const shouldTrigger = isForward
-        ? (previousTime < time && currentTime >= time)
-        : (previousTime > time && currentTime <= time);
+        ? previousTime < time && currentTime >= time
+        : previousTime > time && currentTime <= time;
 
       if (shouldTrigger) {
         keyframe.trigger();
@@ -370,7 +370,7 @@ export class Timeline {
         this.emit({
           type: TimelineEventType.Keyframe,
           time,
-          data: { keyframeId: keyframe.id }
+          data: { keyframeId: keyframe.id },
         });
       }
     }
@@ -440,7 +440,7 @@ export class Timeline {
         this.emit({
           type: TimelineEventType.Marker,
           time: marker.time,
-          data: { markerName: name, markerData: marker.data }
+          data: { markerName: name, markerData: marker.data },
         });
       }
     }
@@ -480,7 +480,7 @@ export class Timeline {
     this.emit({
       type: TimelineEventType.Loop,
       time: this.currentTime,
-      data: { enabled: this.config.loop }
+      data: { enabled: this.config.loop },
     });
   }
 
@@ -606,7 +606,7 @@ export class Timeline {
     const scaledDelta = deltaTime * (this.config.timeScale ?? 1) * this.playbackSpeed;
 
     // Update current time based on direction
-    const newTime = this.currentTime + (scaledDelta * this.direction);
+    const newTime = this.currentTime + scaledDelta * this.direction;
 
     // Handle loop
     if (newTime >= this.config.duration) {
@@ -649,7 +649,7 @@ class Keyframe {
   constructor(
     public readonly id: string,
     public readonly time: number,
-    private readonly callback: () => void
+    private readonly callback: () => void,
   ) {}
 
   trigger(): void {
@@ -665,7 +665,7 @@ class TimeMarker {
     public readonly name: string,
     public readonly time: number,
     public readonly data?: unknown,
-    public triggered: boolean = false
+    public triggered: boolean = false,
   ) {}
 
   trigger(): void {

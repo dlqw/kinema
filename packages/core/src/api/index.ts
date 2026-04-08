@@ -7,19 +7,14 @@
  * @module api
  */
 
-import type {
-  Point3D,
-  EasingFunction,
-  SceneConfig,
-  StrokeStyle,
-  FillStyle,
-  FontConfig
-} from '../types';
+import type { Point3D, EasingFunction, SceneConfig, StrokeStyle, FillStyle } from '../types';
 import type { RenderObject } from '../core';
 import type { Scene } from '../scene';
 import type { Animation } from '../animation';
 import { GroupObject } from '../core';
-import { smooth } from '../easing';
+import { Scene as SceneClass } from '../scene';
+import { AnimationGroup } from '../animation';
+import * as animations from '../factory/animations';
 
 // ============================================================================
 // Object Chain API
@@ -68,11 +63,7 @@ export class Chain<T extends RenderObject = RenderObject> {
    */
   move(dx: number, dy: number, dz: number = 0): Chain<T> {
     const pos = this.object.getState().transform.position;
-    return new Chain(this.object.withPosition(
-      pos.x + dx,
-      pos.y + dy,
-      pos.z + dz
-    ) as T);
+    return new Chain(this.object.withPosition(pos.x + dx, pos.y + dy, pos.z + dz) as T);
   }
 
   /**
@@ -87,11 +78,7 @@ export class Chain<T extends RenderObject = RenderObject> {
    */
   rotate(dx: number, dy: number = 0, dz: number = 0): Chain<T> {
     const rot = this.object.getState().transform.rotation;
-    return new Chain(this.object.withRotation(
-      rot.x + dx,
-      rot.y + dy,
-      rot.z + dz
-    ) as T);
+    return new Chain(this.object.withRotation(rot.x + dx, rot.y + dy, rot.z + dz) as T);
   }
 
   /**
@@ -106,11 +93,7 @@ export class Chain<T extends RenderObject = RenderObject> {
    */
   scaleBy(factor: number): Chain<T> {
     const s = this.object.getState().transform.scale;
-    return new Chain(this.object.withScale(
-      s.x * factor,
-      s.y * factor,
-      s.z * factor
-    ) as T);
+    return new Chain(this.object.withScale(s.x * factor, s.y * factor, s.z * factor) as T);
   }
 
   /**
@@ -198,7 +181,7 @@ export class Chain<T extends RenderObject = RenderObject> {
    * Chain multiple objects
    */
   static chain<T extends RenderObject>(...objects: T[]): Chain<T>[] {
-    return objects.map(obj => new Chain(obj));
+    return objects.map((obj) => new Chain(obj));
   }
 }
 
@@ -223,7 +206,7 @@ export class SceneBuild {
   private constructor(
     private config?: Partial<SceneConfig>,
     private objects: RenderObject[] = [],
-    private animations: Array<{ animation: Animation; delay: number }> = []
+    private animations: Array<{ animation: Animation; delay: number }> = [],
   ) {}
 
   /**
@@ -237,35 +220,29 @@ export class SceneBuild {
    * Add objects to the scene
    */
   add(...objects: RenderObject[]): SceneBuild {
-    return new SceneBuild(
-      this.config,
-      [...this.objects, ...objects],
-      this.animations
-    );
+    return new SceneBuild(this.config, [...this.objects, ...objects], this.animations);
   }
 
   /**
    * Schedule an animation
    */
   animate(animation: Animation, delay: number = 0): SceneBuild {
-    return new SceneBuild(
-      this.config,
-      this.objects,
-      [...this.animations, { animation, delay }]
-    );
+    return new SceneBuild(this.config, this.objects, [...this.animations, { animation, delay }]);
   }
 
   /**
    * Build the scene
    */
   build(): Scene {
-    const { Scene: SceneClass } = require('../scene');
-    const scene = new SceneClass({
+    const config: { width: number; height: number; fps: number; backgroundColor?: string } = {
       width: this.config?.width ?? 1920,
       height: this.config?.height ?? 1080,
       fps: this.config?.fps ?? 60,
-      backgroundColor: this.config?.backgroundColor
-    });
+    };
+    if (this.config?.backgroundColor !== undefined) {
+      config.backgroundColor = this.config.backgroundColor;
+    }
+    const scene = new SceneClass(config);
 
     // Add objects
     let result = scene;
@@ -303,9 +280,9 @@ export class AnimationSequence {
   private constructor(
     private target: RenderObject,
     private steps: Array<{
-      animation: (target: RenderObject) => Animation;
+      animation: (target: RenderObject, options?: any) => Animation;
       options: any;
-    }> = []
+    }> = [],
   ) {}
 
   /**
@@ -320,78 +297,81 @@ export class AnimationSequence {
    */
   then(
     animation: (target: RenderObject, options?: any) => Animation,
-    options: any = {}
+    options: any = {},
   ): AnimationSequence {
-    return new AnimationSequence(this.target, [
-      ...this.steps,
-      { animation, options }
-    ]);
+    return new AnimationSequence(this.target, [...this.steps, { animation, options }]);
   }
 
   /**
    * Fade in
    */
   fadeIn(options: { duration?: number; easing?: EasingFunction } = {}): AnimationSequence {
-    const { fade } = require('../factory/animations');
-    return this.then((t) => fade(t, options), options);
+    return this.then((t) => animations.fade(t, options), options);
   }
 
   /**
    * Fade out
    */
   fadeOut(options: { duration?: number; easing?: EasingFunction } = {}): AnimationSequence {
-    const { fadeOut } = require('../factory/animations');
-    return this.then((t) => fadeOut(t, options), options);
+    return this.then((t) => animations.fadeOut(t, options), options);
   }
 
   /**
    * Move
    */
-  move(delta: Point3D, options: { duration?: number; easing?: EasingFunction } = {}): AnimationSequence {
-    const { move } = require('../factory/animations');
-    return this.then((t) => move(t, delta, options), options);
+  move(
+    delta: Point3D,
+    options: { duration?: number; easing?: EasingFunction } = {},
+  ): AnimationSequence {
+    return this.then((t) => animations.move(t, delta, options), options);
   }
 
   /**
    * Move to
    */
-  moveTo(position: Point3D, options: { duration?: number; easing?: EasingFunction } = {}): AnimationSequence {
-    const { moveTo } = require('../factory/animations');
-    return this.then((t) => moveTo(t, position, options), options);
+  moveTo(
+    position: Point3D,
+    options: { duration?: number; easing?: EasingFunction } = {},
+  ): AnimationSequence {
+    return this.then((t) => animations.moveTo(t, position, options), options);
   }
 
   /**
    * Rotate
    */
-  rotate(degrees: number, options: { axis?: 'x' | 'y' | 'z'; duration?: number; easing?: EasingFunction } = {}): AnimationSequence {
-    const { rotate } = require('../factory/animations');
-    return this.then((t) => rotate(t, options.axis ?? 'z', degrees, options), options);
+  rotate(
+    degrees: number,
+    options: { axis?: 'x' | 'y' | 'z'; duration?: number; easing?: EasingFunction } = {},
+  ): AnimationSequence {
+    return this.then((t) => animations.rotate(t, options.axis ?? 'z', degrees, options), options);
   }
 
   /**
    * Scale
    */
-  scale(factor: number, options: { duration?: number; easing?: EasingFunction } = {}): AnimationSequence {
-    const { scaleBy } = require('../factory/animations');
-    return this.then((t) => scaleBy(t, factor, options), options);
+  scale(
+    factor: number,
+    options: { duration?: number; easing?: EasingFunction } = {},
+  ): AnimationSequence {
+    return this.then((t) => animations.scaleBy(t, factor, options), options);
   }
 
   /**
    * Wait/delay
    */
   wait(duration: number): AnimationSequence {
-    return this.then(() => ({ interpolate: () => ({ object: this.target, complete: false }) } as any), { duration });
+    return this.then(
+      () => ({ interpolate: () => ({ object: this.target, complete: false }) }) as any,
+      { duration },
+    );
   }
 
   /**
    * Build the sequence as an AnimationGroup
    */
   build(): Animation {
-    const { AnimationGroup } = require('../animation');
-    const animations = this.steps.map(({ animation, options }) =>
-      animation(this.target, options)
-    );
-    return AnimationGroup.sequence(this.target, animations);
+    const anims = this.steps.map(({ animation, options }) => animation(this.target, options));
+    return AnimationGroup.sequence(this.target, anims);
   }
 }
 
@@ -416,10 +396,10 @@ export class Timeline {
   private constructor(
     private events: Array<{
       time: number;
-      animation: (target: RenderObject) => Animation;
+      animation: (target: RenderObject, options?: any) => Animation;
       target: RenderObject;
       options?: any;
-    }> = []
+    }> = [],
   ) {}
 
   /**
@@ -436,12 +416,9 @@ export class Timeline {
     time: number,
     animation: (target: RenderObject, options?: any) => Animation,
     target: RenderObject,
-    options?: any
+    options?: any,
   ): Timeline {
-    return new Timeline([
-      ...this.events,
-      { time, animation, target, options }
-    ]);
+    return new Timeline([...this.events, { time, animation, target, options }]);
   }
 
   /**
@@ -463,7 +440,7 @@ export class Timeline {
    */
   getDuration(): number {
     if (this.events.length === 0) return 0;
-    return Math.max(...this.events.map(e => e.time));
+    return Math.max(...this.events.map((e) => e.time));
   }
 }
 
@@ -515,10 +492,9 @@ export function seq(object: RenderObject): AnimationSequence {
  */
 export function para(
   target: RenderObject,
-  animations: Array<(target: RenderObject) => Animation>
+  animationList: Array<(target: RenderObject) => Animation>,
 ): Animation {
-  const { AnimationGroup } = require('../animation');
-  const anims = animations.map(fn => fn(target));
+  const anims = animationList.map((fn) => fn(target));
   return AnimationGroup.parallel(target, anims);
 }
 
@@ -533,5 +509,5 @@ export default {
   Timeline,
   quick,
   seq,
-  para
+  para,
 };

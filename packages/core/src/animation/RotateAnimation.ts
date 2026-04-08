@@ -35,7 +35,7 @@ export class RotateAnimation extends Animation {
     target: RenderObject,
     private readonly axis: 'x' | 'y' | 'z',
     private readonly degrees: number,
-    config: AnimationConfig = {}
+    config: AnimationConfig = {},
   ) {
     super(target, config);
   }
@@ -46,7 +46,7 @@ export class RotateAnimation extends Animation {
    * @param alpha - Progress value [0, 1]
    * @returns Object with interpolated rotation
    */
-  protected interpolateAt(alpha: Alpha): RenderObject {
+  protected override interpolateAt(alpha: Alpha): RenderObject {
     const currentRotation = this.target.getState().rotation;
     const newRotation = { ...currentRotation };
     newRotation[this.axis] += this.degrees * alpha;
@@ -66,7 +66,7 @@ export class RotateAnimation extends Animation {
     target: RenderObject,
     axis: 'x' | 'y' | 'z',
     degrees: number,
-    duration: number = 1
+    duration: number = 1,
   ): RotateAnimation {
     return new RotateAnimation(target, axis, degrees, { duration });
   }
@@ -96,7 +96,7 @@ export class RotateToAnimation extends Animation {
     target: RenderObject,
     private readonly axis: 'x' | 'y' | 'z',
     private readonly targetDegrees: number,
-    config: AnimationConfig = {}
+    config: AnimationConfig = {},
   ) {
     super(target, config);
     this.startRotation = target.getState().rotation;
@@ -108,7 +108,7 @@ export class RotateToAnimation extends Animation {
    * @param alpha - Progress value [0, 1]
    * @returns Object with interpolated rotation
    */
-  protected interpolateAt(alpha: Alpha): RenderObject {
+  protected override interpolateAt(alpha: Alpha): RenderObject {
     const startAngle = this.startRotation[this.axis];
     const angle = startAngle + (this.targetDegrees - startAngle) * alpha;
 
@@ -131,7 +131,7 @@ export class RotateToAnimation extends Animation {
     target: RenderObject,
     axis: 'x' | 'y' | 'z',
     targetDegrees: number,
-    duration: number = 1
+    duration: number = 1,
   ): RotateToAnimation {
     return new RotateToAnimation(target, axis, targetDegrees, { duration });
   }
@@ -164,7 +164,7 @@ export class MultiRotateAnimation extends Animation {
   constructor(
     target: RenderObject,
     private readonly degrees: Partial<Point3D>,
-    config: AnimationConfig = {}
+    config: AnimationConfig = {},
   ) {
     super(target, config);
     this.startRotation = target.getState().rotation;
@@ -176,7 +176,7 @@ export class MultiRotateAnimation extends Animation {
    * @param alpha - Progress value [0, 1]
    * @returns Object with interpolated rotation
    */
-  protected interpolateAt(alpha: Alpha): RenderObject {
+  protected override interpolateAt(alpha: Alpha): RenderObject {
     const lerp = (start: number, end: number | undefined): number => {
       if (end === undefined) return start;
       return start + (end - start) * alpha;
@@ -186,8 +186,8 @@ export class MultiRotateAnimation extends Animation {
       rotation: {
         x: lerp(this.startRotation.x, this.degrees.x),
         y: lerp(this.startRotation.y, this.degrees.y),
-        z: lerp(this.startRotation.z, this.degrees.z)
-      }
+        z: lerp(this.startRotation.z, this.degrees.z),
+      },
     });
   }
 
@@ -202,7 +202,7 @@ export class MultiRotateAnimation extends Animation {
   static create(
     target: RenderObject,
     degrees: Partial<Point3D>,
-    duration: number = 1
+    duration: number = 1,
   ): MultiRotateAnimation {
     return new MultiRotateAnimation(target, degrees, { duration });
   }
@@ -212,4 +212,3 @@ export class MultiRotateAnimation extends Animation {
  * Default export
  */
 export default RotateAnimation;
-export { RotateToAnimation, MultiRotateAnimation };

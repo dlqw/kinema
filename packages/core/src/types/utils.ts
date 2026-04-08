@@ -7,15 +7,7 @@
  * @module types/utils
  */
 
-import type {
-  ObjectId,
-  Time,
-  Alpha,
-  Point3D,
-  Point2D,
-  Transform,
-  BoundingBox
-} from './core';
+import type { ObjectId, Time, Point3D, Point2D, Transform, BoundingBox } from './core';
 import type { RenderObject } from './objects';
 import type { Animation, EasingFunction } from './animation';
 import type { Scene } from './scene';
@@ -54,13 +46,6 @@ export function isObjectId(value: unknown): value is ObjectId {
  */
 export function isTime(value: unknown): value is Time {
   return typeof value === 'number' && value >= 0;
-}
-
-/**
- * Check if a value is a valid Alpha value [0, 1]
- */
-export function isValidAlpha(value: unknown): value is Alpha {
-  return typeof value === 'number' && value >= 0 && value <= 1;
 }
 
 /**
@@ -205,7 +190,7 @@ export function lerpPoint(start: Point3D, end: Point3D, alpha: number): Point3D 
   return {
     x: lerp(start.x, end.x, alpha),
     y: lerp(start.y, end.y, alpha),
-    z: lerp(start.z, end.z, alpha)
+    z: lerp(start.z, end.z, alpha),
   };
 }
 
@@ -222,7 +207,7 @@ export function lerpTransform(start: Transform, end: Transform, alpha: number): 
     position: lerpPoint(start.position, end.position, alpha),
     rotation: lerpPoint(start.rotation, end.rotation, alpha),
     scale: lerpPoint(start.scale, end.scale, alpha),
-    opacity: lerp(start.opacity, end.opacity, alpha)
+    opacity: lerp(start.opacity, end.opacity, alpha),
   };
 }
 
@@ -241,7 +226,7 @@ export function mapRange(
   inMin: number,
   inMax: number,
   outMin: number,
-  outMax: number
+  outMax: number,
 ): number {
   return ((value - inMin) * (outMax - outMin)) / (inMax - inMin) + outMin;
 }
@@ -313,30 +298,30 @@ export function boundingBoxFromPoints(points: ReadonlyArray<Point3D>): BoundingB
     return {
       min: { x: 0, y: 0, z: 0 },
       max: { x: 0, y: 0, z: 0 },
-      center: { x: 0, y: 0, z: 0 }
+      center: { x: 0, y: 0, z: 0 },
     };
   }
 
-  const xs = points.map(p => p.x);
-  const ys = points.map(p => p.y);
-  const zs = points.map(p => p.z);
+  const xs = points.map((p) => p.x);
+  const ys = points.map((p) => p.y);
+  const zs = points.map((p) => p.z);
 
   return {
     min: {
       x: Math.min(...xs),
       y: Math.min(...ys),
-      z: Math.min(...zs)
+      z: Math.min(...zs),
     },
     max: {
       x: Math.max(...xs),
       y: Math.max(...ys),
-      z: Math.max(...zs)
+      z: Math.max(...zs),
     },
     center: {
       x: (Math.min(...xs) + Math.max(...xs)) / 2,
       y: (Math.min(...ys) + Math.max(...ys)) / 2,
-      z: (Math.min(...zs) + Math.max(...zs)) / 2
-    }
+      z: (Math.min(...zs) + Math.max(...zs)) / 2,
+    },
   };
 }
 
@@ -370,18 +355,18 @@ export function mergeBoundingBoxes(a: BoundingBox, b: BoundingBox): BoundingBox 
     min: {
       x: Math.min(a.min.x, b.min.x),
       y: Math.min(a.min.y, b.min.y),
-      z: Math.min(a.min.z, b.min.z)
+      z: Math.min(a.min.z, b.min.z),
     },
     max: {
       x: Math.max(a.max.x, b.max.x),
       y: Math.max(a.max.y, b.max.y),
-      z: Math.max(a.max.z, b.max.z)
+      z: Math.max(a.max.z, b.max.z),
     },
     center: {
       x: 0,
       y: 0,
-      z: 0
-    }
+      z: 0,
+    },
   };
 }
 
@@ -399,11 +384,11 @@ export function mergeBoundingBoxes(a: BoundingBox, b: BoundingBox): BoundingBox 
  */
 export function hexToRgb(hex: string): { r: number; g: number; b: number } {
   const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-  return result
+  return result && result[1] && result[2] && result[3]
     ? {
         r: parseInt(result[1], 16),
         g: parseInt(result[2], 16),
-        b: parseInt(result[3], 16)
+        b: parseInt(result[3], 16),
       }
     : { r: 0, g: 0, b: 0 };
 }
@@ -435,7 +420,7 @@ export function lerpColor(color1: string, color2: string, alpha: number): string
   return rgbToHex(
     Math.round(lerp(rgb1.r, rgb2.r, alpha)),
     Math.round(lerp(rgb1.g, rgb2.g, alpha)),
-    Math.round(lerp(rgb1.b, rgb2.b, alpha))
+    Math.round(lerp(rgb1.b, rgb2.b, alpha)),
   );
 }
 
@@ -521,7 +506,7 @@ export const DEFAULT_TRANSFORM: Transform = Object.freeze({
   position: { x: 0, y: 0, z: 0 },
   rotation: { x: 0, y: 0, z: 0 },
   scale: { x: 1, y: 1, z: 1 },
-  opacity: 1
+  opacity: 1,
 });
 
 /**

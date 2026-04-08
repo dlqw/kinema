@@ -1,7 +1,7 @@
 /**
- * AniMaker Core Type Definitions
+ * Kinema Core Type Definitions
  *
- * This file contains the fundamental type definitions for the AniMaker animation framework.
+ * This file contains the fundamental type definitions for the Kinema animation framework.
  * All types are designed with immutability and type safety in mind.
  *
  * @packageDocumentation
@@ -26,7 +26,7 @@ export type Time = number & { readonly __brand: 'time' };
 /**
  * Animation progress value [0, 1]
  */
-export type Alpha = number & { readonly __brand: 'alpha' };
+export type Alpha = number;
 
 /**
  * ============================================================================
@@ -83,7 +83,7 @@ export const DEFAULT_TRANSFORM: Transform = Object.freeze({
   position: { x: 0, y: 0, z: 0 },
   rotation: { x: 0, y: 0, z: 0 },
   scale: { x: 1, y: 1, z: 1 },
-  opacity: 1
+  opacity: 1,
 });
 
 /**
@@ -93,17 +93,9 @@ export const DEFAULT_TRANSFORM: Transform = Object.freeze({
  */
 
 /**
- * Geometry type enumeration
+ * Geometry type enumeration (re-exported from objects.ts for convenience)
  */
-export enum GeometryType {
-  Circle = 'circle',
-  Rectangle = 'rectangle',
-  Polygon = 'polygon',
-  Line = 'line',
-  Curve = 'curve',
-  Arc = 'arc',
-  Ellipse = 'ellipse'
-}
+export { GeometryType } from './objects';
 
 /**
  * Stroke style for vector objects
@@ -142,6 +134,9 @@ export interface RenderObjectState {
   readonly z_index: number;
   readonly styles: ReadonlyMap<string, unknown>;
   readonly parentId?: ObjectId;
+  readonly position: Point3D;
+  readonly rotation: Point3D;
+  readonly scale: Point3D;
 }
 
 /**
@@ -151,38 +146,23 @@ export interface RenderObjectState {
  */
 
 /**
- * Scene configuration
+ * Scene configuration - re-exported from scene.ts
  */
-export interface SceneConfig {
-  readonly width: number;
-  readonly height: number;
-  readonly backgroundColor?: string;
-  readonly fps: number;
-}
+export type { SceneConfig } from './scene';
+export { DEFAULT_SCENE_CONFIG } from './scene';
 
 /**
- * Default scene configuration
+ * Scene snapshot for undo/redo functionality - re-exported from scene.ts
  */
-export const DEFAULT_SCENE_CONFIG: SceneConfig = Object.freeze({
-  width: 1920,
-  height: 1080,
-  backgroundColor: '#000000',
-  fps: 60
-});
-
-/**
- * Scene snapshot for undo/redo functionality
- */
-export interface SceneSnapshot {
-  readonly time: number;
-  readonly objects: ReadonlyArray<RenderObject>;
-  readonly metadata?: ReadonlyMap<string, unknown>;
-}
+export type { SceneSnapshot } from './scene';
 
 /**
  * Forward declarations for circular dependencies
  */
 export interface RenderObject {
+  readonly id: ObjectId;
+  readonly visible: boolean;
+  readonly zIndex: number;
   getState(): RenderObjectState;
   withTransform(transform: Partial<Transform>): RenderObject;
   getBoundingBox(): BoundingBox;
@@ -193,12 +173,13 @@ export interface Animation {
   readonly target: RenderObject;
   interpolate(elapsedTime: number): InterpolationResult;
   getTotalDuration(): number;
+  /** Whether to remove target object from scene on completion */
+  readonly removeOnComplete?: boolean;
 }
 
-export interface InterpolationResult {
-  readonly object: RenderObject;
-  readonly complete: boolean;
-}
+// Import InterpolationResult type for local use (not re-exported)
+// The generic InterpolationResult is exported from ./animation.ts
+import type { InterpolationResult } from './animation';
 
 /**
  * ============================================================================
@@ -235,38 +216,6 @@ export function generateObjectId(prefix: string = 'obj'): ObjectId {
 }
 
 /**
- * Check if a value is a valid Alpha value [0, 1]
- */
-export function isValidAlpha(value: number): value is Alpha {
-  return typeof value === 'number' && value >= 0 && value <= 1;
-}
-
-/**
- * Clamp a value between min and max
- */
-export function clamp(value: number, min: number, max: number): number {
-  return Math.max(min, Math.min(max, value));
-}
-
-/**
- * Linear interpolation between two values
- */
-export function lerp(start: number, end: number, alpha: number): number {
-  return start + (end - start) * alpha;
-}
-
-/**
- * Linear interpolation between two points
- */
-export function lerpPoint(start: Point3D, end: Point3D, alpha: number): Point3D {
-  return {
-    x: lerp(start.x, end.x, alpha),
-    y: lerp(start.y, end.y, alpha),
-    z: lerp(start.z, end.z, alpha)
-  };
-}
-
-/**
  * ============================================================================
  * Type Guards
  * ============================================================================
@@ -289,8 +238,30 @@ export function isPoint3D(value: unknown): value is Point3D {
 }
 
 /**
- * Check if a value is a valid Alpha value
+ * Check if a value is a valid Alpha value [0, 1]
  */
 export function isAlpha(value: unknown): value is Alpha {
   return typeof value === 'number' && value >= 0 && value <= 1;
+}
+
+/**
+ * ============================================================================
+ * Color Types
+ * ============================================================================
+ */
+
+/**
+ * RGB color representation
+ */
+export interface RGB {
+  readonly r: number;
+  readonly g: number;
+  readonly b: number;
+}
+
+/**
+ * RGBA color representation (with alpha channel)
+ */
+export interface RGBA extends RGB {
+  readonly a: number;
 }

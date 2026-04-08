@@ -7,13 +7,7 @@
  * @module events
  */
 
-import type {
-  EventEmitter,
-  EventData,
-  EventHandler,
-  EventMap,
-  IDisposable,
-} from './EventEmitter';
+import type { EventEmitter, EventHandler, IDisposable } from './EventEmitter';
 import { EventEmitter as EventEmitterImpl } from './EventEmitter';
 
 /**
@@ -143,7 +137,7 @@ export class EventBus implements IDisposable {
         channel,
         new EventEmitterImpl({
           maxListeners: this.config.maxListeners,
-        })
+        }),
       );
     });
   }
@@ -188,20 +182,17 @@ export class EventBus implements IDisposable {
    * @param options - Listener options
    * @returns Unsubscribe function
    */
-  on<K extends EventMap>(
+  on(
     channel: EventChannel,
     event: string,
     handler: EventHandler,
-    options: { once?: boolean; priority?: number } = {}
+    options: { once?: boolean; priority?: number } = {},
   ): () => void {
     const emitter = this.getChannel(channel);
     const unsubscribe = emitter.on(event, handler, options);
 
     if (this.config.logging) {
-      console.log(
-        `${this.config.logPrefix} Subscribed to ${channel}:${event}`,
-        options
-      );
+      console.log(`${this.config.logPrefix} Subscribed to ${channel}:${event}`, options);
     }
 
     return unsubscribe;
@@ -215,11 +206,7 @@ export class EventBus implements IDisposable {
    * @param handler - Event handler
    * @returns Unsubscribe function
    */
-  once<K extends EventMap>(
-    channel: EventChannel,
-    event: string,
-    handler: EventHandler
-  ): () => void {
+  once(channel: EventChannel, event: string, handler: EventHandler): () => void {
     return this.on(channel, event, handler, { once: true });
   }
 
@@ -316,9 +303,7 @@ export class EventBus implements IDisposable {
     emitter.removeAllListeners(event as any);
 
     if (this.config.logging) {
-      console.log(
-        `${this.config.logPrefix} Cleared ${event ? event + ' from ' : ''}${channel}`
-      );
+      console.log(`${this.config.logPrefix} Cleared ${event ? event + ' from ' : ''}${channel}`);
     }
   }
 
@@ -329,10 +314,7 @@ export class EventBus implements IDisposable {
    * @param event - Optional event filter
    * @returns History entries
    */
-  getHistory(
-    channel?: EventChannel,
-    event?: string
-  ): ReadonlyArray<HistoryEntry> {
+  getHistory(channel?: EventChannel, event?: string): ReadonlyArray<HistoryEntry> {
     let filtered = this.history;
 
     if (channel) {
@@ -409,11 +391,7 @@ export const EventBusInstance = EventBus.getInstance();
  * ```
  */
 export function EmitEvent(channel: EventChannel, event: string) {
-  return function (
-    target: any,
-    propertyKey: string,
-    descriptor: PropertyDescriptor
-  ) {
+  return function (_target: any, _propertyKey: string, descriptor: PropertyDescriptor) {
     const originalMethod = descriptor.value;
 
     descriptor.value = async function (...args: any[]) {

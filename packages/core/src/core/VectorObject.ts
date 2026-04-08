@@ -9,15 +9,14 @@
  */
 
 import type {
-  ObjectId,
   Point3D,
   BoundingBox,
   Transform,
   RenderObjectState,
   StrokeStyle,
   FillStyle,
-  GeometryType
 } from '../types';
+import { GeometryType } from '../types';
 import { RenderObject } from './RenderObject';
 import { boundingBoxFromPoints } from '../types/utils';
 
@@ -59,7 +58,7 @@ export class VectorObject extends RenderObject {
     public readonly geometryType: GeometryType,
     public readonly points: ReadonlyArray<Point3D>,
     public readonly stroke?: StrokeStyle,
-    public readonly fill?: FillStyle
+    public readonly fill?: FillStyle,
   ) {
     super(state);
     Object.freeze(points);
@@ -86,12 +85,12 @@ export class VectorObject extends RenderObject {
     return new VectorObject(
       {
         ...this.state,
-        transform: { ...this.state.transform, ...transform }
+        transform: { ...this.state.transform, ...transform },
       },
       this.geometryType,
       this.points,
       this.stroke,
-      this.fill
+      this.fill,
     );
   }
 
@@ -151,13 +150,7 @@ export class VectorObject extends RenderObject {
    * @returns A new VectorObject with the updated stroke
    */
   withStroke(stroke: StrokeStyle): VectorObject {
-    return new VectorObject(
-      this.state,
-      this.geometryType,
-      this.points,
-      stroke,
-      this.fill
-    );
+    return new VectorObject(this.state, this.geometryType, this.points, stroke, this.fill);
   }
 
   /**
@@ -166,13 +159,7 @@ export class VectorObject extends RenderObject {
    * @returns A new VectorObject without stroke
    */
   withoutStroke(): VectorObject {
-    return new VectorObject(
-      this.state,
-      this.geometryType,
-      this.points,
-      undefined,
-      this.fill
-    );
+    return new VectorObject(this.state, this.geometryType, this.points, undefined, this.fill);
   }
 
   /**
@@ -182,13 +169,7 @@ export class VectorObject extends RenderObject {
    * @returns A new VectorObject with the updated fill
    */
   withFill(fill: FillStyle): VectorObject {
-    return new VectorObject(
-      this.state,
-      this.geometryType,
-      this.points,
-      this.stroke,
-      fill
-    );
+    return new VectorObject(this.state, this.geometryType, this.points, this.stroke, fill);
   }
 
   /**
@@ -197,13 +178,7 @@ export class VectorObject extends RenderObject {
    * @returns A new VectorObject without fill
    */
   withoutFill(): VectorObject {
-    return new VectorObject(
-      this.state,
-      this.geometryType,
-      this.points,
-      this.stroke,
-      undefined
-    );
+    return new VectorObject(this.state, this.geometryType, this.points, this.stroke, undefined);
   }
 
   /**
@@ -213,13 +188,7 @@ export class VectorObject extends RenderObject {
    * @returns A new VectorObject with the updated points
    */
   withPoints(points: ReadonlyArray<Point3D>): VectorObject {
-    return new VectorObject(
-      this.state,
-      this.geometryType,
-      points,
-      this.stroke,
-      this.fill
-    );
+    return new VectorObject(this.state, this.geometryType, points, this.stroke, this.fill);
   }
 
   /**
@@ -253,7 +222,7 @@ export class VectorObject extends RenderObject {
     radius: number,
     center: Point3D = { x: 0, y: 0, z: 0 },
     stroke?: StrokeStyle,
-    fill?: FillStyle
+    fill?: FillStyle,
   ): VectorObject {
     const points: Point3D[] = [];
     const segments = 64;
@@ -263,7 +232,7 @@ export class VectorObject extends RenderObject {
       points.push({
         x: center.x + radius * Math.cos(angle),
         y: center.y + radius * Math.sin(angle),
-        z: center.z
+        z: center.z,
       });
     }
 
@@ -273,13 +242,13 @@ export class VectorObject extends RenderObject {
           position: center,
           rotation: { x: 0, y: 0, z: 0 },
           scale: { x: 1, y: 1, z: 1 },
-          opacity: 1
-        }
+          opacity: 1,
+        },
       }),
       GeometryType.Circle,
       points,
       stroke,
-      fill
+      fill,
     );
   }
 
@@ -298,7 +267,7 @@ export class VectorObject extends RenderObject {
     radiusY: number,
     center: Point3D = { x: 0, y: 0, z: 0 },
     stroke?: StrokeStyle,
-    fill?: FillStyle
+    fill?: FillStyle,
   ): VectorObject {
     const points: Point3D[] = [];
     const segments = 64;
@@ -308,7 +277,7 @@ export class VectorObject extends RenderObject {
       points.push({
         x: center.x + radiusX * Math.cos(angle),
         y: center.y + radiusY * Math.sin(angle),
-        z: center.z
+        z: center.z,
       });
     }
 
@@ -318,13 +287,13 @@ export class VectorObject extends RenderObject {
           position: center,
           rotation: { x: 0, y: 0, z: 0 },
           scale: { x: 1, y: 1, z: 1 },
-          opacity: 1
-        }
+          opacity: 1,
+        },
       }),
       GeometryType.Ellipse,
       points,
       stroke,
-      fill
+      fill,
     );
   }
 
@@ -343,7 +312,7 @@ export class VectorObject extends RenderObject {
     height: number,
     center: Point3D = { x: 0, y: 0, z: 0 },
     stroke?: StrokeStyle,
-    fill?: FillStyle
+    fill?: FillStyle,
   ): VectorObject {
     const hw = width / 2;
     const hh = height / 2;
@@ -354,18 +323,18 @@ export class VectorObject extends RenderObject {
           position: center,
           rotation: { x: 0, y: 0, z: 0 },
           scale: { x: 1, y: 1, z: 1 },
-          opacity: 1
-        }
+          opacity: 1,
+        },
       }),
       GeometryType.Rectangle,
       [
         { x: center.x - hw, y: center.y - hh, z: center.z },
         { x: center.x + hw, y: center.y - hh, z: center.z },
         { x: center.x + hw, y: center.y + hh, z: center.z },
-        { x: center.x - hw, y: center.y + hh, z: center.z }
+        { x: center.x - hw, y: center.y + hh, z: center.z },
       ],
       stroke,
-      fill
+      fill,
     );
   }
 
@@ -382,7 +351,7 @@ export class VectorObject extends RenderObject {
     size: number,
     center: Point3D = { x: 0, y: 0, z: 0 },
     stroke?: StrokeStyle,
-    fill?: FillStyle
+    fill?: FillStyle,
   ): VectorObject {
     return VectorObject.rectangle(size, size, center, stroke, fill);
   }
@@ -402,7 +371,7 @@ export class VectorObject extends RenderObject {
     radius: number,
     center: Point3D = { x: 0, y: 0, z: 0 },
     stroke?: StrokeStyle,
-    fill?: FillStyle
+    fill?: FillStyle,
   ): VectorObject {
     if (sides < 3) {
       throw new Error('Polygon must have at least 3 sides');
@@ -415,7 +384,7 @@ export class VectorObject extends RenderObject {
       points.push({
         x: center.x + radius * Math.cos(angle),
         y: center.y + radius * Math.sin(angle),
-        z: center.z
+        z: center.z,
       });
     }
 
@@ -425,13 +394,13 @@ export class VectorObject extends RenderObject {
           position: center,
           rotation: { x: 0, y: 0, z: 0 },
           scale: { x: 1, y: 1, z: 1 },
-          opacity: 1
-        }
+          opacity: 1,
+        },
       }),
       GeometryType.Polygon,
       points,
       stroke,
-      fill
+      fill,
     );
   }
 
@@ -448,7 +417,7 @@ export class VectorObject extends RenderObject {
     size: number,
     center: Point3D = { x: 0, y: 0, z: 0 },
     stroke?: StrokeStyle,
-    fill?: FillStyle
+    fill?: FillStyle,
   ): VectorObject {
     return VectorObject.polygon(3, size, center, stroke, fill);
   }
@@ -466,7 +435,7 @@ export class VectorObject extends RenderObject {
       RenderObject.createDefaultState(),
       GeometryType.Line,
       [start, end],
-      stroke
+      stroke,
     );
   }
 
@@ -481,17 +450,15 @@ export class VectorObject extends RenderObject {
   static path(
     points: ReadonlyArray<Point3D>,
     stroke: StrokeStyle,
-    close: boolean = false
+    close: boolean = false,
   ): VectorObject {
-    const pathPoints = close && points.length > 2
-      ? [...points, points[0]]
-      : points;
+    const pathPoints = close && points.length > 2 ? [...points, points[0]!] : points;
 
     return new VectorObject(
       RenderObject.createDefaultState(),
       GeometryType.Curve,
       pathPoints,
-      stroke
+      stroke,
     );
   }
 
@@ -510,7 +477,7 @@ export class VectorObject extends RenderObject {
     startAngle: number,
     endAngle: number,
     center: Point3D = { x: 0, y: 0, z: 0 },
-    stroke: StrokeStyle
+    stroke: StrokeStyle,
   ): VectorObject {
     const points: Point3D[] = [];
     const segments = 32;
@@ -521,7 +488,7 @@ export class VectorObject extends RenderObject {
       points.push({
         x: center.x + radius * Math.cos(angle),
         y: center.y + radius * Math.sin(angle),
-        z: center.z
+        z: center.z,
       });
     }
 
@@ -531,12 +498,12 @@ export class VectorObject extends RenderObject {
           position: center,
           rotation: { x: 0, y: 0, z: 0 },
           scale: { x: 1, y: 1, z: 1 },
-          opacity: 1
-        }
+          opacity: 1,
+        },
       }),
       GeometryType.Arc,
       points,
-      stroke
+      stroke,
     );
   }
 
@@ -547,13 +514,13 @@ export class VectorObject extends RenderObject {
   /**
    * Get a JSON-serializable representation
    */
-  toJSON(): Record<string, unknown> {
+  override toJSON(): Record<string, unknown> {
     return {
       ...super.toJSON(),
       geometryType: this.geometryType,
       pointCount: this.points.length,
       hasStroke: this.hasStroke(),
-      hasFill: this.hasFill()
+      hasFill: this.hasFill(),
     };
   }
 }

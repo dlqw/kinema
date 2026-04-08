@@ -8,7 +8,7 @@
  */
 
 import type { RenderObject, ObjectId, Point3D } from './core';
-import type { Animation, InterpolationResult } from './animation';
+import type { Animation } from './animation';
 
 /**
  * ============================================================================
@@ -21,13 +21,13 @@ import type { Animation, InterpolationResult } from './animation';
  */
 export interface SceneConfig {
   /** Scene width in pixels */
-  readonly width: number;
+  width: number;
   /** Scene height in pixels */
-  readonly height: number;
+  height: number;
   /** Background color (CSS color string) */
-  readonly backgroundColor?: string;
+  backgroundColor?: string;
   /** Frames per second for animation */
-  readonly fps: number;
+  fps: number;
 }
 
 /**
@@ -37,7 +37,7 @@ export const DEFAULT_SCENE_CONFIG: SceneConfig = Object.freeze({
   width: 1920,
   height: 1080,
   backgroundColor: '#000000',
-  fps: 60
+  fps: 60,
 });
 
 /**
@@ -115,7 +115,7 @@ export class Scene {
     objects?: Map<ObjectId, RenderObject>,
     currentTime?: number,
     animationQueue?: Array<{ animation: Animation; startTime: number }>,
-    activeAnimations?: Set<Animation>
+    activeAnimations?: Set<Animation>,
   ) {
     this._objects = objects ?? new Map();
     this._currentTime = currentTime ?? 0;
@@ -162,8 +162,9 @@ export class Scene {
    * Get all objects in the scene (sorted by z-index)
    */
   getObjects(): ReadonlyArray<RenderObject> {
-    return Array.from(this.objects.values())
-      .sort((a, b) => a.getState().z_index - b.getState().z_index);
+    return Array.from(this.objects.values()).sort(
+      (a, b) => a.getState().z_index - b.getState().z_index,
+    );
   }
 
   /**
@@ -171,6 +172,13 @@ export class Scene {
    */
   getObject(id: ObjectId): RenderObject | undefined {
     return this.objects.get(id);
+  }
+
+  /**
+   * Get visible objects only
+   */
+  getVisibleObjects(): ReadonlyArray<RenderObject> {
+    return this.getObjects().filter((obj) => obj.visible);
   }
 
   /**
@@ -184,7 +192,7 @@ export class Scene {
     newObjects.set(object.getState().id, object);
 
     return this.clone({
-      objects: newObjects
+      objects: newObjects,
     });
   }
 
@@ -201,7 +209,7 @@ export class Scene {
     }
 
     return this.clone({
-      objects: newObjects
+      objects: newObjects,
     });
   }
 
@@ -216,7 +224,7 @@ export class Scene {
     newObjects.delete(objectId);
 
     return this.clone({
-      objects: newObjects
+      objects: newObjects,
     });
   }
 
@@ -233,7 +241,7 @@ export class Scene {
     }
 
     return this.clone({
-      objects: newObjects
+      objects: newObjects,
     });
   }
 
@@ -244,7 +252,7 @@ export class Scene {
    */
   clear(): Scene {
     return this.clone({
-      objects: new Map()
+      objects: new Map(),
     });
   }
 
@@ -260,7 +268,7 @@ export class Scene {
     const newQueue = [...this.animationQueue, { animation, startTime }];
 
     return this.clone({
-      animationQueue: newQueue
+      animationQueue: newQueue,
     });
   }
 
@@ -275,11 +283,11 @@ export class Scene {
     const startTime = this.currentTime + delay;
     const newQueue = [
       ...this.animationQueue,
-      ...animations.map(anim => ({ animation: anim, startTime }))
+      ...animations.map((anim) => ({ animation: anim, startTime })),
     ];
 
     return this.clone({
-      animationQueue: newQueue
+      animationQueue: newQueue,
     });
   }
 
@@ -306,7 +314,7 @@ export class Scene {
     }
 
     // Also include currently active animations
-    for (const animation of this.activeAnimations) {
+    for (const animation of Array.from(this.activeAnimations)) {
       animationsToProcess.push(animation);
     }
 
@@ -329,15 +337,13 @@ export class Scene {
     }
 
     // Filter animation queue - remove processed animations
-    const newQueue = this.animationQueue.filter(
-      ({ startTime }) => startTime >= targetTime
-    );
+    const newQueue = this.animationQueue.filter(({ startTime }) => startTime >= targetTime);
 
     return this.clone({
       objects: newObjects,
       currentTime: targetTime,
       animationQueue: newQueue,
-      activeAnimations: newActiveAnimations
+      activeAnimations: newActiveAnimations,
     });
   }
 
@@ -348,7 +354,7 @@ export class Scene {
     return {
       time: this.currentTime,
       objects: Array.from(this.objects.values()),
-      metadata: new Map()
+      metadata: new Map(),
     };
   }
 
@@ -359,13 +365,11 @@ export class Scene {
    * @returns New scene instance restored from snapshot
    */
   restoreFromSnapshot(snapshot: SceneSnapshot): Scene {
-    const newObjects = new Map(
-      snapshot.objects.map(obj => [obj.getState().id, obj])
-    );
+    const newObjects = new Map(snapshot.objects.map((obj) => [obj.getState().id, obj]));
 
     return this.clone({
       objects: newObjects,
-      currentTime: snapshot.time
+      currentTime: snapshot.time,
     });
   }
 
@@ -377,7 +381,7 @@ export class Scene {
       time: this.currentTime,
       objects: this.objects,
       activeAnimations: this.activeAnimations,
-      animationQueue: this.animationQueue
+      animationQueue: this.animationQueue,
     };
   }
 
@@ -388,7 +392,7 @@ export class Scene {
    * @returns Array of objects containing the point (topmost last)
    */
   findObjectsAtPoint(point: Point3D): ReadonlyArray<RenderObject> {
-    return this.getObjects().filter(obj => obj.containsPoint(point));
+    return this.getObjects().filter((obj) => obj.containsPoint(point));
   }
 
   /**
@@ -417,7 +421,7 @@ export class Scene {
       updates.objects ?? this.objects,
       updates.currentTime ?? this.currentTime,
       updates.animationQueue ?? this.animationQueue,
-      updates.activeAnimations ?? this.activeAnimations
+      updates.activeAnimations ?? this.activeAnimations,
     );
   }
 }
@@ -432,14 +436,17 @@ export class Scene {
  * Builder for creating scenes with a fluent API
  */
 export class SceneBuilder {
-  private config: Partial<SceneConfig> = {};
+  private _width?: number;
+  private _height?: number;
+  private _backgroundColor?: string;
+  private _fps?: number;
 
   /**
    * Set scene dimensions
    */
   withDimensions(width: number, height: number): SceneBuilder {
-    this.config.width = width;
-    this.config.height = height;
+    this._width = width;
+    this._height = height;
     return this;
   }
 
@@ -447,7 +454,7 @@ export class SceneBuilder {
    * Set background color
    */
   withBackgroundColor(color: string): SceneBuilder {
-    this.config.backgroundColor = color;
+    this._backgroundColor = color;
     return this;
   }
 
@@ -455,7 +462,7 @@ export class SceneBuilder {
    * Set frame rate
    */
   withFps(fps: number): SceneBuilder {
-    this.config.fps = fps;
+    this._fps = fps;
     return this;
   }
 
@@ -463,12 +470,19 @@ export class SceneBuilder {
    * Build the scene instance
    */
   build(id?: string): Scene {
-    const fullConfig: SceneConfig = {
-      ...DEFAULT_SCENE_CONFIG,
-      ...this.config
+    // Build config with optional backgroundColor handling
+    const config: SceneConfig = {
+      width: this._width ?? DEFAULT_SCENE_CONFIG.width,
+      height: this._height ?? DEFAULT_SCENE_CONFIG.height,
+      fps: this._fps ?? DEFAULT_SCENE_CONFIG.fps,
     };
 
-    return new Scene(fullConfig, id);
+    // Only add backgroundColor if it was explicitly set
+    if (this._backgroundColor !== undefined) {
+      Object.assign(config, { backgroundColor: this._backgroundColor });
+    }
+
+    return new Scene(config, id);
   }
 }
 
@@ -484,7 +498,7 @@ export class SceneBuilder {
 export function createScene(config?: Partial<SceneConfig>): Scene {
   const fullConfig: SceneConfig = {
     ...DEFAULT_SCENE_CONFIG,
-    ...config
+    ...config,
   };
 
   return new Scene(fullConfig);
