@@ -39,7 +39,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [18, 20, 22]
+        node-version: [20, 22]
 
     steps:
       - name: Checkout code
@@ -54,11 +54,14 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Build core package
+        run: npm run build:core
+
       - name: Run unit tests
-        run: npm run test -- --run
+        run: npm run test
 
       - name: Run integration tests
-        run: npm run test:integration -- --run
+        run: npm run test:integration
 
       - name: Generate coverage report
         run: npm run test:coverage
@@ -132,16 +135,16 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Build project
-        run: npm run build
+      - name: Build core package
+        run: npm run build:core
 
       - name: Check build output
         run: |
-          if [ -d "dist" ]; then
-            echo "Build successful, dist directory created"
-            ls -la dist/
+          if [ -f "packages/core/dist/index.js" ]; then
+            echo "Build successful, core dist created"
+            ls -la packages/core/dist/
           else
-            echo "Build failed, dist directory not found"
+            echo "Build failed, core dist not found"
             exit 1
           fi
 
@@ -149,7 +152,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: build-output
-          path: dist/
+          path: packages/core/dist/
           retention-days: 7
 
   security:

@@ -5,8 +5,10 @@
  * exports, with verification of output files.
  */
 
-import { test, expect, fs } from '@playwright/test';
+import { test, expect } from '@playwright/test';
 import path from 'path';
+import { promises as fsPromises } from 'fs';
+import fs from 'fs';
 
 test.describe('Export Workflow', () => {
   const exportDir = 'test-results/exports';
@@ -60,11 +62,11 @@ test.describe('Export Workflow', () => {
     expect(download.suggestedFilename()).toMatch(/\.(mp4|webm)$/);
 
     // Verify file metadata
-    const stats = await fs.stat(download.path());
+    const stats = await fsPromises.stat(download.path());
     expect(stats.size).toBeGreaterThan(1000); // At least 1KB
 
     // Cleanup
-    await fs.unlink(download.path());
+    await fsPromises.unlink(download.path());
   });
 
   test('should export animation as GIF', async ({ page }) => {
@@ -94,12 +96,12 @@ test.describe('Export Workflow', () => {
     expect(download.suggestedFilename()).toMatch(/\.gif$/);
 
     // Verify it's a valid GIF (has GIF header)
-    const buffer = await fs.readFile(download.path());
+    const buffer = await fsPromises.readFile(download.path());
     const header = buffer.slice(0, 6).toString('hex');
     expect(header).toBe('474946383961'); // 'GIF89a' in hex
 
     // Cleanup
-    await fs.unlink(download.path());
+    await fsPromises.unlink(download.path());
   });
 
   test('should export as image sequence', async ({ page }) => {
@@ -130,11 +132,11 @@ test.describe('Export Workflow', () => {
     expect(download.suggestedFilename()).toMatch(/\.(zip|tar\.gz)$/);
 
     // Verify file size is reasonable
-    const stats = await fs.stat(download.path());
+    const stats = await fsPromises.stat(download.path());
     expect(stats.size).toBeGreaterThan(500);
 
     // Cleanup
-    await fs.unlink(download.path());
+    await fsPromises.unlink(download.path());
   });
 
   test('should export single frame as image', async ({ page }) => {
@@ -158,7 +160,7 @@ test.describe('Export Workflow', () => {
     expect(download.suggestedFilename()).toMatch(/\.(png|jpg|jpeg)$/);
 
     // Verify it's a valid image
-    const buffer = await fs.readFile(download.path());
+    const buffer = await fsPromises.readFile(download.path());
 
     // Check PNG header (if PNG)
     if (download.suggestedFilename().endsWith('.png')) {
@@ -167,7 +169,7 @@ test.describe('Export Workflow', () => {
     }
 
     // Cleanup
-    await fs.unlink(download.path());
+    await fsPromises.unlink(download.path());
   });
 
   test('should export with custom resolution', async ({ page }) => {
@@ -184,8 +186,7 @@ test.describe('Export Workflow', () => {
     await page.click('[data-testid="export-start-button"]');
 
     // Verify export respects resolution setting
-    const resolutionText = await page.locator('[data-testid="export-resolution"]')
-      .inputValue();
+    const resolutionText = await page.locator('[data-testid="export-resolution"]').inputValue();
 
     expect(resolutionText).toBe('1920x1080');
   });
@@ -209,7 +210,8 @@ test.describe('Export Workflow', () => {
     await expect(page.locator('[data-testid="export-progress"]')).toBeVisible();
 
     // Verify progress updates
-    const progressText = await page.locator('[data-testid="export-progress-percent"]')
+    const progressText = await page
+      .locator('[data-testid="export-progress-percent"]')
       .textContent();
 
     expect(progressText).toBeDefined();
@@ -246,9 +248,7 @@ test.describe('Export Workflow', () => {
     await expect(page.locator('[data-testid="export-cancelled"]')).toBeVisible();
 
     // Verify no partial file was created
-    const files = fs.readdirSync('test-results/exports').filter(
-      f => !f.startsWith('.')
-    );
+    const files = fs.readdirSync('test-results/exports').filter((f) => !f.startsWith('.'));
 
     // Should be empty or only contain test artifacts
     expect(files.length).toBe(0);
@@ -267,8 +267,9 @@ test.describe('Export Workflow', () => {
     await page.click('[data-testid="export-start-button"]');
 
     // Should show validation error
-    await expect(page.locator('[data-testid="export-error"] >> text=Duration must be positive'))
-      .toBeVisible();
+    await expect(
+      page.locator('[data-testid="export-error"] >> text=Duration must be positive'),
+    ).toBeVisible();
 
     // Fix duration
     await page.fill('[data-testid="export-duration"]', '5');
@@ -334,7 +335,8 @@ test.describe('Export Workflow', () => {
     await page.click('[data-testid="export-video-button"]');
 
     // Check aspect ratio in export settings
-    const exportAspectRatio = await page.locator('[data-testid="export-aspect-ratio"]')
+    const exportAspectRatio = await page
+      .locator('[data-testid="export-aspect-ratio"]')
       .textContent();
 
     expect(exportAspectRatio).toBe('16:9');
@@ -391,7 +393,7 @@ test.describe('Export Workflow', () => {
 
     // Check if transparency option is available
     const transparencyOption = page.locator('[data-testid="export-transparency"]');
-    const hasTransparency = await transparencyOption.count() > 0;
+    const hasTransparency = (await transparencyOption.count()) > 0;
 
     if (hasTransparency) {
       await page.check('[data-testid="export-transparency"]');
@@ -414,7 +416,7 @@ test.describe('Export Workflow', () => {
 
     // Check if preview is shown
     const previewCanvas = page.locator('[data-testid="export-preview-canvas"]');
-    const hasPreview = await previewCanvas.count() > 0;
+    const hasPreview = (await previewCanvas.count()) > 0;
 
     if (hasPreview) {
       await expect(previewCanvas).toBeVisible();
@@ -481,7 +483,7 @@ test.describe('Export - File Verification', () => {
     await expect(img).toBeVisible();
 
     // Clean up
-    await fs.unlink(download.path());
+    await fsPromises.unlink(download.path());
   });
 
   test('should export with custom frame rate and duration', async ({ page }) => {
@@ -493,7 +495,7 @@ test.describe('Export - File Verification', () => {
     await page.click('[data-testid="add-animation-button"]');
     await page.selectOption('[data-testid="animation-type"]', 'bounce');
     await page.fill('[data-testid="animation-duration"]', '2000');
-    await page.click('[data-testid="animation-apply-button']');
+    await page.click('[data-testid="animation-apply-button"]');
 
     // Configure export with custom settings
     await page.click('[data-testid="export-video-button"]');
@@ -507,12 +509,10 @@ test.describe('Export - File Verification', () => {
     await page.click('[data-testid="export-start-button"]');
 
     // Verify settings were applied
-    const frameRate = await page.locator('[data-testid="video-framerate"]')
-      .inputValue();
+    const frameRate = await page.locator('[data-testid="video-framerate"]').inputValue();
     expect(frameRate).toBe('120');
 
-    const duration = await page.locator('[data-testid="export-duration"]')
-      .inputValue();
+    const duration = await page.locator('[data-testid="export-duration"]').inputValue();
     expect(duration).toBe('2');
   });
 });
@@ -558,7 +558,7 @@ test.describe('Export - Performance', () => {
     await page.click('[data-testid="add-animation-button"]');
     await page.selectOption('[data-testid="animation-type"]', 'move');
     await page.fill('[data-testid="animation-duration"]', '30000'); // 30 seconds
-    await page.click('[data-testid="animation-apply-button']');
+    await page.click('[data-testid="animation-apply-button"]');
 
     // Start export
     await page.click('[data-testid="export-video-button"]');
@@ -577,9 +577,7 @@ test.describe('Export - Performance', () => {
     // Verify no export file was created (or if created, it was cleaned up)
     const exportDirExists = fs.existsSync('test-results/exports');
     if (exportDirExists) {
-      const files = fs.readdirSync('test-results/exports').filter(
-        f => !f.startsWith('.')
-      );
+      const files = fs.readdirSync('test-results/exports').filter((f) => !f.startsWith('.'));
       expect(files.length).toBe(0);
     }
   });
@@ -598,8 +596,8 @@ test.describe('Export - Edge Cases', () => {
     const errorOrWarning = page.locator('[data-testid="export-error"]');
     const completeIndicator = page.locator('[data-testid="export-complete"]');
 
-    const hasError = await errorOrWarning.count() > 0;
-    const isComplete = await completeIndicator.count() > 0;
+    const hasError = (await errorOrWarning.count()) > 0;
+    const isComplete = (await completeIndicator.count()) > 0;
 
     expect(hasError || isComplete).toBeTruthy();
   });
@@ -624,7 +622,7 @@ test.describe('Export - Edge Cases', () => {
 
     // Should either stop playback, show warning, or proceed
     const warning = page.locator('[data-testid="export-while-playing-warning"]');
-    const hasWarning = await warning.count() > 0;
+    const hasWarning = (await warning.count()) > 0;
 
     // If no warning, export should still work
     expect(true).toBeTruthy();

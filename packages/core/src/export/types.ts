@@ -131,7 +131,7 @@ export interface Encoder<TOptions extends EncoderOptions = EncoderOptions> {
   encode(
     frames: ImageData[],
     options: TOptions,
-    onProgress?: EncoderProgressCallback
+    onProgress?: EncoderProgressCallback,
   ): Promise<Blob>;
 
   /** Abort current encoding operation */
@@ -145,7 +145,7 @@ export interface Encoder<TOptions extends EncoderOptions = EncoderOptions> {
  * Encoder factory function type
  */
 export type EncoderFactory<TOptions extends EncoderOptions = EncoderOptions> = (
-  options: TOptions
+  options: TOptions,
 ) => Encoder<TOptions>;
 
 /**
@@ -163,7 +163,9 @@ export interface EncoderAvailabilityResult {
 /**
  * Default GIF encoder options
  */
-export const DEFAULT_GIF_OPTIONS: Required<Omit<GifEncoderOptions, 'width' | 'height' | 'backgroundColor'>> = {
+export const DEFAULT_GIF_OPTIONS: Required<
+  Omit<GifEncoderOptions, 'width' | 'height' | 'backgroundColor'>
+> = {
   loop: 0,
   frameDelay: 100,
   dither: 'fs',
@@ -177,7 +179,9 @@ export const DEFAULT_GIF_OPTIONS: Required<Omit<GifEncoderOptions, 'width' | 'he
 /**
  * Default WebM encoder options
  */
-export const DEFAULT_WEBM_OPTIONS: Required<Omit<WebMEncoderOptions, 'width' | 'height' | 'backgroundColor'>> = {
+export const DEFAULT_WEBM_OPTIONS: Required<
+  Omit<WebMEncoderOptions, 'width' | 'height' | 'backgroundColor'>
+> = {
   quality: 0.8,
   bitrate: 2500000,
   keyframeInterval: 60,
@@ -187,7 +191,9 @@ export const DEFAULT_WEBM_OPTIONS: Required<Omit<WebMEncoderOptions, 'width' | '
 /**
  * Default MP4 encoder options
  */
-export const DEFAULT_MP4_OPTIONS: Required<Omit<MP4EncoderOptions, 'width' | 'height' | 'backgroundColor'>> = {
+export const DEFAULT_MP4_OPTIONS: Required<
+  Omit<MP4EncoderOptions, 'width' | 'height' | 'backgroundColor'>
+> = {
   quality: 0.8,
   bitrate: 5000000,
   gopSize: 60,

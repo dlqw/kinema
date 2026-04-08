@@ -260,64 +260,113 @@ function calculateTotalDuration(
 }
 
 /**
+ * Loop mode for LoopAnimation
+ */
+export type LoopMode =
+  | { readonly type: 'finite'; readonly count: number }
+  | { readonly type: 'infinite' };
+
+/**
  * LoopAnimation repeats an animation
  *
  * @example
  * ```typescript
- * const loop = new LoopAnimation(rotate, 3); // Rotate 3 times
- * const infiniteLoop = LoopAnimation.infinite(pulse); // Loop forever
+ * const loop = new LoopAnimation(target, rotateAnim, { type: 'finite', count: 3 });
+ * const infiniteLoop = LoopAnimation.infinite(pulse);
  * ```
  */
 export class LoopAnimation extends Animation {
   private readonly baseAnimation: Animation;
-  private _loopCount: number;
+  private readonly loopMode: LoopMode;
 
   /**
    * Creates a new LoopAnimation
    *
    * @param target - Target object
    * @param baseAnimation - Animation to loop
-   * @param loopCount - Number of times to loop
+   * @param loopMode - Loop configuration (finite count or infinite)
    * @param config - Animation configuration
    */
   constructor(
     target: RenderObject,
     baseAnimation: Animation,
-    loopCount: number,
+    loopMode: LoopMode = { type: 'finite', count: 1 },
     config: AnimationConfig = {},
   ) {
-    const totalDuration = baseAnimation.getTotalDuration() * loopCount;
-    super(target, { ...config, duration: totalDuration });
+    const baseDuration = baseAnimation.getTotalDuration();
+    const duration =
+      loopMode.type === 'infinite'
+        ? baseDuration > 0
+          ? Infinity
+          : 0
+        : baseDuration * loopMode.count;
+    super(target, { ...config, duration });
     this.baseAnimation = baseAnimation;
-    this._loopCount = loopCount;
+    this.loopMode = loopMode;
   }
 
   /**
-   * Get the loop count
+   * Get the loop count (Infinity for infinite loops)
    */
   get loopCount(): number {
-    return this._loopCount;
+    return this.loopMode.type === 'infinite' ? Infinity : this.loopMode.count;
   }
 
   /**
    * Check if this is an infinite loop
    */
   get isInfinite(): boolean {
-    return this._loopCount === Infinity;
+    return this.loopMode.type === 'infinite';
   }
 
   /**
-   * Interpolate with looping
+   * Override interpolate to handle infinite duration correctly.
+   *
+   * The parent Animation.interpolate() computes progress as
+   * `(elapsedTime - delay) / duration`, which yields 0 when duration is Infinity.
+   * For infinite loops, we compute progress directly from elapsed time modulo
+   * the base animation duration.
+   */
+  override interpolate(elapsedTime: number): ReturnType<Animation['interpolate']> {
+    if (this.loopMode.type !== 'infinite') {
+      return super.interpolate(elapsedTime);
+    }
+
+    const baseDuration = this.baseAnimation.getTotalDuration();
+    const delay = this.config.delay ?? 0;
+
+    if (baseDuration === 0) {
+      return this.baseAnimation.interpolate(0);
+    }
+
+    // During delay, return original object
+    if (elapsedTime < delay) {
+      return { object: this.target, complete: false };
+    }
+
+    const effectiveElapsed = elapsedTime - delay;
+    const loopElapsed = effectiveElapsed % baseDuration;
+    return this.baseAnimation.interpolate(loopElapsed);
+  }
+
+  /**
+   * Interpolate with looping for finite case.
+   * Called by parent interpolate() after easing is applied.
    */
   protected override interpolateAt(alpha: Alpha): RenderObject {
-    const loopProgress = alpha * this._loopCount;
+    const baseDuration = this.baseAnimation.getTotalDuration();
+
+    if (baseDuration === 0) {
+      const { object } = this.baseAnimation.interpolate(0);
+      return object;
+    }
+
+    const count = this.loopMode.type === 'infinite' ? 1 : this.loopMode.count;
+    const loopProgress = alpha * count;
     const currentLoop = Math.floor(loopProgress);
     const loopAlpha = loopProgress - currentLoop;
 
-    const { object } = this.baseAnimation.interpolate(
-      loopAlpha * this.baseAnimation.getTotalDuration(),
-    );
-
+    const { object } = this.baseAnimation.interpolate(loopAlpha * baseDuration);
     return object;
   }
 
@@ -329,21 +378,24 @@ export class LoopAnimation extends Animation {
    * @returns A new LoopAnimation
    */
   static create(baseAnimation: Animation, loopCount: number): LoopAnimation {
-    return new LoopAnimation(baseAnimation.target, baseAnimation, loopCount);
+    return new LoopAnimation(baseAnimation.target, baseAnimation, {
+      type: 'finite',
+      count: loopCount,
+    });
   }
 
   /**
    * Create an infinite loop animation
    *
    * Note: Infinite loops need special handling in scene rendering.
+   * The total duration is set to Infinity, so the timeline must handle
+   * termination externally (e.g. via a scene duration cap).
    *
    * @param baseAnimation - Animation to loop
    * @returns A new LoopAnimation with infinite loop
    */
   static infinite(baseAnimation: Animation): LoopAnimation {
-    const anim = new LoopAnimation(baseAnimation.target, baseAnimation, 1);
-    anim._loopCount = Infinity;
-    return anim;
+    return new LoopAnimation(baseAnimation.target, baseAnimation, { type: 'infinite' });
   }
 }
 

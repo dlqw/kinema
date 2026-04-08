@@ -10,24 +10,19 @@
  * @module examples/basic/fade
  */
 
-import {
-  createScene,
-  Scene
-} from '../../../../packages/core/src/types/scene';
-import {
-  VectorObject
-} from '../../../../packages/core/src/types/objects';
+import { createScene, Scene } from '../../../../packages/core/src/types/scene';
+import { VectorObject } from '../../../../packages/core/src/types/objects';
 import {
   FadeInAnimation,
   FadeOutAnimation,
   AnimationGroup,
-  CompositionType
+  CompositionType,
 } from '../../../../packages/core/src/types/animation';
 import {
   smooth,
   easeInSine,
   easeOutSine,
-  linear
+  linear,
 } from '../../../../packages/core/src/types/easing';
 
 /**
@@ -44,30 +39,27 @@ export function createFadeExample(): Scene {
     width: 1280,
     height: 720,
     backgroundColor: '#1a1a2e',
-    fps: 60
+    fps: 60,
   });
 
   // 创建三个矩形，分别展示不同的淡入淡出效果
   const rect1: VectorObject = VectorObject.rectangle(
-    1.5, 1,              // 宽度、高度
-    { x: -3, y: 1, z: 0 },  // 位置
+    1.5,
+    1, // 宽度、高度
+    { x: -3, y: 1, z: 0 }, // 位置
     undefined,
-    { color: '#e74c3c', opacity: 0 }  // 初始透明度为 0
+    { color: '#e74c3c', opacity: 0 }, // 初始透明度为 0
   );
 
-  const rect2: VectorObject = VectorObject.rectangle(
-    1.5, 1,
-    { x: 0, y: 1, z: 0 },
-    undefined,
-    { color: '#3498db', opacity: 0 }
-  );
+  const rect2: VectorObject = VectorObject.rectangle(1.5, 1, { x: 0, y: 1, z: 0 }, undefined, {
+    color: '#3498db',
+    opacity: 0,
+  });
 
-  const rect3: VectorObject = VectorObject.rectangle(
-    1.5, 1,
-    { x: 3, y: 1, z: 0 },
-    undefined,
-    { color: '#2ecc71', opacity: 0 }
-  );
+  const rect3: VectorObject = VectorObject.rectangle(1.5, 1, { x: 3, y: 1, z: 0 }, undefined, {
+    color: '#2ecc71',
+    opacity: 0,
+  });
 
   let currentScene: Scene = scene.addObjects(rect1, rect2, rect3);
 
@@ -78,24 +70,24 @@ export function createFadeExample(): Scene {
   // 矩形 1：平滑淡入
   const fadeIn1: FadeInAnimation = new FadeInAnimation(rect1, {
     duration: 1.0,
-    easing: smooth,       // 平滑的 S 曲线
-    name: 'fade-in-smooth'
+    easing: smooth, // 平滑的 S 曲线
+    name: 'fade-in-smooth',
   });
 
   // 矩形 2：慢速开始淡入
   const fadeIn2: FadeInAnimation = new FadeInAnimation(rect2, {
     duration: 1.0,
-    easing: easeInSine,   // 开始慢，逐渐加快
-    delay: 0.3,          // 延迟 0.3 秒开始
-    name: 'fade-in-ease-in'
+    easing: easeInSine, // 开始慢，逐渐加快
+    delay: 0.3, // 延迟 0.3 秒开始
+    name: 'fade-in-ease-in',
   });
 
   // 矩形 3：快速开始淡入
   const fadeIn3: FadeInAnimation = new FadeInAnimation(rect3, {
     duration: 1.0,
-    easing: easeOutSine,  // 开始快，逐渐减慢
+    easing: easeOutSine, // 开始快，逐渐减慢
     delay: 0.6,
-    name: 'fade-in-ease-out'
+    name: 'fade-in-ease-out',
   });
 
   // 调度淡入动画
@@ -111,21 +103,21 @@ export function createFadeExample(): Scene {
   const fadeOut1: FadeOutAnimation = new FadeOutAnimation(rect1, {
     duration: 1.0,
     easing: smooth,
-    name: 'fade-out-smooth'
+    name: 'fade-out-smooth',
   });
 
   // 矩形 2：快速淡出
   const fadeOut2: FadeOutAnimation = new FadeOutAnimation(rect2, {
     duration: 0.5,
     easing: easeInSine,
-    name: 'fade-out-fast'
+    name: 'fade-out-fast',
   });
 
   // 矩形 3：慢速淡出
   const fadeOut3: FadeOutAnimation = new FadeOutAnimation(rect3, {
     duration: 1.5,
     easing: easeOutSine,
-    name: 'fade-out-slow'
+    name: 'fade-out-slow',
   });
 
   // 调度淡出动画（在淡入完成后）
@@ -148,7 +140,7 @@ export function createBlinkExample(): Scene {
     width: 1280,
     height: 720,
     backgroundColor: '#0f0f1e',
-    fps: 60
+    fps: 60,
   });
 
   // 创建一个圆形
@@ -156,26 +148,26 @@ export function createBlinkExample(): Scene {
     0.8,
     { x: 0, y: 0, z: 0 },
     { color: '#f39c12', width: 0.05 },
-    { color: '#e67e22', opacity: 0 }
+    { color: '#e67e22', opacity: 0 },
   );
 
   let currentScene: Scene = scene.addObject(circle);
 
   // 创建闪烁序列
-  const blinkCount: number = 5;  // 闪烁次数
-  const blinkDuration: number = 0.3;  // 每次闪烁的持续时间
+  const blinkCount: number = 5; // 闪烁次数
+  const blinkDuration: number = 0.3; // 每次闪烁的持续时间
 
   for (let i: number = 0; i < blinkCount; i++) {
     const fadeIn: FadeInAnimation = new FadeInAnimation(circle, {
       duration: blinkDuration,
       easing: linear,
-      name: `blink-in-${i}`
+      name: `blink-in-${i}`,
     });
 
     const fadeOut: FadeOutAnimation = new FadeOutAnimation(circle, {
       duration: blinkDuration,
       easing: linear,
-      name: `blink-out-${i}`
+      name: `blink-out-${i}`,
     });
 
     // 调度闪烁动画
@@ -188,7 +180,7 @@ export function createBlinkExample(): Scene {
   const finalFadeIn: FadeInAnimation = new FadeInAnimation(circle, {
     duration: 0.5,
     easing: smooth,
-    name: 'final-fade-in'
+    name: 'final-fade-in',
   });
   currentScene = currentScene.schedule(finalFadeIn, blinkCount * blinkDuration * 2);
 
@@ -207,7 +199,7 @@ export function createPulseExample(): Scene {
     width: 1280,
     height: 720,
     backgroundColor: '#1a1a2e',
-    fps: 60
+    fps: 60,
   });
 
   // 创建中心圆形
@@ -215,7 +207,7 @@ export function createPulseExample(): Scene {
     1.0,
     { x: 0, y: 0, z: 0 },
     { color: '#9b59b6', width: 0.05 },
-    { color: '#8e44ad', opacity: 1 }
+    { color: '#8e44ad', opacity: 1 },
   );
 
   let currentScene: Scene = scene.addObject(circle);
@@ -230,14 +222,14 @@ export function createPulseExample(): Scene {
     const fadeOut: FadeOutAnimation = new FadeOutAnimation(circle, {
       duration: 0.8,
       easing: easeOutSine,
-      name: `pulse-out-${i}`
+      name: `pulse-out-${i}`,
     });
 
     // 淡入并放大
     const fadeIn: FadeInAnimation = new FadeInAnimation(circle, {
       duration: 0.8,
       easing: easeInSine,
-      name: `pulse-in-${i}`
+      name: `pulse-in-${i}`,
     });
 
     currentScene = currentScene.schedule(fadeOut, startTime);
@@ -259,49 +251,51 @@ export function createCrossFadeExample(): Scene {
     width: 1280,
     height: 720,
     backgroundColor: '#2c3e50',
-    fps: 60
+    fps: 60,
   });
 
   // 创建两个重叠的矩形
   const rect1: VectorObject = VectorObject.rectangle(
-    2, 2,
+    2,
+    2,
     { x: 0, y: 0, z: 0 },
     { color: '#e74c3c', width: 0.05 },
-    { color: '#c0392b', opacity: 1 }
+    { color: '#c0392b', opacity: 1 },
   );
 
   const rect2: VectorObject = VectorObject.rectangle(
-    2, 2,
+    2,
+    2,
     { x: 0, y: 0, z: 0 },
     { color: '#3498db', width: 0.05 },
-    { color: '#2980b9', opacity: 0 }
+    { color: '#2980b9', opacity: 0 },
   );
 
   let currentScene: Scene = scene.addObjects(rect1, rect2);
 
   // 创建交叉淡入淡出动画组
   const crossFadeGroup: AnimationGroup = new AnimationGroup(
-    rect1,  // 主目标对象
+    rect1, // 主目标对象
     [
       // 矩形 1 淡出
       new FadeOutAnimation(rect1, {
         duration: 1.5,
         easing: smooth,
-        name: 'cross-fade-out'
+        name: 'cross-fade-out',
       }),
       // 矩形 2 淡入（并行执行）
       new FadeInAnimation(rect2, {
         duration: 1.5,
         easing: smooth,
-        name: 'cross-fade-in'
-      })
+        name: 'cross-fade-in',
+      }),
     ],
-    CompositionType.Parallel,  // 并行执行
+    CompositionType.Parallel, // 并行执行
     {
       duration: 1.5,
       easing: smooth,
-      name: 'cross-fade-group'
-    }
+      name: 'cross-fade-group',
+    },
   );
 
   // 调度交叉淡入淡出
@@ -321,7 +315,7 @@ export function createCompleteFadeDemo(): Scene {
     width: 1280,
     height: 720,
     backgroundColor: '#1a1a2e',
-    fps: 60
+    fps: 60,
   });
 
   // 创建多个对象展示不同效果
@@ -330,7 +324,7 @@ export function createCompleteFadeDemo(): Scene {
     VectorObject.circle(0.4, { x: -2, y: 2, z: 0 }, undefined, { color: '#e67e22', opacity: 0 }),
     VectorObject.circle(0.4, { x: 0, y: 2, z: 0 }, undefined, { color: '#f39c12', opacity: 0 }),
     VectorObject.circle(0.4, { x: 2, y: 2, z: 0 }, undefined, { color: '#2ecc71', opacity: 0 }),
-    VectorObject.circle(0.4, { x: 4, y: 2, z: 0 }, undefined, { color: '#3498db', opacity: 0 })
+    VectorObject.circle(0.4, { x: 4, y: 2, z: 0 }, undefined, { color: '#3498db', opacity: 0 }),
   ];
 
   let currentScene: Scene = scene.addObjects(...objects);
@@ -340,14 +334,14 @@ export function createCompleteFadeDemo(): Scene {
     const fadeIn: FadeInAnimation = new FadeInAnimation(obj, {
       duration: 0.8,
       easing: smooth,
-      delay: index * 0.15,  // 错开时间
-      name: `demo-fade-in-${index}`
+      delay: index * 0.15, // 错开时间
+      name: `demo-fade-in-${index}`,
     });
 
     const fadeOut: FadeOutAnimation = new FadeOutAnimation(obj, {
       duration: 0.8,
       easing: smooth,
-      name: `demo-fade-out-${index}`
+      name: `demo-fade-out-${index}`,
     });
 
     currentScene = currentScene.schedule(fadeIn, 0);
@@ -355,12 +349,10 @@ export function createCompleteFadeDemo(): Scene {
   });
 
   // 添加闪烁提示文字（使用矩形模拟）
-  const indicator: VectorObject = VectorObject.rectangle(
-    3, 0.3,
-    { x: 0, y: -2, z: 0 },
-    undefined,
-    { color: '#95a5a6', opacity: 0 }
-  );
+  const indicator: VectorObject = VectorObject.rectangle(3, 0.3, { x: 0, y: -2, z: 0 }, undefined, {
+    color: '#95a5a6',
+    opacity: 0,
+  });
 
   currentScene = currentScene.addObject(indicator);
 
@@ -368,11 +360,11 @@ export function createCompleteFadeDemo(): Scene {
   for (let i: number = 0; i < 3; i++) {
     currentScene = currentScene.schedule(
       new FadeInAnimation(indicator, { duration: 0.3, easing: linear }),
-      3.5 + i * 0.6
+      3.5 + i * 0.6,
     );
     currentScene = currentScene.schedule(
       new FadeOutAnimation(indicator, { duration: 0.3, easing: linear }),
-      3.8 + i * 0.6
+      3.8 + i * 0.6,
     );
   }
 

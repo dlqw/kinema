@@ -32,13 +32,13 @@ export function Circle(
     position?: Point3D;
     stroke?: StrokeStyle;
     fill?: FillStyle;
-  } = {}
+  } = {},
 ): VectorObject {
   return VectorObject.circle(
     radius,
     options.position ?? { x: 0, y: 0, z: 0 },
     options.stroke,
-    options.fill
+    options.fill,
   );
 }
 
@@ -63,14 +63,14 @@ export function Ellipse(
     position?: Point3D;
     stroke?: StrokeStyle;
     fill?: FillStyle;
-  } = {}
+  } = {},
 ): VectorObject {
   return VectorObject.ellipse(
     radiusX,
     radiusY,
     options.position ?? { x: 0, y: 0, z: 0 },
     options.stroke,
-    options.fill
+    options.fill,
   );
 }
 
@@ -98,14 +98,14 @@ export function Rectangle(
     position?: Point3D;
     stroke?: StrokeStyle;
     fill?: FillStyle;
-  } = {}
+  } = {},
 ): VectorObject {
   return VectorObject.rectangle(
     width,
     height,
     options.position ?? { x: 0, y: 0, z: 0 },
     options.stroke,
-    options.fill
+    options.fill,
   );
 }
 
@@ -128,13 +128,13 @@ export function Square(
     position?: Point3D;
     stroke?: StrokeStyle;
     fill?: FillStyle;
-  } = {}
+  } = {},
 ): VectorObject {
   return VectorObject.square(
     size,
     options.position ?? { x: 0, y: 0, z: 0 },
     options.stroke,
-    options.fill
+    options.fill,
   );
 }
 
@@ -159,14 +159,14 @@ export function Polygon(
     position?: Point3D;
     stroke?: StrokeStyle;
     fill?: FillStyle;
-  } = {}
+  } = {},
 ): VectorObject {
   return VectorObject.polygon(
     sides,
     radius,
     options.position ?? { x: 0, y: 0, z: 0 },
     options.stroke,
-    options.fill
+    options.fill,
   );
 }
 
@@ -189,13 +189,13 @@ export function Triangle(
     position?: Point3D;
     stroke?: StrokeStyle;
     fill?: FillStyle;
-  } = {}
+  } = {},
 ): VectorObject {
   return VectorObject.triangle(
     size,
     options.position ?? { x: 0, y: 0, z: 0 },
     options.stroke,
-    options.fill
+    options.fill,
   );
 }
 
@@ -216,11 +216,7 @@ export function Triangle(
  * );
  * ```
  */
-export function Line(
-  start: Point3D,
-  end: Point3D,
-  stroke: StrokeStyle
-): VectorObject {
+export function Line(start: Point3D, end: Point3D, stroke: StrokeStyle): VectorObject {
   return VectorObject.line(start, end, stroke);
 }
 
@@ -248,7 +244,7 @@ export function Line(
 export function Path(
   points: ReadonlyArray<Point3D>,
   stroke: StrokeStyle,
-  close: boolean = false
+  close: boolean = false,
 ): VectorObject {
   return VectorObject.path(points, stroke, close);
 }
@@ -276,14 +272,14 @@ export function Arc(
   stroke: StrokeStyle,
   options: {
     position?: Point3D;
-  } = {}
+  } = {},
 ): VectorObject {
   return VectorObject.arc(
     radius,
     startAngle,
     endAngle,
     options.position ?? { x: 0, y: 0, z: 0 },
-    stroke
+    stroke,
   );
 }
 
@@ -307,7 +303,7 @@ export const Colors = {
   purple: '#8000ff',
   gray: '#808080',
   lightGray: '#c0c0c0',
-  darkGray: '#404040'
+  darkGray: '#404040',
 } as const;
 
 /**
@@ -318,14 +314,8 @@ export const Colors = {
  * @param opacity - Optional opacity
  * @returns Stroke style object
  */
-export function Stroke(
-  color: string,
-  width: number = 1,
-  opacity?: number
-): StrokeStyle {
-  return opacity !== undefined
-    ? { color, width, opacity }
-    : { color, width };
+export function Stroke(color: string, width: number = 1, opacity?: number): StrokeStyle {
+  return opacity !== undefined ? { color, width, opacity } : { color, width };
 }
 
 /**
@@ -335,10 +325,7 @@ export function Stroke(
  * @param opacity - Opacity (default: 1)
  * @returns Fill style object
  */
-export function Fill(
-  color: string,
-  opacity: number = 1
-): FillStyle {
+export function Fill(color: string, opacity: number = 1): FillStyle {
   return { color, opacity };
 }
 
@@ -358,5 +345,5 @@ export default {
   Arc,
   Colors,
   Stroke,
-  Fill
+  Fill,
 };

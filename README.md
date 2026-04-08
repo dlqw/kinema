@@ -10,7 +10,7 @@ The root of the repository is now an orchestration layer only. Buildable source 
 ## Repository Layout
 
 ```text
-VideoMaker/
+Kinema/
 ├── packages/
 │   ├── core/                 # Publishable rendering and animation engine
 │   └── workstation/          # Electron desktop application

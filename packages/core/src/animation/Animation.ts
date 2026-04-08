@@ -18,6 +18,10 @@ const DEFAULT_DURATION = 1.0;
 
 /**
  * Default animation configuration
+ *
+ * Note: The default easing is `smooth` (not `linear`), which produces more
+ * natural-looking animations. Additionally, a `duration` of 0 or less causes
+ * the animation to complete immediately at its final state.
  */
 const DEFAULT_ANIMATION_CONFIG: AnimationConfig = {
   duration: DEFAULT_DURATION,

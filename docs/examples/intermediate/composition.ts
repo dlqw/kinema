@@ -10,13 +10,8 @@
  * @module examples/intermediate/composition
  */
 
-import {
-  createScene,
-  Scene
-} from '../../../../packages/core/src/types/scene';
-import {
-  VectorObject
-} from '../../../../packages/core/src/types/objects';
+import { createScene, Scene } from '../../../../packages/core/src/types/scene';
+import { VectorObject } from '../../../../packages/core/src/types/objects';
 import {
   MoveAnimation,
   RotateAnimation,
@@ -24,7 +19,7 @@ import {
   FadeInAnimation,
   FadeOutAnimation,
   AnimationGroup,
-  CompositionType
+  CompositionType,
 } from '../../../../packages/core/src/types/animation';
 import {
   smooth,
@@ -32,7 +27,7 @@ import {
   easeInCubic,
   easeOutCubic,
   easeOutBack,
-  elastic
+  elastic,
 } from '../../../../packages/core/src/types/easing';
 
 /**
@@ -52,7 +47,7 @@ export function createParallelExample(): Scene {
     width: 1280,
     height: 720,
     backgroundColor: '#1a1a2e',
-    fps: 60
+    fps: 60,
   });
 
   // ============================================
@@ -64,7 +59,7 @@ export function createParallelExample(): Scene {
     0.5,
     { x: -4, y: 0, z: 0 },
     { color: '#f39c12', width: 0.08 },
-    { color: '#e67e22', opacity: 1 }
+    { color: '#e67e22', opacity: 1 },
   );
 
   let currentScene: Scene = scene.addObject(wheel);
@@ -74,24 +69,28 @@ export function createParallelExample(): Scene {
     wheel,
     [
       // 向右移动
-      new MoveAnimation(wheel, { x: 0, y: 0, z: 0 }, {
-        duration: 2,
-        easing: smooth,
-        name: 'wheel-move'
-      }),
+      new MoveAnimation(
+        wheel,
+        { x: 0, y: 0, z: 0 },
+        {
+          duration: 2,
+          easing: smooth,
+          name: 'wheel-move',
+        },
+      ),
       // 同时旋转（模拟滚动）
       new RotateAnimation(wheel, 'z', 720, {
         duration: 2,
         easing: smooth,
-        name: 'wheel-rotate'
-      })
+        name: 'wheel-rotate',
+      }),
     ],
-    CompositionType.Parallel,  // 并行执行
+    CompositionType.Parallel, // 并行执行
     {
       duration: 2,
       easing: smooth,
-      name: 'wheel-roll-group'
-    }
+      name: 'wheel-roll-group',
+    },
   );
 
   currentScene = currentScene.schedule(wheelRollGroup, 0);
@@ -101,10 +100,11 @@ export function createParallelExample(): Scene {
   // ============================================
 
   const box: VectorObject = VectorObject.rectangle(
-    1, 1,
+    1,
+    1,
     { x: 2, y: 0, z: 0 },
     { color: '#3498db', width: 0.05 },
-    { color: '#2980b9', opacity: 1 }
+    { color: '#2980b9', opacity: 1 },
   );
 
   currentScene = currentScene.addObject(box);
@@ -113,24 +113,32 @@ export function createParallelExample(): Scene {
   const transformGroup: AnimationGroup = new AnimationGroup(
     box,
     [
-      new MoveAnimation(box, { x: 4, y: 2, z: 0 }, {
-        duration: 2,
-        easing: easeInOut,
-        name: 'box-move'
-      }),
+      new MoveAnimation(
+        box,
+        { x: 4, y: 2, z: 0 },
+        {
+          duration: 2,
+          easing: easeInOut,
+          name: 'box-move',
+        },
+      ),
       new RotateAnimation(box, 'z', 180, {
         duration: 2,
         easing: easeInOut,
-        name: 'box-rotate'
+        name: 'box-rotate',
       }),
-      new ScaleAnimation(box, { x: 1.5, y: 1.5, z: 1 }, {
-        duration: 2,
-        easing: easeInOut,
-        name: 'box-scale'
-      })
+      new ScaleAnimation(
+        box,
+        { x: 1.5, y: 1.5, z: 1 },
+        {
+          duration: 2,
+          easing: easeInOut,
+          name: 'box-scale',
+        },
+      ),
     ],
     CompositionType.Parallel,
-    { duration: 2, easing: easeInOut }
+    { duration: 2, easing: easeInOut },
   );
 
   currentScene = currentScene.schedule(transformGroup, 0);
@@ -151,7 +159,7 @@ export function createSequenceExample(): Scene {
     width: 1280,
     height: 720,
     backgroundColor: '#0f0f1e',
-    fps: 60
+    fps: 60,
   });
 
   // 创建一个英雄角色（用圆形表示）
@@ -159,7 +167,7 @@ export function createSequenceExample(): Scene {
     0.5,
     { x: -4, y: 0, z: 0 },
     { color: '#e74c3c', width: 0.05 },
-    { color: '#c0392b', opacity: 0 }
+    { color: '#c0392b', opacity: 0 },
   );
 
   let currentScene: Scene = scene.addObject(hero);
@@ -172,50 +180,62 @@ export function createSequenceExample(): Scene {
       new FadeInAnimation(hero, {
         duration: 0.5,
         easing: smooth,
-        name: 'step-1-fade-in'
+        name: 'step-1-fade-in',
       }),
 
       // 步骤 2：移动到中心
-      new MoveAnimation(hero, { x: 0, y: 0, z: 0 }, {
-        duration: 1,
-        easing: easeInOut,
-        name: 'step-2-move-center'
-      }),
+      new MoveAnimation(
+        hero,
+        { x: 0, y: 0, z: 0 },
+        {
+          duration: 1,
+          easing: easeInOut,
+          name: 'step-2-move-center',
+        },
+      ),
 
       // 步骤 3：放大亮相
-      new ScaleAnimation(hero, { x: 1.5, y: 1.5, z: 1 }, {
-        duration: 0.5,
-        easing: easeOutBack,
-        name: 'step-3-scale-up'
-      }),
+      new ScaleAnimation(
+        hero,
+        { x: 1.5, y: 1.5, z: 1 },
+        {
+          duration: 0.5,
+          easing: easeOutBack,
+          name: 'step-3-scale-up',
+        },
+      ),
 
       // 步骤 4：旋转一圈
       new RotateAnimation(hero, 'z', 360, {
         duration: 1,
         easing: smooth,
-        name: 'step-4-rotate'
+        name: 'step-4-rotate',
       }),
 
       // 步骤 5：缩小恢复正常
-      new ScaleAnimation(hero, { x: 1, y: 1, z: 1 }, {
-        duration: 0.5,
-        easing: smooth,
-        name: 'step-5-scale-down'
-      }),
+      new ScaleAnimation(
+        hero,
+        { x: 1, y: 1, z: 1 },
+        {
+          duration: 0.5,
+          easing: smooth,
+          name: 'step-5-scale-down',
+        },
+      ),
 
       // 步骤 6：淡出
       new FadeOutAnimation(hero, {
         duration: 0.5,
         easing: smooth,
-        name: 'step-6-fade-out'
-      })
+        name: 'step-6-fade-out',
+      }),
     ],
-    CompositionType.Sequence,  // 顺序执行
+    CompositionType.Sequence, // 顺序执行
     {
-      duration: 0.5 + 1 + 0.5 + 1 + 0.5 + 0.5,  // 总时长
+      duration: 0.5 + 1 + 0.5 + 1 + 0.5 + 0.5, // 总时长
       easing: smooth,
-      name: 'entrance-sequence'
-    }
+      name: 'entrance-sequence',
+    },
   );
 
   currentScene = currentScene.schedule(entranceSequence, 0);
@@ -235,7 +255,7 @@ export function createLaggedExample(): Scene {
     width: 1280,
     height: 720,
     backgroundColor: '#1a1a2e',
-    fps: 60
+    fps: 60,
   });
 
   // 创建一排圆形
@@ -247,7 +267,7 @@ export function createLaggedExample(): Scene {
       0.3,
       { x: -3.5 + i * 1.5, y: 0, z: 0 },
       { color: '#ecf0f1', width: 0.02 },
-      { color: colors[i], opacity: 1 }
+      { color: colors[i], opacity: 1 },
     );
     circles.push(circle);
   }
@@ -256,34 +276,42 @@ export function createLaggedExample(): Scene {
 
   // 为每个圆形创建相同的动画
   const animations = circles.map((circle, index) => {
-    return new MoveAnimation(circle, { x: -3.5 + index * 1.5, y: 2, z: 0 }, {
-      duration: 1.5,
-      easing: easeOutCubic,
-      name: `circle-move-${index}`
-    });
+    return new MoveAnimation(
+      circle,
+      { x: -3.5 + index * 1.5, y: 2, z: 0 },
+      {
+        duration: 1.5,
+        easing: easeOutCubic,
+        name: `circle-move-${index}`,
+      },
+    );
   });
 
   // 创建延迟动画组
   const laggedGroup: AnimationGroup = new AnimationGroup(
-    circles[0],  // 主目标（实际不会被使用）
+    circles[0], // 主目标（实际不会被使用）
     animations,
-    CompositionType.Lagged,  // 延迟执行
+    CompositionType.Lagged, // 延迟执行
     {
-      duration: 1.5 + 0.15 * (animations.length - 1),  // 总时长 = 动画时长 + 延迟
+      duration: 1.5 + 0.15 * (animations.length - 1), // 总时长 = 动画时长 + 延迟
       easing: easeOutCubic,
-      name: 'lagged-wave'
-    }
+      name: 'lagged-wave',
+    },
   );
 
   currentScene = currentScene.schedule(laggedGroup, 0);
 
   // 创建第二组波浪（向下移动）
   const animationsDown = circles.map((circle, index) => {
-    return new MoveAnimation(circle, { x: -3.5 + index * 1.5, y: -2, z: 0 }, {
-      duration: 1.5,
-      easing: easeInCubic,
-      name: `circle-move-down-${index}`
-    });
+    return new MoveAnimation(
+      circle,
+      { x: -3.5 + index * 1.5, y: -2, z: 0 },
+      {
+        duration: 1.5,
+        easing: easeInCubic,
+        name: `circle-move-down-${index}`,
+      },
+    );
   });
 
   const laggedGroupDown: AnimationGroup = new AnimationGroup(
@@ -293,8 +321,8 @@ export function createLaggedExample(): Scene {
     {
       duration: 1.5 + 0.15 * (animationsDown.length - 1),
       easing: easeInCubic,
-      name: 'lagged-wave-down'
-    }
+      name: 'lagged-wave-down',
+    },
   );
 
   currentScene = currentScene.schedule(laggedGroupDown, 2);
@@ -314,7 +342,7 @@ export function createNestedCompositionExample(): Scene {
     width: 1280,
     height: 720,
     backgroundColor: '#0f0f1e',
-    fps: 60
+    fps: 60,
   });
 
   // 创建多个对象
@@ -322,22 +350,18 @@ export function createNestedCompositionExample(): Scene {
     0.8,
     { x: 0, y: 0, z: 0 },
     { color: '#e74c3c', width: 0.05 },
-    { color: '#c0392b', opacity: 0 }
+    { color: '#c0392b', opacity: 0 },
   );
 
-  const orbit1: VectorObject = VectorObject.circle(
-    0.3,
-    { x: 2, y: 0, z: 0 },
-    undefined,
-    { color: '#3498db', opacity: 0 }
-  );
+  const orbit1: VectorObject = VectorObject.circle(0.3, { x: 2, y: 0, z: 0 }, undefined, {
+    color: '#3498db',
+    opacity: 0,
+  });
 
-  const orbit2: VectorObject = VectorObject.circle(
-    0.3,
-    { x: -2, y: 0, z: 0 },
-    undefined,
-    { color: '#2ecc71', opacity: 0 }
-  );
+  const orbit2: VectorObject = VectorObject.circle(0.3, { x: -2, y: 0, z: 0 }, undefined, {
+    color: '#2ecc71',
+    opacity: 0,
+  });
 
   let currentScene: Scene = scene.addObjects(center, orbit1, orbit2);
 
@@ -350,10 +374,10 @@ export function createNestedCompositionExample(): Scene {
     [
       new FadeInAnimation(center, { duration: 0.5, easing: smooth }),
       new FadeInAnimation(orbit1, { duration: 0.5, easing: smooth }),
-      new FadeInAnimation(orbit2, { duration: 0.5, easing: smooth })
+      new FadeInAnimation(orbit2, { duration: 0.5, easing: smooth }),
     ],
     CompositionType.Parallel,
-    { duration: 0.5, easing: smooth }
+    { duration: 0.5, easing: smooth },
   );
 
   currentScene = currentScene.schedule(fadeInStage, 0);
@@ -364,24 +388,32 @@ export function createNestedCompositionExample(): Scene {
 
   const centerRotate: RotateAnimation = new RotateAnimation(center, 'z', 360, {
     duration: 3,
-    easing: smooth
+    easing: smooth,
   });
 
-  const orbit1Move: MoveAnimation = new MoveAnimation(orbit1, { x: -2, y: 0, z: 0 }, {
-    duration: 3,
-    easing: smooth
-  });
+  const orbit1Move: MoveAnimation = new MoveAnimation(
+    orbit1,
+    { x: -2, y: 0, z: 0 },
+    {
+      duration: 3,
+      easing: smooth,
+    },
+  );
 
-  const orbit2Move: MoveAnimation = new MoveAnimation(orbit2, { x: 2, y: 0, z: 0 }, {
-    duration: 3,
-    easing: smooth
-  });
+  const orbit2Move: MoveAnimation = new MoveAnimation(
+    orbit2,
+    { x: 2, y: 0, z: 0 },
+    {
+      duration: 3,
+      easing: smooth,
+    },
+  );
 
   const orbitStage: AnimationGroup = new AnimationGroup(
     center,
     [centerRotate, orbit1Move, orbit2Move],
     CompositionType.Parallel,
-    { duration: 3, easing: smooth }
+    { duration: 3, easing: smooth },
   );
 
   currentScene = currentScene.schedule(orbitStage, 0.5);
@@ -393,25 +425,41 @@ export function createNestedCompositionExample(): Scene {
   const convergeStage: AnimationGroup = new AnimationGroup(
     center,
     [
-      new MoveAnimation(center, { x: 0, y: 0, z: 0 }, {
-        duration: 1,
-        easing: easeOutBack
-      }),
-      new MoveAnimation(orbit1, { x: 0.8, y: 0, z: 0 }, {
-        duration: 1,
-        easing: easeOutBack
-      }),
-      new MoveAnimation(orbit2, { x: -0.8, y: 0, z: 0 }, {
-        duration: 1,
-        easing: easeOutBack
-      }),
-      new ScaleAnimation(center, { x: 1.5, y: 1.5, z: 1 }, {
-        duration: 1,
-        easing: elastic
-      })
+      new MoveAnimation(
+        center,
+        { x: 0, y: 0, z: 0 },
+        {
+          duration: 1,
+          easing: easeOutBack,
+        },
+      ),
+      new MoveAnimation(
+        orbit1,
+        { x: 0.8, y: 0, z: 0 },
+        {
+          duration: 1,
+          easing: easeOutBack,
+        },
+      ),
+      new MoveAnimation(
+        orbit2,
+        { x: -0.8, y: 0, z: 0 },
+        {
+          duration: 1,
+          easing: easeOutBack,
+        },
+      ),
+      new ScaleAnimation(
+        center,
+        { x: 1.5, y: 1.5, z: 1 },
+        {
+          duration: 1,
+          easing: elastic,
+        },
+      ),
     ],
     CompositionType.Parallel,
-    { duration: 1, easing: easeOutBack }
+    { duration: 1, easing: easeOutBack },
   );
 
   currentScene = currentScene.schedule(convergeStage, 3.5);
@@ -423,22 +471,34 @@ export function createNestedCompositionExample(): Scene {
   const explodeStage: AnimationGroup = new AnimationGroup(
     center,
     [
-      new ScaleAnimation(center, { x: 0.5, y: 0.5, z: 1 }, {
-        duration: 0.5,
-        easing: easeInCubic
-      }),
-      new MoveAnimation(orbit1, { x: 4, y: 2, z: 0 }, {
-        duration: 0.8,
-        easing: easeOutCubic
-      }),
-      new MoveAnimation(orbit2, { x: -4, y: -2, z: 0 }, {
-        duration: 0.8,
-        easing: easeOutCubic
-      }),
-      new FadeOutAnimation(center, { duration: 0.5, easing: smooth })
+      new ScaleAnimation(
+        center,
+        { x: 0.5, y: 0.5, z: 1 },
+        {
+          duration: 0.5,
+          easing: easeInCubic,
+        },
+      ),
+      new MoveAnimation(
+        orbit1,
+        { x: 4, y: 2, z: 0 },
+        {
+          duration: 0.8,
+          easing: easeOutCubic,
+        },
+      ),
+      new MoveAnimation(
+        orbit2,
+        { x: -4, y: -2, z: 0 },
+        {
+          duration: 0.8,
+          easing: easeOutCubic,
+        },
+      ),
+      new FadeOutAnimation(center, { duration: 0.5, easing: smooth }),
     ],
     CompositionType.Parallel,
-    { duration: 0.8, easing: easeOutCubic }
+    { duration: 0.8, easing: easeOutCubic },
   );
 
   currentScene = currentScene.schedule(explodeStage, 4.5);
@@ -458,7 +518,7 @@ export function createComplexChoreographyExample(): Scene {
     width: 1280,
     height: 720,
     backgroundColor: '#1a1a2e',
-    fps: 60
+    fps: 60,
   });
 
   // 创建多个对象组成的"队伍"
@@ -468,7 +528,7 @@ export function createComplexChoreographyExample(): Scene {
       0.3,
       { x: -3 + i * 1.5, y: -2, z: 0 },
       { color: '#ecf0f1', width: 0.02 },
-      { color: `hsl(${200 + i * 30}, 70%, 60%)`, opacity: 0 }
+      { color: `hsl(${200 + i * 30}, 70%, 60%)`, opacity: 0 },
     );
     dancers.push(dancer);
   }
@@ -485,13 +545,17 @@ export function createComplexChoreographyExample(): Scene {
       dancer,
       [
         new FadeInAnimation(dancer, { duration: 0.3, easing: smooth }),
-        new MoveAnimation(dancer, { x: -3 + index * 1.5, y: 0, z: 0 }, {
-          duration: 0.5,
-          easing: easeOutBack
-        })
+        new MoveAnimation(
+          dancer,
+          { x: -3 + index * 1.5, y: 0, z: 0 },
+          {
+            duration: 0.5,
+            easing: easeOutBack,
+          },
+        ),
       ],
       CompositionType.Parallel,
-      { duration: 0.5, easing: smooth }
+      { duration: 0.5, easing: smooth },
     );
 
     currentScene = currentScene.schedule(jumpInGroup, index * 0.2);
@@ -503,14 +567,18 @@ export function createComplexChoreographyExample(): Scene {
 
   const startTime: number = 1.5;
   dancers.forEach((dancer, index) => {
-    const waveMove: MoveAnimation = new MoveAnimation(dancer, {
-      x: -3 + index * 1.5,
-      y: 1.5,
-      z: 0
-    }, {
-      duration: 1,
-      easing: easeInOut
-    });
+    const waveMove: MoveAnimation = new MoveAnimation(
+      dancer,
+      {
+        x: -3 + index * 1.5,
+        y: 1.5,
+        z: 0,
+      },
+      {
+        duration: 1,
+        easing: easeInOut,
+      },
+    );
 
     currentScene = currentScene.schedule(waveMove, startTime + index * 0.15);
   });
@@ -525,14 +593,18 @@ export function createComplexChoreographyExample(): Scene {
     const targetX: number = Math.cos(angle) * 2;
     const targetY: number = Math.sin(angle) * 2;
 
-    const formCircle: MoveAnimation = new MoveAnimation(dancer, {
-      x: targetX,
-      y: targetY,
-      z: 0
-    }, {
-      duration: 1,
-      easing: easeInOut
-    });
+    const formCircle: MoveAnimation = new MoveAnimation(
+      dancer,
+      {
+        x: targetX,
+        y: targetY,
+        z: 0,
+      },
+      {
+        duration: 1,
+        easing: easeInOut,
+      },
+    );
 
     currentScene = currentScene.schedule(formCircle, rotateStartTime);
   });
@@ -546,21 +618,29 @@ export function createComplexChoreographyExample(): Scene {
     const spiralGroup: AnimationGroup = new AnimationGroup(
       dancer,
       [
-        new MoveAnimation(dancer, { x: 0, y: 0, z: 0 }, {
-          duration: 1.5,
-          easing: easeInOutCubic
-        }),
+        new MoveAnimation(
+          dancer,
+          { x: 0, y: 0, z: 0 },
+          {
+            duration: 1.5,
+            easing: easeInOutCubic,
+          },
+        ),
         new RotateAnimation(dancer, 'z', 360, {
           duration: 1.5,
-          easing: smooth
+          easing: smooth,
         }),
-        new ScaleAnimation(dancer, { x: 0.3, y: 0.3, z: 1 }, {
-          duration: 1.5,
-          easing: easeInCubic
-        })
+        new ScaleAnimation(
+          dancer,
+          { x: 0.3, y: 0.3, z: 1 },
+          {
+            duration: 1.5,
+            easing: easeInCubic,
+          },
+        ),
       ],
       CompositionType.Parallel,
-      { duration: 1.5, easing: easeInOutCubic }
+      { duration: 1.5, easing: easeInOutCubic },
     );
 
     currentScene = currentScene.schedule(spiralGroup, spiralStartTime + index * 0.1);

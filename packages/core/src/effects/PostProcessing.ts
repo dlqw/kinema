@@ -256,20 +256,26 @@ export class PostProcessingManager {
    * Set input render target
    *
    * @param _target - Input render target
-   * @deprecated Reserved for future implementation
+   * @deprecated Not yet implemented. Will throw if called.
    */
   setInputTarget(_target: RenderTarget): void {
-    // Reserved for future implementation
+    throw new Error(
+      'setInputTarget() is not yet implemented. ' +
+        'Use the constructor or addEffect() to configure the post-processing pipeline.',
+    );
   }
 
   /**
    * Set output render target
    *
    * @param _target - Output render target
-   * @deprecated Reserved for future implementation
+   * @deprecated Not yet implemented. Will throw if called.
    */
   setOutputTarget(_target: RenderTarget): void {
-    // Reserved for future implementation
+    throw new Error(
+      'setOutputTarget() is not yet implemented. ' +
+        'Use the constructor or addEffect() to configure the post-processing pipeline.',
+    );
   }
 
   // ==========================================================================

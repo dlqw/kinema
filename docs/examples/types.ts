@@ -13,12 +13,12 @@ import type {
   Transform,
   ObjectId,
   EasingFunction,
-  Alpha
+  Alpha,
 } from '../../../packages/core/src/types/core';
 import type {
   RenderObjectState,
   AnimationConfig,
-  InterpolationResult
+  InterpolationResult,
 } from '../../../packages/core/src/types/core';
 import type { SceneConfig } from '../../../packages/core/src/types/scene';
 import type { CompositionType } from '../../../packages/core/src/types/animation';
@@ -37,7 +37,7 @@ export type {
   AnimationConfig,
   InterpolationResult,
   SceneConfig,
-  CompositionType
+  CompositionType,
 };
 
 /**

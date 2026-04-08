@@ -49,13 +49,38 @@ class MockFFmpeg {
   async readFile(path: string): Promise<Uint8Array> {
     // Return mock MP4 data
     return new Uint8Array([
-      0x00, 0x00, 0x00, 0x20, 0x66, 0x74, 0x79, 0x70, // ftyp box
-      0x69, 0x73, 0x6F, 0x6D, // 'isom'
-      0x00, 0x00, 0x02, 0x00,
-      0x69, 0x73, 0x6F, 0x6D,
-      0x69, 0x73, 0x6F, 0x32,
-      0x6D, 0x70, 0x34, 0x31,
-      0x00, 0x00, 0x00, 0x00,
+      0x00,
+      0x00,
+      0x00,
+      0x20,
+      0x66,
+      0x74,
+      0x79,
+      0x70, // ftyp box
+      0x69,
+      0x73,
+      0x6f,
+      0x6d, // 'isom'
+      0x00,
+      0x00,
+      0x02,
+      0x00,
+      0x69,
+      0x73,
+      0x6f,
+      0x6d,
+      0x69,
+      0x73,
+      0x6f,
+      0x32,
+      0x6d,
+      0x70,
+      0x34,
+      0x31,
+      0x00,
+      0x00,
+      0x00,
+      0x00,
     ]);
   }
 
@@ -252,9 +277,9 @@ function createMockImageData(width: number, height: number): ImageData {
   const data = new Uint8ClampedArray(width * height * 4);
   // Fill with some test data
   for (let i = 0; i < data.length; i += 4) {
-    data[i] = 0;       // R
+    data[i] = 0; // R
     data[i + 1] = 255; // G
-    data[i + 2] = 0;   // B
+    data[i + 2] = 0; // B
     data[i + 3] = 255; // A
   }
   return new ImageData(data, width, height);

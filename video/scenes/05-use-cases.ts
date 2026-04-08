@@ -8,28 +8,30 @@
  * - 产品演示
  */
 
-import { Scene, Circle, Rectangle, Text, Group, Line, Arc } from '../../src'
-import type { RenderObject, GroupObject } from '../../src'
-import { colors, videoConfig } from '../main'
-import { Easing } from '../../src/easing'
+import { Scene, Circle, Rectangle, Text, Group, Line, Arc } from '../../src';
+import type { RenderObject, GroupObject } from '../../src';
+import { colors, videoConfig } from '../main';
+import { Easing } from '../../src/easing';
 
 // Type aliases to avoid DOM type conflicts
-type AnimGroup = GroupObject
+type AnimGroup = GroupObject;
 
 // === 教育视频场景 ===
 
 function createEducationDemo(x: number, y: number, width: number, height: number): AnimGroup {
-  const container = Group()
+  const container = Group();
 
   // 背景
   const bg = Rectangle({
-    x, y,
-    width, height,
+    x,
+    y,
+    width,
+    height,
     color: '#1C2128',
     cornerRadius: 16,
     opacity: 0,
-  })
-  container.add(bg)
+  });
+  container.add(bg);
 
   // 标题
   const title = Text({
@@ -39,8 +41,8 @@ function createEducationDemo(x: number, y: number, width: number, height: number
     fontSize: 24,
     color: colors.brand,
     opacity: 0,
-  })
-  container.add(title)
+  });
+  container.add(title);
 
   // 勾股定理演示
   // a² + b² = c²
@@ -52,8 +54,8 @@ function createEducationDemo(x: number, y: number, width: number, height: number
     fontFamily: 'Times New Roman, serif',
     color: colors.text.primary,
     opacity: 0,
-  })
-  container.add(formula)
+  });
+  container.add(formula);
 
   // 正方形 a²
   const squareA = Rectangle({
@@ -63,8 +65,8 @@ function createEducationDemo(x: number, y: number, width: number, height: number
     height: 60,
     color: '#FF6B6B',
     opacity: 0,
-  })
-  container.add(squareA)
+  });
+  container.add(squareA);
 
   const labelA = Text({
     x: x + 70,
@@ -73,8 +75,8 @@ function createEducationDemo(x: number, y: number, width: number, height: number
     fontSize: 18,
     color: colors.background,
     opacity: 0,
-  })
-  container.add(labelA)
+  });
+  container.add(labelA);
 
   // 正方形 b²
   const squareB = Rectangle({
@@ -84,8 +86,8 @@ function createEducationDemo(x: number, y: number, width: number, height: number
     height: 80,
     color: '#4ECDC4',
     opacity: 0,
-  })
-  container.add(squareB)
+  });
+  container.add(squareB);
 
   const labelB = Text({
     x: x + 155,
@@ -94,8 +96,8 @@ function createEducationDemo(x: number, y: number, width: number, height: number
     fontSize: 18,
     color: colors.background,
     opacity: 0,
-  })
-  container.add(labelB)
+  });
+  container.add(labelB);
 
   // 正方形 c² (斜边)
   const squareC = Rectangle({
@@ -106,8 +108,8 @@ function createEducationDemo(x: number, y: number, width: number, height: number
     color: '#FFE66D',
     rotation: 45,
     opacity: 0,
-  })
-  container.add(squareC)
+  });
+  container.add(squareC);
 
   const labelC = Text({
     x: x + 270,
@@ -116,26 +118,28 @@ function createEducationDemo(x: number, y: number, width: number, height: number
     fontSize: 18,
     color: colors.background,
     opacity: 0,
-  })
-  container.add(labelC)
+  });
+  container.add(labelC);
 
-  return container
+  return container;
 }
 
 // === 数据可视化场景 ===
 
 function createDataVizDemo(x: number, y: number, width: number, height: number): AnimGroup {
-  const container = Group()
+  const container = Group();
 
   // 背景
   const bg = Rectangle({
-    x, y,
-    width, height,
+    x,
+    y,
+    width,
+    height,
     color: '#1C2128',
     cornerRadius: 16,
     opacity: 0,
-  })
-  container.add(bg)
+  });
+  container.add(bg);
 
   // 标题
   const title = Text({
@@ -145,12 +149,12 @@ function createDataVizDemo(x: number, y: number, width: number, height: number):
     fontSize: 24,
     color: colors.brand,
     opacity: 0,
-  })
-  container.add(title)
+  });
+  container.add(title);
 
   // 柱状图
-  const barData = [0.7, 0.9, 0.5, 0.8, 0.6]
-  const barColors = ['#FF6B6B', '#4ECDC4', '#FFE66D', '#95E1D3', '#F38181']
+  const barData = [0.7, 0.9, 0.5, 0.8, 0.6];
+  const barColors = ['#FF6B6B', '#4ECDC4', '#FFE66D', '#95E1D3', '#F38181'];
 
   barData.forEach((value, i) => {
     const bar = Rectangle({
@@ -161,27 +165,29 @@ function createDataVizDemo(x: number, y: number, width: number, height: number):
       color: barColors[i],
       cornerRadius: [4, 4, 0, 0],
       opacity: 0,
-    })
-    container.add(bar)
-  })
+    });
+    container.add(bar);
+  });
 
-  return container
+  return container;
 }
 
 // === 创意动画场景 ===
 
 function createCreativeDemo(x: number, y: number, width: number, height: number): AnimGroup {
-  const container = Group()
+  const container = Group();
 
   // 背景
   const bg = Rectangle({
-    x, y,
-    width, height,
+    x,
+    y,
+    width,
+    height,
     color: '#1C2128',
     cornerRadius: 16,
     opacity: 0,
-  })
-  container.add(bg)
+  });
+  container.add(bg);
 
   // 标题
   const title = Text({
@@ -191,8 +197,8 @@ function createCreativeDemo(x: number, y: number, width: number, height: number)
     fontSize: 24,
     color: colors.brand,
     opacity: 0,
-  })
-  container.add(title)
+  });
+  container.add(title);
 
   // 几何图形组合
   const shapes = [
@@ -201,7 +207,7 @@ function createCreativeDemo(x: number, y: number, width: number, height: number)
     { type: 'circle', x: x + 140, y: y + 180, size: 35, color: '#FFE66D' },
     { type: 'square', x: x + 260, y: y + 150, size: 40, color: '#95E1D3' },
     { type: 'circle', x: x + 320, y: y + 140, size: 28, color: '#F38181' },
-  ]
+  ];
 
   shapes.forEach((shape) => {
     if (shape.type === 'circle') {
@@ -211,8 +217,8 @@ function createCreativeDemo(x: number, y: number, width: number, height: number)
         radius: shape.size,
         color: shape.color,
         opacity: 0,
-      })
-      container.add(circle)
+      });
+      container.add(circle);
     } else {
       const square = Rectangle({
         x: shape.x - shape.size / 2,
@@ -221,28 +227,30 @@ function createCreativeDemo(x: number, y: number, width: number, height: number)
         height: shape.size,
         color: shape.color,
         opacity: 0,
-      })
-      container.add(square)
+      });
+      container.add(square);
     }
-  })
+  });
 
-  return container
+  return container;
 }
 
 // === 产品演示场景 ===
 
 function createProductDemo(x: number, y: number, width: number, height: number): AnimGroup {
-  const container = Group()
+  const container = Group();
 
   // 背景
   const bg = Rectangle({
-    x, y,
-    width, height,
+    x,
+    y,
+    width,
+    height,
     color: '#1C2128',
     cornerRadius: 16,
     opacity: 0,
-  })
-  container.add(bg)
+  });
+  container.add(bg);
 
   // 标题
   const title = Text({
@@ -252,8 +260,8 @@ function createProductDemo(x: number, y: number, width: number, height: number):
     fontSize: 24,
     color: colors.brand,
     opacity: 0,
-  })
-  container.add(title)
+  });
+  container.add(title);
 
   // 手机框架
   const phone = Rectangle({
@@ -265,8 +273,8 @@ function createProductDemo(x: number, y: number, width: number, height: number):
     cornerRadius: 16,
     border: { color: '#30363D', width: 3 },
     opacity: 0,
-  })
-  container.add(phone)
+  });
+  container.add(phone);
 
   // 屏幕内容
   const screen = Rectangle({
@@ -277,8 +285,8 @@ function createProductDemo(x: number, y: number, width: number, height: number):
     color: '#161B22',
     cornerRadius: 4,
     opacity: 0,
-  })
-  container.add(screen)
+  });
+  container.add(screen);
 
   // App 图标
   const appIcon = Circle({
@@ -287,15 +295,15 @@ function createProductDemo(x: number, y: number, width: number, height: number):
     radius: 20,
     color: colors.brand,
     opacity: 0,
-  })
-  container.add(appIcon)
+  });
+  container.add(appIcon);
 
   // 功能指示点
   const dots = [
     { x: x + width / 2 - 20, y: y + 180 },
     { x: x + width / 2, y: y + 180 },
     { x: x + width / 2 + 20, y: y + 180 },
-  ]
+  ];
 
   dots.forEach((dot) => {
     const circle = Circle({
@@ -304,11 +312,11 @@ function createProductDemo(x: number, y: number, width: number, height: number):
       radius: 4,
       color: colors.text.secondary,
       opacity: 0,
-    })
-    container.add(circle)
-  })
+    });
+    container.add(circle);
+  });
 
-  return container
+  return container;
 }
 
 // === 创建完整场景 ===
@@ -320,10 +328,10 @@ export function createUseCasesScene(): Scene {
     backgroundColor: videoConfig.backgroundColor,
     fps: videoConfig.fps,
     duration: 30,
-  })
+  });
 
-  const centerX = videoConfig.width / 2
-  const centerY = videoConfig.height / 2
+  const centerX = videoConfig.width / 2;
+  const centerY = videoConfig.height / 2;
 
   // 主标题
   const mainTitle = Text({
@@ -333,7 +341,7 @@ export function createUseCasesScene(): Scene {
     fontSize: 42,
     color: colors.brand,
     opacity: 0,
-  })
+  });
 
   scene.timeline.add({
     target: mainTitle,
@@ -343,19 +351,19 @@ export function createUseCasesScene(): Scene {
     from: 0,
     to: 1,
     easing: Easing.easeOut,
-  })
+  });
 
   // 四个场景卡片
-  const cardWidth = 420
-  const cardHeight = 280
-  const gap = 40
+  const cardWidth = 420;
+  const cardHeight = 280;
+  const gap = 40;
 
   const positions = [
     { x: centerX - cardWidth - gap / 2, y: centerY - 40 }, // 左上
-    { x: centerX + gap / 2, y: centerY - 40 },             // 右上
+    { x: centerX + gap / 2, y: centerY - 40 }, // 右上
     { x: centerX - cardWidth - gap / 2, y: centerY + cardHeight / 2 + gap }, // 左下
-    { x: centerX + gap / 2, y: centerY + cardHeight / 2 + gap },             // 右下
-  ]
+    { x: centerX + gap / 2, y: centerY + cardHeight / 2 + gap }, // 右下
+  ];
 
   // 创建四个场景
   const demos = [
@@ -363,9 +371,9 @@ export function createUseCasesScene(): Scene {
     createDataVizDemo(positions[1].x, positions[1].y, cardWidth, cardHeight),
     createCreativeDemo(positions[2].x, positions[2].y, cardWidth, cardHeight),
     createProductDemo(positions[3].x, positions[3].y, cardWidth, cardHeight),
-  ]
+  ];
 
-  const demoLabels = ['教育视频', '数据可视化', '创意动画', '产品演示']
+  const demoLabels = ['教育视频', '数据可视化', '创意动画', '产品演示'];
 
   // 字幕
   const subtitle = Text({
@@ -375,12 +383,12 @@ export function createUseCasesScene(): Scene {
     fontSize: 28,
     color: colors.text.accent,
     opacity: 0,
-  })
+  });
 
   // 动画：卡片依次出现
   demos.forEach((demo, demoIndex) => {
     // 获取容器内所有元素
-    const children = demo.getChildren()
+    const children = demo.getChildren();
 
     children.forEach((child, i) => {
       scene.timeline.add({
@@ -391,8 +399,8 @@ export function createUseCasesScene(): Scene {
         from: 0,
         to: 1,
         easing: Easing.easeOut,
-      })
-    })
+      });
+    });
 
     // 高亮效果
     scene.timeline.add({
@@ -403,7 +411,7 @@ export function createUseCasesScene(): Scene {
       from: 1,
       to: 1.02,
       easing: Easing.easeOut,
-    })
+    });
 
     scene.timeline.add({
       target: children[0],
@@ -413,8 +421,8 @@ export function createUseCasesScene(): Scene {
       from: 1.02,
       to: 1,
       easing: Easing.easeIn,
-    })
-  })
+    });
+  });
 
   // 字幕出现
   scene.timeline.add({
@@ -425,7 +433,7 @@ export function createUseCasesScene(): Scene {
     from: 0,
     to: 1,
     easing: Easing.easeOut,
-  })
+  });
 
   // 清理动画
   scene.timeline.add({
@@ -436,7 +444,7 @@ export function createUseCasesScene(): Scene {
     from: 1,
     to: 0,
     easing: Easing.easeIn,
-  })
+  });
 
   scene.timeline.add({
     target: subtitle,
@@ -446,7 +454,7 @@ export function createUseCasesScene(): Scene {
     from: 1,
     to: 0,
     easing: Easing.easeIn,
-  })
+  });
 
   demos.forEach((demo) => {
     demo.getChildren().forEach((child) => {
@@ -458,15 +466,15 @@ export function createUseCasesScene(): Scene {
         from: 1,
         to: 0,
         easing: Easing.easeIn,
-      })
-    })
-  })
+      });
+    });
+  });
 
   // 添加元素
-  scene.add(mainTitle, subtitle)
+  scene.add(mainTitle, subtitle);
   demos.forEach((demo) => {
-    demo.getChildren().forEach((child) => scene.add(child))
-  })
+    demo.getChildren().forEach((child) => scene.add(child));
+  });
 
-  return scene
+  return scene;
 }
