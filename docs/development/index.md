@@ -145,5 +145,5 @@ Kinema 采用分层架构设计：
 
 - [GitHub 仓库](https://github.com/your-username/kinema)
 - [问题追踪](https://github.com/your-username/kinema/issues)
-- [更新日志](../CHANGELOG.md)
+- [更新日志](../../changelogs/CHANGELOG.md)
 - [许可证](../../LICENSE)

@@ -209,7 +209,7 @@ npm run docs:dev
 
 ## 发布流程
 
-1. 更新 `CHANGELOG.md`
+1. 更新 `changelogs/CHANGELOG.md`
 2. 运行 `npm run docs:api` 生成 API 文档
 3. 运行 `npm run docs:build` 构建文档
 4. 部署到 GitHub Pages 或其他托管服务

@@ -28,4 +28,4 @@ See [v0.1.0.md](./v0.1.0.md) for an example of a complete release note.
 
 ## Archive
 
-Past releases are listed in the main [CHANGELOG.md](../CHANGELOG.md) file.
+Past releases are listed in the main [CHANGELOG.md](./CHANGELOG.md) file.

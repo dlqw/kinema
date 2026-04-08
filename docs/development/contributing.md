@@ -139,7 +139,7 @@ describe('Scene', () => {
 
 - 更新相关文档
 - 添加代码示例
-- 更新 CHANGELOG.md
+- 更新 `changelogs/CHANGELOG.md`
 
 ### Pull Request 检查清单
 

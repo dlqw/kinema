@@ -153,7 +153,7 @@ docs: update API reference for v2.0
 只有维护者可以发布新版本：
 
 1. 更新版本号
-2. 更新 CHANGELOG
+2. 更新 `changelogs/CHANGELOG.md`
 3. 创建 Git tag
 4. 发布到 npm
 
