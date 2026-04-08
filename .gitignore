@@ -5,6 +5,7 @@ node_modules/
 # Build outputs
 dist/
 build/
+out/
 *.tsbuildinfo
 
 # Test coverage
@@ -25,6 +26,7 @@ Thumbs.db
 # Claude-related
 .claude/
 .claude.md
+CLAUDE.md
 
 # Temporary files
 *.log
@@ -44,7 +46,9 @@ video/*.webm
 video/*.gif
 
 # Electron build outputs
+packages/core/dist/
 packages/workstation/dist-electron/
+packages/workstation/dist/
 packages/workstation/release/
 packages/workstation/out/
 
