@@ -1,6 +1,6 @@
 # 渲染性能优化指南
 
-> 本指南介绍 AniMaker 渲染引擎的性能优化技巧，帮助您获得最佳的渲染性能。
+> 本指南介绍 Kinema 渲染引擎的性能优化技巧，帮助您获得最佳的渲染性能。
 
 ## 目录
 
@@ -21,7 +21,7 @@
 对于不常变化的对象，使用静态批处理可以显著提高性能。
 
 ```typescript
-import { BatchingManager, RenderBatch } from '@animaker/render/pipeline';
+import { BatchingManager, RenderBatch } from '@kinema/render/pipeline';
 
 // 创建静态批处理管理器
 const batchingManager = new BatchingManager(device);
@@ -43,7 +43,7 @@ for (const batch of staticBatches) {
 对于相同的几何体使用不同的变换，使用实例化渲染。
 
 ```typescript
-import { InstancedMesh } from '@animaker/render/geometry';
+import { InstancedMesh } from '@kinema/render/geometry';
 
 // 创建实例化网格
 const instancedMesh = new InstancedMesh(device, {
@@ -78,6 +78,7 @@ const dynamicBatches = batchingManager.createDynamicBatches(dynamicObjects);
 ```
 
 **最佳实践**:
+
 - 静态对象优先使用静态批处理
 - 相同材质的对象会被自动合并
 - 避免批处理过大的对象（超过 64KB 顶点数据）
@@ -91,7 +92,7 @@ const dynamicBatches = batchingManager.createDynamicBatches(dynamicObjects);
 ### 1. 渲染对象池
 
 ```typescript
-import { ObjectPool } from '@animaker/utils';
+import { ObjectPool } from '@kinema/utils';
 
 // 创建渲染对象池
 const renderObjectPool = new ObjectPool<RenderObject>({
@@ -114,7 +115,7 @@ renderObjectPool.release(obj);
 ### 2. 纹理池
 
 ```typescript
-import { TexturePool } from '@animaker/render/resources';
+import { TexturePool } from '@kinema/render/resources';
 
 // 创建纹理池
 const texturePool = new TexturePool(device, {
@@ -135,7 +136,7 @@ texturePool.release(texture);
 ### 3. 缓冲区池
 
 ```typescript
-import { BufferPool } from '@animaker/render/resources';
+import { BufferPool } from '@kinema/render/resources';
 
 // 创建顶点缓冲区池
 const bufferPool = new BufferPool(device, {
@@ -156,10 +157,10 @@ bufferPool.releaseVertexBuffer(vertexBuffer);
 
 **性能对比**:
 
-| 方法 | 帧率 (FPS) | GC 暂停时间 | 内存使用 |
-|------|-----------|------------|---------|
-| 无对象池 | 45 | 15ms | 120MB |
-| 使用对象池 | 60 | 2ms | 85MB |
+| 方法       | 帧率 (FPS) | GC 暂停时间 | 内存使用 |
+| ---------- | ---------- | ----------- | -------- |
+| 无对象池   | 45         | 15ms        | 120MB    |
+| 使用对象池 | 60         | 2ms         | 85MB     |
 
 ---
 
@@ -172,7 +173,7 @@ bufferPool.releaseVertexBuffer(vertexBuffer);
 将多个小纹理合并为一个大纹理。
 
 ```typescript
-import { TextureAtlas } from '@animaker/render/resources';
+import { TextureAtlas } from '@kinema/render/resources';
 
 // 创建纹理图集
 const atlas = new TextureAtlas(device, {
@@ -195,6 +196,7 @@ sprite1.uvRect = rect2;
 ```
 
 **优势**:
+
 - 减少纹理切换
 - 减少绘制调用
 - 提高缓存命中率
@@ -204,7 +206,7 @@ sprite1.uvRect = rect2;
 为远处的物体使用较小的 mipmap 级别。
 
 ```typescript
-import { TextureManager } from '@animaker/render/resources';
+import { TextureManager } from '@kinema/render/resources';
 
 const textureManager = new TextureManager(device);
 
@@ -217,6 +219,7 @@ const texture = await textureManager.loadTexture({
 ```
 
 **性能提升**:
+
 - 减少内存带宽 50-70%
 - 提高纹理缓存命中率
 
@@ -234,18 +237,18 @@ const compressedTexture = await textureManager.loadTexture({
 
 **内存对比**:
 
-| 格式 | 原始大小 | 压缩后 | 压缩比 |
-|------|---------|-------|-------|
-| RGBA8 | 4MB | - | 1:1 |
-| BC7 | 4MB | 1MB | 4:1 |
-| ASTC 4x4 | 4MB | 0.5MB | 8:1 |
+| 格式     | 原始大小 | 压缩后 | 压缩比 |
+| -------- | -------- | ------ | ------ |
+| RGBA8    | 4MB      | -      | 1:1    |
+| BC7      | 4MB      | 1MB    | 4:1    |
+| ASTC 4x4 | 4MB      | 0.5MB  | 8:1    |
 
 ### 4. 纹理流式加载
 
 对于大型场景，使用纹理流式加载。
 
 ```typescript
-import { TextureStreamer } from '@animaker/render/resources';
+import { TextureStreamer } from '@kinema/render/resources';
 
 const streamer = new TextureStreamer(device, {
   maxMemoryMB: 256,
@@ -329,7 +332,7 @@ const depthStencil: GPUDepthStencilState = {
 ### 4. 着色器变体
 
 ```typescript
-import { ShaderManager } from '@animaker/render/resources';
+import { ShaderManager } from '@kinema/render/resources';
 
 const shaderManager = new ShaderManager(device);
 
@@ -353,22 +356,22 @@ for (const variant of variants) {
 
 测试场景: 1000 个动态对象，1920x1080 分辨率
 
-| 优化技术 | FPS | 绘制调用 | GPU 时间 | CPU 时间 |
-|---------|-----|---------|---------|---------|
-| 无优化 | 25 | 1000 | 35ms | 5ms |
-| 批量渲染 | 60 | 50 | 8ms | 2ms |
-| + 实例化 | 60 | 10 | 5ms | 1ms |
-| + 对象池 | 60 | 10 | 5ms | 0.5ms |
-| + 纹理优化 | 60 | 10 | 3ms | 0.5ms |
-| 全部优化 | 60 | 10 | 3ms | 0.3ms |
+| 优化技术   | FPS | 绘制调用 | GPU 时间 | CPU 时间 |
+| ---------- | --- | -------- | -------- | -------- |
+| 无优化     | 25  | 1000     | 35ms     | 5ms      |
+| 批量渲染   | 60  | 50       | 8ms      | 2ms      |
+| + 实例化   | 60  | 10       | 5ms      | 1ms      |
+| + 对象池   | 60  | 10       | 5ms      | 0.5ms    |
+| + 纹理优化 | 60  | 10       | 3ms      | 0.5ms    |
+| 全部优化   | 60  | 10       | 3ms      | 0.3ms    |
 
 ### 内存使用对比
 
-| 场景 | 无优化 | 优化后 | 减少 |
-|-----|-------|-------|-----|
-| 纹理内存 | 450MB | 120MB | 73% |
-| 几何数据 | 85MB | 45MB | 47% |
-| 总内存 | 650MB | 280MB | 57% |
+| 场景     | 无优化 | 优化后 | 减少 |
+| -------- | ------ | ------ | ---- |
+| 纹理内存 | 450MB  | 120MB  | 73%  |
+| 几何数据 | 85MB   | 45MB   | 47%  |
+| 总内存   | 650MB  | 280MB  | 57%  |
 
 ---
 
@@ -382,7 +385,7 @@ for (const variant of variants) {
 6. **监控性能** - 使用内置性能分析工具
 
 ```typescript
-import { RenderStats } from '@animaker/render/core';
+import { RenderStats } from '@kinema/render/core';
 
 // 启用性能统计
 const stats = new RenderStats();

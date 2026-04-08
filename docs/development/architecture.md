@@ -1,12 +1,12 @@
 # 架构设计文档
 
-AniMaker 是一个模块化的动画渲染框架和视频工作站，采用 Monorepo 架构。
+Kinema 是一个模块化的动画渲染框架和视频工作站，采用 Monorepo 架构。
 
 ## 整体架构
 
 ```
 ┌─────────────────────────────────────────────────────────┐
-│                    AniMaker 项目                          │
+│                    Kinema 项目                          │
 ├─────────────────────────────────────────────────────────┤
 │                                                           │
 │  ┌──────────────────┐      ┌──────────────────┐         │
@@ -100,16 +100,16 @@ RenderObject (抽象基类)
 ```typescript
 class Scene {
   // 对象管理
-  add(object: RenderObject): void
-  remove(object: RenderObject): void
+  add(object: RenderObject): void;
+  remove(object: RenderObject): void;
 
   // 时间控制
-  play(): void
-  pause(): void
-  seek(time: Time): void
+  play(): void;
+  pause(): void;
+  seek(time: Time): void;
 
   // 渲染
-  render(renderer: Renderer): void
+  render(renderer: Renderer): void;
 }
 ```
 
@@ -132,17 +132,17 @@ Animation (抽象基类)
 ```typescript
 // 类型安全的事件
 type SceneEvents = {
-  init: void
-  objectAdded: RenderObject
-  objectRemoved: RenderObject
-  frameRender: RenderContext
-  update: number
-  pause: void
-}
+  init: void;
+  objectAdded: RenderObject;
+  objectRemoved: RenderObject;
+  frameRender: RenderContext;
+  update: number;
+  pause: void;
+};
 
 class EventEmitter<T extends Record<string, any>> {
-  on<K extends keyof T>(event: K, listener: (data: T[K]) => void): void
-  emit<K extends keyof T>(event: K, data: T[K]): void
+  on<K extends keyof T>(event: K, listener: (data: T[K]) => void): void;
+  emit<K extends keyof T>(event: K, data: T[K]): void;
 }
 ```
 
@@ -169,14 +169,14 @@ Output (Frame)
 ```typescript
 interface GraphicsDevice {
   // 资源创建
-  createBuffer(data: ArrayBuffer): GPUBuffer
-  createTexture(desc: TextureDesc): GPUTexture
-  createPipeline(desc: PipelineDesc): GPUPipeline
+  createBuffer(data: ArrayBuffer): GPUBuffer;
+  createTexture(desc: TextureDesc): GPUTexture;
+  createPipeline(desc: PipelineDesc): GPUPipeline;
 
   // 渲染命令
-  beginPass(): void
-  draw(vertexCount: number): void
-  endPass(): void
+  beginPass(): void;
+  draw(vertexCount: number): void;
+  endPass(): void;
 }
 ```
 
@@ -203,7 +203,7 @@ Final Output
 ### Electron 应用结构
 
 ```
-AniMaker Workstation
+Kinema Workstation
 ├── Main Process (主进程)
 │   ├── Window Management
 │   ├── IPC Handlers
@@ -224,12 +224,12 @@ AniMaker Workstation
 ```typescript
 // 主进程
 ipcMain.handle('project:save', async (event, project) => {
-  await saveProject(project)
-  return { success: true }
-})
+  await saveProject(project);
+  return { success: true };
+});
 
 // 渲染进程
-const result = await ipcRenderer.invoke('project:save', project)
+const result = await ipcRenderer.invoke('project:save', project);
 ```
 
 ### 状态管理
@@ -253,7 +253,7 @@ Application State
 ## Monorepo 结构
 
 ```
-animaker/
+kinema/
 ├── packages/
 │   ├── core/              # 核心框架库
 │   │   ├── src/
@@ -299,10 +299,10 @@ animaker/
 
 ```typescript
 interface Plugin {
-  name: string
-  version: string
-  install(app: Application): void
-  uninstall(app: Application): void
+  name: string;
+  version: string;
+  install(app: Application): void;
+  uninstall(app: Application): void;
 }
 ```
 

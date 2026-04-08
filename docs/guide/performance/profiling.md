@@ -1,6 +1,6 @@
 # 性能分析指南
 
-> 本指南介绍如何使用各种工具分析 AniMaker 渲染引擎的性能，识别瓶颈并进行优化。
+> 本指南介绍如何使用各种工具分析 Kinema 渲染引擎的性能，识别瓶颈并进行优化。
 
 ## 目录
 
@@ -40,6 +40,7 @@ Main Thread (主线程)
 ```
 
 **关注指标**:
+
 - **FPS** - 帧率，目标 60 FPS (16.67ms/帧)
 - **Script** - 脚本执行时间
 - **Rendering** - 渲染时间
@@ -106,10 +107,10 @@ if (import.meta.env.DEV) {
 
 ### 1. 内置帧率监控
 
-AniMaker 提供内置的帧率监控工具。
+Kinema 提供内置的帧率监控工具。
 
 ```typescript
-import { RenderEngine, RenderStats } from '@animaker/render/core';
+import { RenderEngine, RenderStats } from '@kinema/render/core';
 
 // 创建渲染引擎
 const engine = await RenderEngine.init({
@@ -200,7 +201,9 @@ class FrameTimeAnalyzer {
     const max = Math.max(...this.frameTimes);
 
     // 计算标准差
-    const variance = this.frameTimes.reduce((acc, val) => acc + Math.pow(val - avg, 2), 0) / this.frameTimes.length;
+    const variance =
+      this.frameTimes.reduce((acc, val) => acc + Math.pow(val - avg, 2), 0) /
+      this.frameTimes.length;
     const std = Math.sqrt(variance);
 
     return { avg, min, max, std };
@@ -225,7 +228,8 @@ function animate() {
   analyzer.recordFrame(duration);
 
   // 每秒打印分析
-  if (Math.random() < 0.016) { // 约 1/60 概率
+  if (Math.random() < 0.016) {
+    // 约 1/60 概率
     const analysis = analyzer.getAnalysis();
     console.log('Frame Time:', analysis);
     console.log('99th percentile:', analyzer.getPercentile(0.99));
@@ -242,6 +246,7 @@ function animate() {
 ### 1. CPU 瓶颈
 
 **症状**:
+
 - 低 FPS，帧时间高
 - 脚本执行时间长
 - 主线程繁忙
@@ -249,7 +254,7 @@ function animate() {
 **诊断**:
 
 ```typescript
-import { Profiler } from '@animaker/utils';
+import { Profiler } from '@kinema/utils';
 
 const profiler = new Profiler();
 
@@ -271,6 +276,7 @@ console.log(profiler.getReport());
 ```
 
 **输出示例**:
+
 ```
 Profile Report:
 ┌─────────────┬──────────┬──────────┬─────────┐
@@ -285,6 +291,7 @@ Profile Report:
 ### 2. GPU 瓶颈
 
 **症状**:
+
 - 低 FPS，但脚本执行时间短
 - GPU 时间高
 - 绘制调用多
@@ -293,7 +300,7 @@ Profile Report:
 
 ```typescript
 // 使用 GPU 计时器 (WebGPU)
-import { GPUProfiler } from '@animaker/render/debug';
+import { GPUProfiler } from '@kinema/render/debug';
 
 const gpuProfiler = new GPUProfiler(device);
 
@@ -311,6 +318,7 @@ console.log('GPU Time:', gpuTime, 'ns');
 ```
 
 **常见 GPU 瓶颈**:
+
 - 过多的绘制调用
 - 过大的纹理
 - 复杂的着色器
@@ -319,6 +327,7 @@ console.log('GPU Time:', gpuTime, 'ns');
 ### 3. 内存瓶颈
 
 **症状**:
+
 - 频繁 GC 暂停
 - 内存持续增长
 - 页面卡顿
@@ -335,7 +344,8 @@ class MemoryMonitor {
 
     console.log('Memory Delta:', (delta / 1024 / 1024).toFixed(2), 'MB');
 
-    if (delta > 10 * 1024 * 1024) { // 增长超过 10MB
+    if (delta > 10 * 1024 * 1024) {
+      // 增长超过 10MB
       console.warn('Large memory increase detected!');
       console.trace('Call stack:');
     }
@@ -355,10 +365,10 @@ setInterval(() => memoryMonitor.check(), 5000);
 
 ### 1. 性能分析器
 
-AniMaker 提供内置的性能分析器。
+Kinema 提供内置的性能分析器。
 
 ```typescript
-import { PerformanceAnalyzer } from '@animaker/render/debug';
+import { PerformanceAnalyzer } from '@kinema/render/debug';
 
 const analyzer = new PerformanceAnalyzer();
 
@@ -397,7 +407,7 @@ console.log('Bottlenecks:', bottlenecks);
 启用渲染诊断信息。
 
 ```typescript
-import { RenderEngine } from '@animaker/render/core';
+import { RenderEngine } from '@kinema/render/core';
 
 const engine = await RenderEngine.init({
   // ... 配置
@@ -423,7 +433,7 @@ engine.setDiagnosticsOptions({
 设置性能阈值，自动警告性能问题。
 
 ```typescript
-import { PerformanceMonitor } from '@animaker/render/debug';
+import { PerformanceMonitor } from '@kinema/render/debug';
 
 const monitor = new PerformanceMonitor({
   minFPS: 55,
@@ -463,25 +473,33 @@ function animate() {
 对比不同配置的性能。
 
 ```typescript
-import { PerformanceComparator } from '@animaker/render/debug';
+import { PerformanceComparator } from '@kinema/render/debug';
 
 const comparator = new PerformanceComparator();
 
 // 测试配置 A
-await comparator.test('Config A', async () => {
-  // 使用配置 A 渲染
-}, {
-  duration: 5000, // 测试 5 秒
-  warmup: 1000,   // 预热 1 秒
-});
+await comparator.test(
+  'Config A',
+  async () => {
+    // 使用配置 A 渲染
+  },
+  {
+    duration: 5000, // 测试 5 秒
+    warmup: 1000, // 预热 1 秒
+  },
+);
 
 // 测试配置 B
-await comparator.test('Config B', async () => {
-  // 使用配置 B 渲染
-}, {
-  duration: 5000,
-  warmup: 1000,
-});
+await comparator.test(
+  'Config B',
+  async () => {
+    // 使用配置 B 渲染
+  },
+  {
+    duration: 5000,
+    warmup: 1000,
+  },
+);
 
 // 生成对比报告
 const comparison = comparator.compare('Config A', 'Config B');
@@ -521,11 +539,11 @@ console.log('GPU Time:', comparison.gpuTime.diff, comparison.gpuTime.improvement
 
 根据目标平台设定合理的性能目标。
 
-| 平台 | 目标 FPS | 最大帧时间 | 最大绘制调用 |
-|-----|---------|-----------|------------|
-| 桌面 | 60 | 16.67ms | 100 |
-| 移动高端 | 60 | 16.67ms | 50 |
-| 移动低端 | 30 | 33.33ms | 30 |
+| 平台     | 目标 FPS | 最大帧时间 | 最大绘制调用 |
+| -------- | -------- | ---------- | ------------ |
+| 桌面     | 60       | 16.67ms    | 100          |
+| 移动高端 | 60       | 16.67ms    | 50           |
+| 移动低端 | 30       | 33.33ms    | 30           |
 
 ---
 

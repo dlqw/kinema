@@ -2,14 +2,16 @@
 
 ## 概述
 
-为 AniMaker 渲染引擎编写了全面的测试用例，覆盖设备创建、能力检测、渲染循环和渲染管线集成。所有测试使用 Mock GPU API 进行，确保在无 GPU 环境下也能运行。
+为 Kinema 渲染引擎编写了全面的测试用例，覆盖设备创建、能力检测、渲染循环和渲染管线集成。所有测试使用 Mock GPU API 进行，确保在无 GPU 环境下也能运行。
 
 ## 创建的测试文件
 
 ### 1. RenderEngine.test.ts
+
 **位置**: `tests/unit/render/RenderEngine.test.ts`
 
 **测试覆盖**:
+
 - 初始化测试
   - 默认配置初始化
   - 自定义配置初始化
@@ -39,9 +41,11 @@
   - 单例重置
 
 ### 2. Capability.test.ts
+
 **位置**: `tests/unit/render/Capability.test.ts`
 
 **测试覆盖**:
+
 - WebGPU 检测
   - 可用性检测
   - 功能收集
@@ -68,9 +72,11 @@
   - 无API处理
 
 ### 3. GraphicsDevice.test.ts
+
 **位置**: `tests/unit/render/GraphicsDevice.test.ts`
 
 **测试覆盖**:
+
 - 设备创建
   - WebGPU 设备创建
   - WebGL2 设备创建
@@ -101,9 +107,11 @@
   - Canvas 引用
 
 ### 4. pipeline.test.ts (集成测试)
+
 **位置**: `tests/integration/rendering/pipeline.test.ts`
 
 **测试覆盖**:
+
 - 设备初始化管线
   - 渲染引擎初始化
   - 呈现尺寸设置
@@ -151,21 +159,25 @@
 ## Mock GPU API 实现
 
 ### MockCanvas
+
 - 模拟 HTMLCanvasElement
 - 可配置宽高
 - Mock getContext 方法
 
 ### MockWebGPUDevice
+
 - 模拟 WebGPU 设备接口
 - Mock 所有资源创建方法
 - Mock 队列操作
 
 ### MockWebGL2Context
+
 - 模拟 WebGL2RenderingContext
 - Mock 参数获取
 - Mock 扩展检测
 
 ### MockCommandEncoder
+
 - 模拟命令编码器
 - Mock 渲染/计算通道
 - Mock 命令缓冲区完成

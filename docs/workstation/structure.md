@@ -1,6 +1,6 @@
 # 视频工作站文档结构规划
 
-本文档规划 AniMaker 视频工作站的完整文档结构。
+本文档规划 Kinema 视频工作站的完整文档结构。
 
 ## 当前文档结构
 
@@ -59,6 +59,7 @@ docs/workstation/
 ## 文档优先级
 
 ### 高优先级（v0.1.0）
+
 - ✓ index.md - 概述
 - ✓ installation.md - 安装指南
 - ✓ user-guide.md - 基础用户手册
@@ -67,12 +68,14 @@ docs/workstation/
 - ✓ settings.md - 设置
 
 ### 中优先级（v0.2.0）
+
 - getting-started/ - 快速入门系列
 - features/timeline.md - 时间轴详解
 - features/keyframes.md - 关键帧动画
 - reference/shortcuts.md - 快捷键参考
 
 ### 低优先级（v0.3.0+）
+
 - features/effects.md - 特效系统
 - features/audio.md - 音频编辑
 - tutorials/ - 完整教程系列
@@ -81,16 +84,19 @@ docs/workstation/
 ## 文档风格指南
 
 ### 语言
+
 - 主要使用简体中文
 - API 参考、代码示例使用英文
 
 ### 格式
+
 - 使用 Markdown 格式
 - 代码块指定语言
 - 表格用于对比和说明
 - 使用警告框、提示框
 
 ### 截图和示例
+
 - 实际功能截图（待功能实现后添加）
 - 可运行的代码示例
 - 动画演示（GIF 或视频）

@@ -1,6 +1,6 @@
 # API 参考
 
-完整的 AniMaker API 文档。
+完整的 Kinema API 文档。
 
 ## 快速导航
 
@@ -589,7 +589,7 @@ type TweenEvent = 'start' | 'update' | 'complete' | 'stop';
 
 ## 工厂函数
 
-AniMaker 提供了便捷的工厂函数来快速创建对象：
+Kinema 提供了便捷的工厂函数来快速创建对象：
 
 ### 形状工厂
 
@@ -651,7 +651,7 @@ animateSequentially(animations: Animation[]): Timeline
 ## 使用示例
 
 ```typescript
-import { Scene, Circle, Rectangle, fade, move, createScene } from 'animaker';
+import { Scene, Circle, Rectangle, fade, move, createScene } from 'kinema';
 
 // 创建场景
 const scene = createScene({ width: 1920, height: 1080 });
@@ -671,6 +671,5 @@ fade(rect, 0, 500).delay(1000).start();
 ## 更多文档
 
 - [完整 API 文档（HTML）](./html/index.html) - 查看所有类、接口、函数的详细文档
-- [框架指南](../guide/getting-started.md) - 快速开始使用 AniMaker
+- [框架指南](../guide/getting-started.md) - 快速开始使用 Kinema
 - [示例代码](../examples/) - 实战示例
-

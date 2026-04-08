@@ -2,14 +2,16 @@
 
 ## Overview
 
-Comprehensive unit tests have been written for all core types in the AniMaker animation framework. The tests ensure 80%+ code coverage while testing immutable update patterns, boundary conditions, and edge cases.
+Comprehensive unit tests have been written for all core types in the Kinema animation framework. The tests ensure 80%+ code coverage while testing immutable update patterns, boundary conditions, and edge cases.
 
 ## Test Files Created
 
 ### 1. RenderObject.test.ts (13.6 KB)
+
 **Location**: `tests/unit/core/RenderObject.test.ts`
 
 **Test Coverage**:
+
 - Constructor and State Management
   - Object creation with default state
   - Unique ID generation
@@ -54,9 +56,11 @@ Comprehensive unit tests have been written for all core types in the AniMaker an
   - Independent copies
 
 ### 2. Animation.test.ts (20.3 KB)
+
 **Location**: `tests/unit/core/Animation.test.ts`
 
 **Test Coverage**:
+
 - Basic Animation Properties
   - Target object association
   - Configuration management
@@ -112,9 +116,11 @@ Comprehensive unit tests have been written for all core types in the AniMaker an
   - New objects from interpolation
 
 ### 3. Scene.test.ts (18.7 KB)
+
 **Location**: `tests/unit/core/Scene.test.ts`
 
 **Test Coverage**:
+
 - Scene Creation and Configuration
   - Default configuration
   - Custom configuration
@@ -175,9 +181,11 @@ Comprehensive unit tests have been written for all core types in the AniMaker an
   - Independent instances
 
 ### 4. Easing.test.ts (18.7 KB)
+
 **Location**: `tests/unit/core/Easing.test.ts`
 
 **Test Coverage**:
+
 - Boundary Conditions
   - All functions return 0 at input 0
   - All functions return 1 at input 1
@@ -271,6 +279,7 @@ pnpm run test tests/unit/core/RenderObject.test.ts
 ## Coverage Goals
 
 All test files are designed to achieve:
+
 - **Line Coverage**: 80%+
 - **Branch Coverage**: 80%+
 - **Function Coverage**: 80%+

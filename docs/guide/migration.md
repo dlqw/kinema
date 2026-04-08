@@ -1,19 +1,20 @@
 # 迁移指南
 
-从其他动画框架迁移到 AniMaker。
+从其他动画框架迁移到 Kinema。
 
 ## 从 GSAP 迁移
 
 ### 时间轴
 
 **GSAP:**
+
 ```javascript
 const tl = gsap.timeline();
-tl.to('.box', { x: 100, duration: 1 })
-  .to('.box', { y: 100, duration: 1 });
+tl.to('.box', { x: 100, duration: 1 }).to('.box', { y: 100, duration: 1 });
 ```
 
-**AniMaker:**
+**Kinema:**
+
 ```typescript
 const tl = new Timeline();
 tl.sequence([
@@ -25,6 +26,7 @@ tl.sequence([
 ### 补间动画
 
 **GSAP:**
+
 ```javascript
 gsap.to('.box', {
   x: 100,
@@ -37,7 +39,8 @@ gsap.to('.box', {
 });
 ```
 
-**AniMaker:**
+**Kinema:**
+
 ```typescript
 new Tween({
   target: box.position,
@@ -60,6 +63,7 @@ new Tween({
 ### 基本动画
 
 **Anime.js:**
+
 ```javascript
 anime({
   targets: '.box',
@@ -71,7 +75,8 @@ anime({
 });
 ```
 
-**AniMaker:**
+**Kinema:**
+
 ```typescript
 new Tween({
   target: box.position,
@@ -94,6 +99,7 @@ new Tween({
 ### 时间轴
 
 **Anime.js:**
+
 ```javascript
 const tl = anime.timeline({
   easing: 'easeOutExpo',
@@ -103,39 +109,48 @@ const tl = anime.timeline({
 tl.add({
   targets: '.box',
   translateX: 250,
-}).add({
-  targets: '.circle',
-  translateY: 250,
-}, '-=500');
+}).add(
+  {
+    targets: '.circle',
+    translateY: 250,
+  },
+  '-=500',
+);
 ```
 
-**AniMaker:**
+**Kinema:**
+
 ```typescript
 const tl = new Timeline();
-tl.add(new Tween({
-  target: box.position,
-  to: { x: 250 },
-  duration: 750,
-  easing: 'easeOutExpo',
-}));
-tl.insert(new Tween({
-  target: circle.position,
-  to: { y: 250 },
-  duration: 750,
-  easing: 'easeOutExpo',
-}), 250); // 750 - 500 = 250ms offset
+tl.add(
+  new Tween({
+    target: box.position,
+    to: { x: 250 },
+    duration: 750,
+    easing: 'easeOutExpo',
+  }),
+);
+tl.insert(
+  new Tween({
+    target: circle.position,
+    to: { y: 250 },
+    duration: 750,
+    easing: 'easeOutExpo',
+  }),
+  250,
+); // 750 - 500 = 250ms offset
 ```
 
 ## 从 Lottie 迁移
 
-Lottie 用于 After Effects 动画导出，而 AniMaker 是程序化动画框架。
+Lottie 用于 After Effects 动画导出，而 Kinema 是程序化动画框架。
 
 ### 加载 Lottie
 
-AniMaker 支持通过插件加载 Lottie 动画：
+Kinema 支持通过插件加载 Lottie 动画：
 
 ```typescript
-import { LottiePlugin } from '@animaker/plugin-lottie';
+import { LottiePlugin } from '@kinema/plugin-lottie';
 
 animator.use(new LottiePlugin());
 
@@ -146,9 +161,10 @@ animator.scene.add(lottieAnimation);
 
 ### 重写为代码
 
-将 Lottie 动画重写为 AniMaker 代码：
+将 Lottie 动画重写为 Kinema 代码：
 
 **Lottie (JSON):**
+
 ```json
 {
   "layers": [
@@ -163,7 +179,8 @@ animator.scene.add(lottieAnimation);
 }
 ```
 
-**AniMaker:**
+**Kinema:**
+
 ```typescript
 const obj = new Rectangle({ width: 100, height: 100 });
 animator.scene.add(obj);
@@ -177,11 +194,12 @@ new Tween({
 
 ## 从 Three.js 动画迁移
 
-Three.js 主要用于 3D，AniMaker 支持 2D/3D。
+Three.js 主要用于 3D，Kinema 支持 2D/3D。
 
 ### Three.js 动画循环
 
 **Three.js:**
+
 ```javascript
 function animate() {
   requestAnimationFrame(animate);
@@ -193,7 +211,8 @@ function animate() {
 }
 ```
 
-**AniMaker (WebGL):**
+**Kinema (WebGL):**
+
 ```typescript
 const renderer = new WebGLRenderer({ canvas });
 const scene = new Scene();
@@ -212,37 +231,37 @@ animator.play();
 
 ### 淡入淡出
 
-| 框架 | 代码 |
-|------|------|
-| GSAP | `gsap.to(el, { opacity: 0 })` |
-| Anime.js | `anime({ targets: el, opacity: 0 })` |
-| AniMaker | `new Tween({ target: el, to: { opacity: 0 } })` |
+| 框架     | 代码                                            |
+| -------- | ----------------------------------------------- |
+| GSAP     | `gsap.to(el, { opacity: 0 })`                   |
+| Anime.js | `anime({ targets: el, opacity: 0 })`            |
+| Kinema   | `new Tween({ target: el, to: { opacity: 0 } })` |
 
 ### 并行动画
 
-| 框架 | 代码 |
-|------|------|
-| GSAP | `gsap.to([el1, el2], { x: 100 })` |
+| 框架     | 代码                                              |
+| -------- | ------------------------------------------------- |
+| GSAP     | `gsap.to([el1, el2], { x: 100 })`                 |
 | Anime.js | `anime({ targets: [el1, el2], translateX: 100 })` |
-| AniMaker | `timeline.parallel([tween1, tween2])` |
+| Kinema   | `timeline.parallel([tween1, tween2])`             |
 
 ### 缓动函数映射
 
-| GSAP | Anime.js | AniMaker |
-|------|----------|----------|
-| none | linear | linear |
-| power1.out | easeOutQuad | easeOutQuad |
+| GSAP         | Anime.js       | Kinema         |
+| ------------ | -------------- | -------------- |
+| none         | linear         | linear         |
+| power1.out   | easeOutQuad    | easeOutQuad    |
 | power2.inOut | easeInOutCubic | easeInOutCubic |
-| elastic.out | easeOutElastic | easeOutElastic |
-| bounce.out | easeOutBounce | easeOutBounce |
+| elastic.out  | easeOutElastic | easeOutElastic |
+| bounce.out   | easeOutBounce  | easeOutBounce  |
 
 ### 时间单位
 
-| 框架 | 时间单位 | 示例 |
-|------|----------|------|
-| GSAP | 秒 | `duration: 1` = 1秒 |
-| Anime.js | 毫秒 | `duration: 1000` = 1秒 |
-| AniMaker | 毫秒 | `duration: 1000` = 1秒 |
+| 框架     | 时间单位 | 示例                   |
+| -------- | -------- | ---------------------- |
+| GSAP     | 秒       | `duration: 1` = 1秒    |
+| Anime.js | 毫秒     | `duration: 1000` = 1秒 |
+| Kinema   | 毫秒     | `duration: 1000` = 1秒 |
 
 ## 迁移检查清单
 
@@ -260,4 +279,4 @@ animator.play();
 
 1. 查看 [API 参考](./api/)
 2. 参考 [示例集合](./examples/)
-3. 提交 [GitHub Issue](https://github.com/your-username/animaker/issues)
+3. 提交 [GitHub Issue](https://github.com/your-username/kinema/issues)

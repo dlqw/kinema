@@ -1,6 +1,6 @@
 # 自定义渲染对象
 
-本教程将指导你如何创建自定义渲染对象，扩展 AniMaker 的图形能力，以及实现特殊的视觉效果。
+本教程将指导你如何创建自定义渲染对象，扩展 Kinema 的图形能力，以及实现特殊的视觉效果。
 
 ## 目录
 
@@ -21,7 +21,7 @@
 所有渲染对象都实现 `RenderObject` 接口：
 
 ```typescript
-import { RenderObject, RenderObjectState, ObjectId, Transform, BoundingBox } from '@animaker/core';
+import { RenderObject, RenderObjectState, ObjectId, Transform, BoundingBox } from '@kinema/core';
 
 interface RenderObject {
   // 获取当前状态
@@ -81,16 +81,16 @@ import {
   Transform,
   Point3D,
   BoundingBox,
-  generateObjectId
-} from '@animaker/core';
+  generateObjectId,
+} from '@kinema/core';
 
 interface StarConfig {
-  outerRadius: number;     // 外半径
-  innerRadius: number;     // 内半径
-  points: number;          // 星形角数
-  fillColor?: string;      // 填充颜色
-  strokeColor?: string;    // 描边颜色
-  strokeWidth?: number;    // 描边宽度
+  outerRadius: number; // 外半径
+  innerRadius: number; // 内半径
+  points: number; // 星形角数
+  fillColor?: string; // 填充颜色
+  strokeColor?: string; // 描边颜色
+  strokeWidth?: number; // 描边宽度
 }
 
 class StarObject implements RenderObject {
@@ -106,15 +106,15 @@ class StarObject implements RenderObject {
         position,
         rotation: { x: 0, y: 0, z: 0 },
         scale: { x: 1, y: 1, z: 1 },
-        opacity: 1
+        opacity: 1,
       },
       visible: true,
       z_index: 0,
       styles: new Map([
         ['fillColor', config.fillColor ?? '#FFD700'],
         ['strokeColor', config.strokeColor ?? '#FFA500'],
-        ['strokeWidth', config.strokeWidth ?? 0.02]
-      ])
+        ['strokeWidth', config.strokeWidth ?? 0.02],
+      ]),
     };
   }
 
@@ -131,28 +131,28 @@ class StarObject implements RenderObject {
   withPosition(position: Point3D): StarObject {
     return this.withTransform({
       ...this.state.transform,
-      position
+      position,
     });
   }
 
   withRotation(rotation: Point3D): StarObject {
     return this.withTransform({
       ...this.state.transform,
-      rotation
+      rotation,
     });
   }
 
   withScale(scale: Point3D): StarObject {
     return this.withTransform({
       ...this.state.transform,
-      scale
+      scale,
     });
   }
 
   withOpacity(opacity: number): StarObject {
     return this.withTransform({
       ...this.state.transform,
-      opacity
+      opacity,
     });
   }
 
@@ -182,14 +182,14 @@ class StarObject implements RenderObject {
       min: {
         x: position.x - maxRadius,
         y: position.y - maxRadius,
-        z: position.z
+        z: position.z,
       },
       max: {
         x: position.x + maxRadius,
         y: position.y + maxRadius,
-        z: position.z
+        z: position.z,
       },
-      center: position
+      center: position,
     };
   }
 
@@ -204,7 +204,7 @@ class StarObject implements RenderObject {
 
       vertices.push({
         x: Math.cos(angle) * radius,
-        y: Math.sin(angle) * radius
+        y: Math.sin(angle) * radius,
       });
     }
 
@@ -260,7 +260,7 @@ class StarObject implements RenderObject {
     return new StarObject({
       points: 5,
       outerRadius,
-      innerRadius: innerRadius ?? outerRadius * 0.4
+      innerRadius: innerRadius ?? outerRadius * 0.4,
     });
   }
 
@@ -268,15 +268,13 @@ class StarObject implements RenderObject {
     return new StarObject({
       points: 6,
       outerRadius,
-      innerRadius: innerRadius ?? outerRadius * 0.5
+      innerRadius: innerRadius ?? outerRadius * 0.5,
     });
   }
 }
 
 // 使用示例
-const star = StarObject.fivePointed(1, 0.4)
-  .withPosition({ x: 0, y: 2, z: 0 })
-  .withOpacity(0.8);
+const star = StarObject.fivePointed(1, 0.4).withPosition({ x: 0, y: 2, z: 0 }).withOpacity(0.8);
 
 scene.addObject(star);
 ```
@@ -287,9 +285,9 @@ scene.addObject(star);
 
 ```typescript
 interface PolygonConfig {
-  sides: number;           // 边数
-  radius: number;          // 半径
-  rotation?: number;       // 初始旋转角度
+  sides: number; // 边数
+  radius: number; // 半径
+  rotation?: number; // 初始旋转角度
   fillColor?: string;
   strokeColor?: string;
   strokeWidth?: number;
@@ -308,20 +306,22 @@ class PolygonObject implements RenderObject {
         position,
         rotation: { x: 0, y: 0, z: config.rotation ?? 0 },
         scale: { x: 1, y: 1, z: 1 },
-        opacity: 1
+        opacity: 1,
       },
       visible: true,
       z_index: 0,
       styles: new Map([
         ['fillColor', config.fillColor ?? '#4A90E2'],
         ['strokeColor', config.strokeColor ?? '#2E5C8A'],
-        ['strokeWidth', config.strokeWidth ?? 0.02]
-      ])
+        ['strokeWidth', config.strokeWidth ?? 0.02],
+      ]),
     };
   }
 
   // 实现与 StarObject 类似的方法
-  getState(): RenderObjectState { return this.state; }
+  getState(): RenderObjectState {
+    return this.state;
+  }
 
   withTransform(transform: Transform): PolygonObject {
     const newObj = new PolygonObject(this.config, this.state.transform.position);
@@ -370,7 +370,7 @@ class PolygonObject implements RenderObject {
     return {
       min: { x: position.x - maxRadius, y: position.y - maxRadius, z: position.z },
       max: { x: position.x + maxRadius, y: position.y + maxRadius, z: position.z },
-      center: position
+      center: position,
     };
   }
 
@@ -382,7 +382,7 @@ class PolygonObject implements RenderObject {
       const angle = i * angleStep;
       vertices.push({
         x: Math.cos(angle) * this.config.radius,
-        y: Math.sin(angle) * this.config.radius
+        y: Math.sin(angle) * this.config.radius,
       });
     }
 
@@ -473,9 +473,9 @@ scene.addObjects(triangle, hexagon);
 interface GradientConfig {
   type: 'linear' | 'radial';
   stops: Array<{ offset: number; color: string }>;
-  angle?: number;         // 线性渐变角度
-  startRadius?: number;   // 径向渐变起始半径
-  endRadius?: number;     // 径向渐变结束半径
+  angle?: number; // 线性渐变角度
+  startRadius?: number; // 径向渐变起始半径
+  endRadius?: number; // 径向渐变结束半径
 }
 
 class GradientPolygonObject extends PolygonObject {
@@ -484,7 +484,7 @@ class GradientPolygonObject extends PolygonObject {
   constructor(
     polygonConfig: PolygonConfig,
     gradient: GradientConfig,
-    position: Point3D = { x: 0, y: 0, z: 0 }
+    position: Point3D = { x: 0, y: 0, z: 0 },
   ) {
     super(polygonConfig, position);
     this.gradient = gradient;
@@ -550,9 +550,9 @@ class GradientPolygonObject extends PolygonObject {
         stops: [
           { offset: 0, color: '#FF6B6B' },
           { offset: 0.5, color: '#FFD93D' },
-          { offset: 1, color: '#6BCB77' }
-        ]
-      }
+          { offset: 1, color: '#6BCB77' },
+        ],
+      },
     );
   }
 
@@ -564,19 +564,17 @@ class GradientPolygonObject extends PolygonObject {
         stops: [
           { offset: 0, color: '#4FC3F7' },
           { offset: 0.5, color: '#0288D1' },
-          { offset: 1, color: '#01579B' }
-        ]
-      }
+          { offset: 1, color: '#01579B' },
+        ],
+      },
     );
   }
 }
 
 // 使用示例
-const sunsetPoly = GradientPolygonObject.sunsetGradient(6, 1.5)
-  .withPosition({ x: -3, y: 0, z: 0 });
+const sunsetPoly = GradientPolygonObject.sunsetGradient(6, 1.5).withPosition({ x: -3, y: 0, z: 0 });
 
-const oceanPoly = GradientPolygonObject.oceanGradient(5, 1.2)
-  .withPosition({ x: 3, y: 0, z: 0 });
+const oceanPoly = GradientPolygonObject.oceanGradient(5, 1.2).withPosition({ x: 3, y: 0, z: 0 });
 
 scene.addObjects(sunsetPoly, oceanPoly);
 ```
@@ -587,10 +585,10 @@ scene.addObjects(sunsetPoly, oceanPoly);
 
 ```typescript
 interface ShadowConfig {
-  color: string;           // 阴影颜色
-  offsetX: number;         // X 偏移
-  offsetY: number;         // Y 偏移
-  blur: number;            // 模糊程度
+  color: string; // 阴影颜色
+  offsetX: number; // X 偏移
+  offsetY: number; // Y 偏移
+  blur: number; // 模糊程度
 }
 
 class ShadowPolygonObject extends PolygonObject {
@@ -599,7 +597,7 @@ class ShadowPolygonObject extends PolygonObject {
   constructor(
     polygonConfig: PolygonConfig,
     shadow: ShadowConfig,
-    position: Point3D = { x: 0, y: 0, z: 0 }
+    position: Point3D = { x: 0, y: 0, z: 0 },
   ) {
     super(polygonConfig, position);
     this.shadow = shadow;
@@ -615,11 +613,11 @@ class ShadowPolygonObject extends PolygonObject {
     renderer.translate(
       transform.position.x + this.shadow.offsetX,
       transform.position.y + this.shadow.offsetY,
-      transform.position.z - 0.01  // 略低于主对象
+      transform.position.z - 0.01, // 略低于主对象
     );
     renderer.rotateZ(transform.rotation.z);
     renderer.scale(transform.scale.x, transform.scale.y, transform.scale.z);
-    renderer.setOpacity(transform.opacity * 0.5);  // 阴影半透明
+    renderer.setOpacity(transform.opacity * 0.5); // 阴影半透明
 
     // 应用阴影模糊
     renderer.setShadow(this.shadow.color, this.shadow.blur);
@@ -652,8 +650,8 @@ class ShadowPolygonObject extends PolygonObject {
         color: 'rgba(0, 0, 0, 0.3)',
         offsetX: 0.1,
         offsetY: -0.1,
-        blur: 0.2
-      }
+        blur: 0.2,
+      },
     );
   }
 
@@ -664,8 +662,8 @@ class ShadowPolygonObject extends PolygonObject {
         color: 'rgba(0, 0, 0, 0.5)',
         offsetX: 0.15,
         offsetY: -0.15,
-        blur: 0
-      }
+        blur: 0,
+      },
     );
   }
 }
@@ -686,12 +684,12 @@ scene.addObject(softShadowHex);
 
 ```typescript
 interface TextConfig {
-  text: string;            // 文本内容
-  fontSize: number;        // 字体大小
-  fontFamily?: string;     // 字体系列
-  fontWeight?: string;     // 字体粗细
-  fillColor?: string;      // 文本颜色
-  align?: 'left' | 'center' | 'right';  // 对齐方式
+  text: string; // 文本内容
+  fontSize: number; // 字体大小
+  fontFamily?: string; // 字体系列
+  fontWeight?: string; // 字体粗细
+  fillColor?: string; // 文本颜色
+  align?: 'left' | 'center' | 'right'; // 对齐方式
 }
 
 class TextObject implements RenderObject {
@@ -707,7 +705,7 @@ class TextObject implements RenderObject {
         position,
         rotation: { x: 0, y: 0, z: 0 },
         scale: { x: 1, y: 1, z: 1 },
-        opacity: 1
+        opacity: 1,
       },
       visible: true,
       z_index: 0,
@@ -717,13 +715,15 @@ class TextObject implements RenderObject {
         ['fontFamily', config.fontFamily ?? 'Arial'],
         ['fontWeight', config.fontWeight ?? 'normal'],
         ['fillColor', config.fillColor ?? '#FFFFFF'],
-        ['align', config.align ?? 'center']
-      ])
+        ['align', config.align ?? 'center'],
+      ]),
     };
   }
 
   // 实现标准 RenderObject 方法
-  getState(): RenderObjectState { return this.state; }
+  getState(): RenderObjectState {
+    return this.state;
+  }
 
   withTransform(transform: Transform): TextObject {
     const newObj = new TextObject(this.config, this.state.transform.position);
@@ -783,14 +783,14 @@ class TextObject implements RenderObject {
       min: {
         x: position.x - textWidth / 2,
         y: position.y - textHeight / 2,
-        z: position.z
+        z: position.z,
       },
       max: {
         x: position.x + textWidth / 2,
         y: position.y + textHeight / 2,
-        z: position.z
+        z: position.z,
       },
-      center: position
+      center: position,
     };
   }
 
@@ -830,7 +830,7 @@ class TextObject implements RenderObject {
       text,
       fontSize: 0.5,
       fontWeight: 'bold',
-      fillColor: '#FFFFFF'
+      fillColor: '#FFFFFF',
     });
   }
 
@@ -838,7 +838,7 @@ class TextObject implements RenderObject {
     return new TextObject({
       text,
       fontSize: 0.3,
-      fillColor: '#CCCCCC'
+      fillColor: '#CCCCCC',
     });
   }
 
@@ -846,17 +846,15 @@ class TextObject implements RenderObject {
     return new TextObject({
       text,
       fontSize: 0.2,
-      fillColor: '#AAAAAA'
+      fillColor: '#AAAAAA',
     });
   }
 }
 
 // 使用示例
-const title = TextObject.title('AniMaker 框架')
-  .withPosition({ x: 0, y: 2, z: 0 });
+const title = TextObject.title('Kinema 框架').withPosition({ x: 0, y: 2, z: 0 });
 
-const subtitle = TextObject.subtitle('现代化动画渲染系统')
-  .withPosition({ x: 0, y: 1.5, z: 0 });
+const subtitle = TextObject.subtitle('现代化动画渲染系统').withPosition({ x: 0, y: 1.5, z: 0 });
 
 scene.addObjects(title, subtitle);
 ```
@@ -871,19 +869,19 @@ scene.addObjects(title, subtitle);
 interface Particle {
   position: Point3D;
   velocity: Point3D;
-  life: number;          // 生命值 [0, 1]
+  life: number; // 生命值 [0, 1]
   size: number;
   color: string;
 }
 
 interface ParticleSystemConfig {
-  maxParticles: number;      // 最大粒子数
-  emissionRate: number;      // 发射速率（粒子/秒）
-  particleLife: number;      // 粒子寿命（秒）
-  initialVelocity: Point3D;  // 初始速度
+  maxParticles: number; // 最大粒子数
+  emissionRate: number; // 发射速率（粒子/秒）
+  particleLife: number; // 粒子寿命（秒）
+  initialVelocity: Point3D; // 初始速度
   velocityVariance: Point3D; // 速度变化范围
-  gravity?: Point3D;         // 重力
-  colors: string[];          // 粒子颜色数组
+  gravity?: Point3D; // 重力
+  colors: string[]; // 粒子颜色数组
   sizeRange: [number, number]; // 大小范围
 }
 
@@ -902,11 +900,11 @@ class ParticleSystemObject implements RenderObject {
         position,
         rotation: { x: 0, y: 0, z: 0 },
         scale: { x: 1, y: 1, z: 1 },
-        opacity: 1
+        opacity: 1,
       },
       visible: true,
       z_index: 0,
-      styles: new Map()
+      styles: new Map(),
     };
   }
 
@@ -960,7 +958,7 @@ class ParticleSystemObject implements RenderObject {
     return {
       min: { x: position.x - 1, y: position.y - 1, z: position.z },
       max: { x: position.x + 1, y: position.y + 1, z: position.z },
-      center: position
+      center: position,
     };
   }
 
@@ -986,24 +984,26 @@ class ParticleSystemObject implements RenderObject {
     }
 
     // 更新现有粒子
-    newObj.particles = newObj.particles.map(particle => {
-      // 应用重力
-      if (this.config.gravity) {
-        particle.velocity.x += this.config.gravity.x * deltaTime;
-        particle.velocity.y += this.config.gravity.y * deltaTime;
-        particle.velocity.z += this.config.gravity.z * deltaTime;
-      }
+    newObj.particles = newObj.particles
+      .map((particle) => {
+        // 应用重力
+        if (this.config.gravity) {
+          particle.velocity.x += this.config.gravity.x * deltaTime;
+          particle.velocity.y += this.config.gravity.y * deltaTime;
+          particle.velocity.z += this.config.gravity.z * deltaTime;
+        }
 
-      // 更新位置
-      particle.position.x += particle.velocity.x * deltaTime;
-      particle.position.y += particle.velocity.y * deltaTime;
-      particle.position.z += particle.velocity.z * deltaTime;
+        // 更新位置
+        particle.position.x += particle.velocity.x * deltaTime;
+        particle.position.y += particle.velocity.y * deltaTime;
+        particle.position.z += particle.velocity.z * deltaTime;
 
-      // 更新生命值
-      particle.life -= deltaTime / this.config.particleLife;
+        // 更新生命值
+        particle.life -= deltaTime / this.config.particleLife;
 
-      return particle;
-    }).filter(p => p.life > 0);
+        return particle;
+      })
+      .filter((p) => p.life > 0);
 
     return newObj;
   }
@@ -1012,11 +1012,12 @@ class ParticleSystemObject implements RenderObject {
     const velocity = {
       x: this.config.initialVelocity.x + (Math.random() - 0.5) * this.config.velocityVariance.x,
       y: this.config.initialVelocity.y + (Math.random() - 0.5) * this.config.velocityVariance.y,
-      z: this.config.initialVelocity.z + (Math.random() - 0.5) * this.config.velocityVariance.z
+      z: this.config.initialVelocity.z + (Math.random() - 0.5) * this.config.velocityVariance.z,
     };
 
-    const size = this.config.sizeRange[0] +
-                 Math.random() * (this.config.sizeRange[1] - this.config.sizeRange[0]);
+    const size =
+      this.config.sizeRange[0] +
+      Math.random() * (this.config.sizeRange[1] - this.config.sizeRange[0]);
 
     const color = this.config.colors[Math.floor(Math.random() * this.config.colors.length)];
 
@@ -1025,7 +1026,7 @@ class ParticleSystemObject implements RenderObject {
       velocity,
       life: 1,
       size,
-      color
+      color,
     };
   }
 
@@ -1068,9 +1069,9 @@ class ParticleSystemObject implements RenderObject {
         velocityVariance: { x: 1, y: 0.5, z: 0 },
         gravity: { x: 0, y: -2, z: 0 },
         colors: ['#FF6B35', '#F7931E', '#FFD23F', '#EE4266'],
-        sizeRange: [0.02, 0.08]
+        sizeRange: [0.02, 0.08],
       },
-      position
+      position,
     );
   }
 
@@ -1084,9 +1085,9 @@ class ParticleSystemObject implements RenderObject {
         velocityVariance: { x: 0.3, y: 0.2, z: 0 },
         gravity: { x: 0, y: 0, z: 0 },
         colors: ['#CCCCCC', '#AAAAAA', '#888888'],
-        sizeRange: [0.05, 0.15]
+        sizeRange: [0.05, 0.15],
       },
-      position
+      position,
     );
   }
 
@@ -1100,9 +1101,9 @@ class ParticleSystemObject implements RenderObject {
         velocityVariance: { x: 3, y: 3, z: 0 },
         gravity: { x: 0, y: -5, z: 0 },
         colors: ['#FFFFFF', '#FFFACD', '#F0E68C'],
-        sizeRange: [0.01, 0.03]
+        sizeRange: [0.01, 0.03],
       },
-      position
+      position,
     );
   }
 }
@@ -1130,7 +1131,7 @@ function animate(deltaTime: number) {
 
 ```typescript
 interface CubeConfig {
-  size: number;            // 立方体大小
+  size: number; // 立方体大小
   colors?: {
     front?: string;
     back?: string;
@@ -1154,7 +1155,7 @@ class CubeObject implements RenderObject {
         position,
         rotation: { x: 0, y: 0, z: 0 },
         scale: { x: 1, y: 1, z: 1 },
-        opacity: 1
+        opacity: 1,
       },
       visible: true,
       z_index: 0,
@@ -1164,13 +1165,15 @@ class CubeObject implements RenderObject {
         ['leftColor', config.colors?.left ?? '#45B7D1'],
         ['rightColor', config.colors?.right ?? '#96CEB4'],
         ['topColor', config.colors?.top ?? '#FFEAA7'],
-        ['bottomColor', config.colors?.bottom ?? '#DFE6E9']
-      ])
+        ['bottomColor', config.colors?.bottom ?? '#DFE6E9'],
+      ]),
     };
   }
 
   // 实现标准 RenderObject 方法（省略具体实现）
-  getState(): RenderObjectState { return this.state; }
+  getState(): RenderObjectState {
+    return this.state;
+  }
 
   withTransform(transform: Transform): CubeObject {
     const newObj = new CubeObject(this.config, this.state.transform.position);
@@ -1220,14 +1223,14 @@ class CubeObject implements RenderObject {
       min: {
         x: position.x - halfSize,
         y: position.y - halfSize,
-        z: position.z - halfSize
+        z: position.z - halfSize,
       },
       max: {
         x: position.x + halfSize,
         y: position.y + halfSize,
-        z: position.z + halfSize
+        z: position.z + halfSize,
       },
-      center: position
+      center: position,
     };
   }
 
@@ -1253,7 +1256,7 @@ class CubeObject implements RenderObject {
       { x: -halfSize, y: -halfSize, z: halfSize },
       { x: halfSize, y: -halfSize, z: halfSize },
       { x: halfSize, y: halfSize, z: halfSize },
-      { x: -halfSize, y: halfSize, z: halfSize }
+      { x: -halfSize, y: halfSize, z: halfSize },
     );
 
     // 后面
@@ -1262,7 +1265,7 @@ class CubeObject implements RenderObject {
       { x: halfSize, y: -halfSize, z: -halfSize },
       { x: -halfSize, y: -halfSize, z: -halfSize },
       { x: -halfSize, y: halfSize, z: -halfSize },
-      { x: halfSize, y: halfSize, z: -halfSize }
+      { x: halfSize, y: halfSize, z: -halfSize },
     );
 
     // 左面
@@ -1271,7 +1274,7 @@ class CubeObject implements RenderObject {
       { x: -halfSize, y: -halfSize, z: -halfSize },
       { x: -halfSize, y: -halfSize, z: halfSize },
       { x: -halfSize, y: halfSize, z: halfSize },
-      { x: -halfSize, y: halfSize, z: -halfSize }
+      { x: -halfSize, y: halfSize, z: -halfSize },
     );
 
     // 右面
@@ -1280,7 +1283,7 @@ class CubeObject implements RenderObject {
       { x: halfSize, y: -halfSize, z: halfSize },
       { x: halfSize, y: -halfSize, z: -halfSize },
       { x: halfSize, y: halfSize, z: -halfSize },
-      { x: halfSize, y: halfSize, z: halfSize }
+      { x: halfSize, y: halfSize, z: halfSize },
     );
 
     // 上面
@@ -1289,7 +1292,7 @@ class CubeObject implements RenderObject {
       { x: -halfSize, y: halfSize, z: halfSize },
       { x: halfSize, y: halfSize, z: halfSize },
       { x: halfSize, y: halfSize, z: -halfSize },
-      { x: -halfSize, y: halfSize, z: -halfSize }
+      { x: -halfSize, y: halfSize, z: -halfSize },
     );
 
     // 下面
@@ -1298,7 +1301,7 @@ class CubeObject implements RenderObject {
       { x: -halfSize, y: -halfSize, z: -halfSize },
       { x: halfSize, y: -halfSize, z: -halfSize },
       { x: halfSize, y: -halfSize, z: halfSize },
-      { x: -halfSize, y: -halfSize, z: halfSize }
+      { x: -halfSize, y: -halfSize, z: halfSize },
     );
 
     renderer.popMatrix();
@@ -1314,8 +1317,8 @@ class CubeObject implements RenderObject {
         left: '#0000FF',
         right: '#FFFF00',
         top: '#FF00FF',
-        bottom: '#00FFFF'
-      }
+        bottom: '#00FFFF',
+      },
     });
   }
 
@@ -1328,22 +1331,21 @@ class CubeObject implements RenderObject {
         left: color,
         right: color,
         top: color,
-        bottom: color
-      }
+        bottom: color,
+      },
     });
   }
 }
 
 // 使用示例
-const rotatingCube = CubeObject.rainbow(1)
-  .withPosition({ x: 0, y: 0, z: 0 });
+const rotatingCube = CubeObject.rainbow(1).withPosition({ x: 0, y: 0, z: 0 });
 
 scene.addObject(rotatingCube);
 
 // 旋转动画
 const rotateCube = new RotateAnimation(rotatingCube, 'y', 360, {
   duration: 3,
-  easing: smooth
+  easing: smooth,
 });
 
 scene.schedule(rotateCube, 0);
@@ -1395,7 +1397,7 @@ class ObjectPool<T extends RenderObject> {
 const particlePool = new ObjectPool(
   () => new CircleObject(0.05),
   (obj) => obj.withPosition({ x: 0, y: 0, z: 0 }).withOpacity(0),
-  100
+  100,
 );
 
 // 获取粒子

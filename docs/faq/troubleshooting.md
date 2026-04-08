@@ -1,30 +1,33 @@
 # 故障排除 FAQ
 
-关于 AniMaker 常见错误和调试问题的解答。
+关于 Kinema 常见错误和调试问题的解答。
 
 ---
 
 ## 常见错误及解决方案
 
-### 错误：Cannot find module '@animaker/core'
+### 错误：Cannot find module '@kinema/core'
 
 **症状：**
+
 ```
-Error: Cannot find module '@animaker/core'
+Error: Cannot find module '@kinema/core'
 ```
 
 **解决方案：**
 
 1. 检查安装
+
 ```bash
 # 检查 package.json
-cat package.json | grep animaker
+cat package.json | grep kinema
 
 # 如果没有，重新安装
-npm install @animaker/core
+npm install @kinema/core
 ```
 
 2. 清理缓存
+
 ```bash
 # 清理 npm 缓存
 npm cache clean --force
@@ -37,6 +40,7 @@ npm install
 ```
 
 3. 检查 TypeScript 配置
+
 ```json
 // tsconfig.json
 {
@@ -53,6 +57,7 @@ npm install
 ### 错误：Type 'X' is not assignable to type 'Y'
 
 **症状：**
+
 ```
 Type 'CircleObject' is not assignable to type 'RenderObject'
 ```
@@ -60,22 +65,25 @@ Type 'CircleObject' is not assignable to type 'RenderObject'
 **解决方案：**
 
 1. 检查类型导入
+
 ```typescript
 // ✅ 正确导入
-import { RenderObject } from '@animaker/core';
-import { CircleObject } from '@animaker/core/objects';
+import { RenderObject } from '@kinema/core';
+import { CircleObject } from '@kinema/core/objects';
 
 const circle: CircleObject = VectorObject.circle(1);
-const obj: RenderObject = circle;  // 可以赋值
+const obj: RenderObject = circle; // 可以赋值
 ```
 
 2. 使用类型断言
+
 ```typescript
 // 如果确定类型正确
 const obj = unknownObject as RenderObject;
 ```
 
 3. 检查泛型类型
+
 ```typescript
 // ✅ 正确使用泛型
 const animation: Animation<RenderObject> = new MoveAnimation(circle, ...);
@@ -89,6 +97,7 @@ const circleAnimation: Animation<CircleObject> = new MoveAnimation(circle, ...);
 ### 错误：Cannot read property 'getState' of undefined
 
 **症状：**
+
 ```
 TypeError: Cannot read property 'getState' of undefined
 ```
@@ -96,6 +105,7 @@ TypeError: Cannot read property 'getState' of undefined
 **解决方案：**
 
 1. 检查对象是否存在
+
 ```typescript
 // ✅ 添加存在性检查
 const obj = scene.getObject(id);
@@ -108,6 +118,7 @@ if (obj) {
 ```
 
 2. 使用可选链
+
 ```typescript
 // ✅ 使用可选链操作符
 const state = obj?.getState();
@@ -117,6 +128,7 @@ if (state) {
 ```
 
 3. 检查场景初始化
+
 ```typescript
 // ✅ 确保场景已正确初始化
 let scene: Scene;
@@ -132,6 +144,7 @@ try {
 ### 错误：WebGPU not available
 
 **症状：**
+
 ```
 Error: WebGPU is not available in this browser
 ```
@@ -139,6 +152,7 @@ Error: WebGPU is not available in this browser
 **解决方案：**
 
 1. 检查浏览器支持
+
 ```typescript
 // ✅ 检测 WebGPU 支持
 async function checkWebGPU(): Promise<boolean> {
@@ -165,16 +179,18 @@ if (await checkWebGPU()) {
 ```
 
 2. 启用 WebGPU 标志
+
 ```typescript
 // Chrome: 访问 chrome://flags
 // 搜索 "WebGPU" 并启用
 ```
 
 3. 降级到 Canvas2D
+
 ```typescript
 // ✅ 自动降级
 const scene = createScene({
-  renderer: 'auto'  // 自动选择可用渲染器
+  renderer: 'auto', // 自动选择可用渲染器
 });
 ```
 
@@ -183,6 +199,7 @@ const scene = createScene({
 ### 错误：Maximum call stack size exceeded
 
 **症状：**
+
 ```
 RangeError: Maximum call stack size exceeded
 ```
@@ -190,11 +207,12 @@ RangeError: Maximum call stack size exceeded
 **解决方案：**
 
 1. 检查无限递归
+
 ```typescript
 // ❌ 错误：无限递归
 class BadAnimation extends Animation {
   interpolate(elapsedTime: number): InterpolationResult {
-    return this.interpolate(elapsedTime);  // 无限递归！
+    return this.interpolate(elapsedTime); // 无限递归！
   }
 }
 
@@ -214,12 +232,13 @@ class GoodAnimation extends Animation {
 ```
 
 2. 检查循环引用
+
 ```typescript
 // ❌ 错误：循环引用
 const obj1 = createObject();
 const obj2 = createObject();
 obj1.parent = obj2;
-obj2.parent = obj1;  // 循环引用！
+obj2.parent = obj1; // 循环引用！
 
 // ✅ 正确：避免循环引用
 const root = createObject();
@@ -231,6 +250,7 @@ root.addChild(child2);
 ```
 
 3. 增加栈大小（不推荐）
+
 ```typescript
 // 临时解决方案：增加 Node.js 栈大小
 // node --stack-size=10000 your-script.js
@@ -241,6 +261,7 @@ root.addChild(child2);
 ### 错误：Memory allocation failed
 
 **症状：**
+
 ```
 Error: Out of memory
 ```
@@ -248,13 +269,14 @@ Error: Out of memory
 **解决方案：**
 
 1. 释放不需要的资源
+
 ```typescript
 // ✅ 及时释放资源
 function cleanup(scene: Scene): Scene {
   const objects = scene.getObjects();
 
   // 移除不可见的对象
-  const visibleObjects = objects.filter(obj => obj.getState().visible);
+  const visibleObjects = objects.filter((obj) => obj.getState().visible);
 
   let cleanedScene = scene.clear();
   return cleanedScene.addObjects(...visibleObjects);
@@ -262,6 +284,7 @@ function cleanup(scene: Scene): Scene {
 ```
 
 2. 使用对象池
+
 ```typescript
 // ✅ 使用对象池减少内存分配
 const pool = new ObjectPool();
@@ -274,6 +297,7 @@ pool.release(obj);
 ```
 
 3. 分批处理大数据
+
 ```typescript
 // ✅ 分批处理
 function processLargeData(data: unknown[], batchSize: number = 100): void {
@@ -282,7 +306,7 @@ function processLargeData(data: unknown[], batchSize: number = 100): void {
     processBatch(batch);
 
     // 让出控制权，允许垃圾回收
-    await new Promise(resolve => setTimeout(resolve, 0));
+    await new Promise((resolve) => setTimeout(resolve, 0));
   }
 }
 ```
@@ -308,7 +332,7 @@ class DebuggableAnimation extends Animation {
     // 输出调试信息
     console.log(`[${this.getName()}] t=${elapsedTime.toFixed(2)}`, {
       position: result.object.getState().transform.position,
-      complete: result.complete
+      complete: result.complete,
     });
 
     return result;
@@ -320,7 +344,7 @@ class DebuggableAnimation extends Animation {
 
 ```typescript
 // ✅ 使用内置性能分析器
-import { Profiler } from '@animaker/core';
+import { Profiler } from '@kinema/core';
 
 const profiler = new Profiler();
 
@@ -344,19 +368,15 @@ function drawBoundingBox(obj: RenderObject, renderer: Renderer): void {
   renderer.setLineWidth(0.01);
 
   // 绘制边界框
-  renderer.strokeRect(
-    bbox.min.x, bbox.min.y,
-    bbox.max.x - bbox.min.x,
-    bbox.max.y - bbox.min.y
-  );
+  renderer.strokeRect(bbox.min.x, bbox.min.y, bbox.max.x - bbox.min.x, bbox.max.y - bbox.min.y);
 
   renderer.popMatrix();
 }
 
 // 渲染时绘制边界
-objects.forEach(obj => {
+objects.forEach((obj) => {
   renderer.render(obj);
-  drawBoundingBox(obj, renderer);  // 调试边界
+  drawBoundingBox(obj, renderer); // 调试边界
 });
 ```
 
@@ -395,7 +415,7 @@ TypeScript 报告各种类型错误，如何解决？
 
 ```typescript
 // ❌ 错误：类型不匹配
-const position: Point3D = { x: 0, y: 0 };  // 缺少 z
+const position: Point3D = { x: 0, y: 0 }; // 缺少 z
 
 // ✅ 正确：提供完整类型
 const position: Point3D = { x: 0, y: 0, z: 0 };
@@ -409,7 +429,7 @@ const position = { x: 0, y: 0 } as Point3D;
 ```typescript
 // ❌ 错误：不能修改只读属性
 const obj = VectorObject.circle(1);
-obj.getState().transform.position.x = 2;  // 错误！
+obj.getState().transform.position.x = 2; // 错误！
 
 // ✅ 正确：使用 with 方法
 const newObj = obj.withPosition({ x: 2, y: 0, z: 0 });
@@ -422,11 +442,7 @@ const newObj = obj.withPosition({ x: 2, y: 0, z: 0 });
 const animation = new MoveAnimation(circle, { x: 2 }, config);
 
 // ✅ 正确：明确指定类型
-const animation = new MoveAnimation<CircleObject>(
-  circle,
-  { x: 2, y: 0, z: 0 },
-  config
-);
+const animation = new MoveAnimation<CircleObject>(circle, { x: 2, y: 0, z: 0 }, config);
 ```
 
 ### 4. 联合类型处理
@@ -438,7 +454,7 @@ function isCircleObject(obj: RenderObject): obj is CircleObject {
 }
 
 if (isCircleObject(obj)) {
-  const radius = obj.getRadius();  // 类型安全
+  const radius = obj.getRadius(); // 类型安全
 }
 ```
 
@@ -456,13 +472,13 @@ if (isCircleObject(obj)) {
 
 ```bash
 # 检查已安装的版本
-npm list @animaker/core
+npm list @kinema/core
 
 # 更新到最新版本
-npm update @animaker/core
+npm update @kinema/core
 
 # 或安装特定版本
-npm install @animaker/core@latest
+npm install @kinema/core@latest
 ```
 
 ### 2. 清理构建缓存
@@ -507,16 +523,16 @@ import { defineConfig } from 'vite';
 export default defineConfig({
   resolve: {
     alias: {
-      '@animaker/core': '/path/to/animaker/packages/core/src'
-    }
+      '@kinema/core': '/path/to/kinema/packages/core/src',
+    },
   },
   build: {
     target: 'es2020',
     lib: {
       entry: 'src/index.ts',
-      formats: ['es', 'cjs']
-    }
-  }
+      formats: ['es', 'cjs'],
+    },
+  },
 });
 ```
 

@@ -1,6 +1,6 @@
-# 从 Framer Motion 迁移到 AniMaker
+# 从 Framer Motion 迁移到 Kinema
 
-本指南帮助你从 React 的 Framer Motion 迁移到 AniMaker。
+本指南帮助你从 React 的 Framer Motion 迁移到 Kinema。
 
 ## 目录
 
@@ -16,16 +16,16 @@
 
 ### 主要差异
 
-| 方面 | Framer Motion | AniMaker |
-|------|---------------|----------|
-| **框架** | React | 框架无关 |
-| **组件** | motion 组件 | RenderObject |
+| 方面     | Framer Motion        | Kinema       |
+| -------- | -------------------- | ------------ |
+| **框架** | React                | 框架无关     |
+| **组件** | motion 组件          | RenderObject |
 | **动画** | props / useAnimation | Animation 类 |
-| **状态** | React State | 不可变对象 |
-| **布局** | Layout API | 手动计算 |
-| **手势** | Gesture API | 自定义实现 |
+| **状态** | React State          | 不可变对象   |
+| **布局** | Layout API           | 手动计算     |
+| **手势** | Gesture API          | 自定义实现   |
 
-### AniMaker 的优势
+### Kinema 的优势
 
 1. **框架无关** - 可用于任何 JavaScript 项目
 2. **3D 支持** - 原生 3D 渲染
@@ -40,44 +40,43 @@
 
 ```jsx
 // Framer Motion
-import { motion } from "framer-motion";
+import { motion } from 'framer-motion';
 
 function MyComponent() {
   return (
-    <motion.div
-      animate={{ x: 100, opacity: 1 }}
-      transition={{ duration: 1, ease: "easeInOut" }}
-    />
+    <motion.div animate={{ x: 100, opacity: 1 }} transition={{ duration: 1, ease: 'easeInOut' }} />
   );
 }
 ```
 
 ```typescript
-// AniMaker
-import { createScene, VectorObject } from '@animaker/core';
-import { TransformAnimation } from '@animaker/core/animation';
-import { easeInOut } from '@animaker/core/easing';
+// Kinema
+import { createScene, VectorObject } from '@kinema/core';
+import { TransformAnimation } from '@kinema/core/animation';
+import { easeInOut } from '@kinema/core/easing';
 
 const scene = createScene();
-const div = VectorObject.rectangle(1, 1)
-  .withPosition({ x: 0, y: 0, z: 0 })
-  .withOpacity(0);
+const div = VectorObject.rectangle(1, 1).withPosition({ x: 0, y: 0, z: 0 }).withOpacity(0);
 
-const animate = new TransformAnimation(div, {
-  id: div.getState().id,
-  transform: {
-    position: { x: 2, y: 0, z: 0 },
-    rotation: { x: 0, y: 0, z: 0 },
-    scale: { x: 1, y: 1, z: 1 },
-    opacity: 1
+const animate = new TransformAnimation(
+  div,
+  {
+    id: div.getState().id,
+    transform: {
+      position: { x: 2, y: 0, z: 0 },
+      rotation: { x: 0, y: 0, z: 0 },
+      scale: { x: 1, y: 1, z: 1 },
+      opacity: 1,
+    },
+    visible: true,
+    z_index: 0,
+    styles: new Map(),
   },
-  visible: true,
-  z_index: 0,
-  styles: new Map()
-}, {
-  duration: 1,
-  easing: easeInOut
-});
+  {
+    duration: 1,
+    easing: easeInOut,
+  },
+);
 
 scene.schedule(animate, 0);
 ```
@@ -86,7 +85,7 @@ scene.schedule(animate, 0);
 
 ```jsx
 // Framer Motion
-import { useAnimation } from "framer-motion";
+import { useAnimation } from 'framer-motion';
 
 function MyComponent() {
   const controls = useAnimation();
@@ -94,7 +93,7 @@ function MyComponent() {
   useEffect(() => {
     controls.start({
       x: 100,
-      transition: { duration: 1 }
+      transition: { duration: 1 },
     });
   }, []);
 
@@ -103,25 +102,29 @@ function MyComponent() {
 ```
 
 ```typescript
-// AniMaker + React
+// Kinema + React
 import { useEffect, useRef } from 'react';
-import { useScene } from '@animaker/react';
-import { MoveAnimation } from '@animaker/core/animation';
+import { useScene } from '@kinema/react';
+import { MoveAnimation } from '@kinema/core/animation';
 
 function MyComponent() {
   const scene = useScene();
   const animationRef = useRef<MoveAnimation | null>(null);
 
   useEffect(() => {
-    const animation = new MoveAnimation(obj, { x: 2, y: 0, z: 0 }, {
-      duration: 1
-    });
+    const animation = new MoveAnimation(
+      obj,
+      { x: 2, y: 0, z: 0 },
+      {
+        duration: 1,
+      },
+    );
 
     animationRef.current = animation;
     scene.schedule(animation, 0);
   }, []);
 
-  return null;  // 渲染由 Scene 组件处理
+  return null; // 渲染由 Scene 组件处理
 }
 ```
 
@@ -131,45 +134,45 @@ function MyComponent() {
 
 ### 动画属性
 
-| Framer Motion | AniMaker | 说明 |
-|---------------|----------|------|
-| `animate` | Animation 类 | 动画定义 |
-| `initial` | 初始状态 | 初始状态 |
-| `exit` | FadeOutAnimation | 退出动画 |
-| `transition` | AnimationConfig | 动画配置 |
-| `whileHover` | 鼠标事件处理 | 悬停状态 |
-| `whileTap` | 点击事件处理 | 点击状态 |
-| `whileDrag` | 拖拽事件处理 | 拖拽状态 |
+| Framer Motion | Kinema           | 说明     |
+| ------------- | ---------------- | -------- |
+| `animate`     | Animation 类     | 动画定义 |
+| `initial`     | 初始状态         | 初始状态 |
+| `exit`        | FadeOutAnimation | 退出动画 |
+| `transition`  | AnimationConfig  | 动画配置 |
+| `whileHover`  | 鼠标事件处理     | 悬停状态 |
+| `whileTap`    | 点击事件处理     | 点击状态 |
+| `whileDrag`   | 拖拽事件处理     | 拖拽状态 |
 
 ### Transition 配置
 
-| Framer Motion | AniMaker | 说明 |
-|---------------|----------|------|
-| `duration` | `duration` | 持续时间 |
-| `ease` | `easing` | 缓动函数 |
-| `delay` | `delay` | 延迟 |
-| `repeat` | 循环调度 | 重复次数 |
-| `repeatType` | 循环类型 | 重复类型 |
-| `yoyo` | `thereAndBack` | 往返动画 |
+| Framer Motion | Kinema         | 说明     |
+| ------------- | -------------- | -------- |
+| `duration`    | `duration`     | 持续时间 |
+| `ease`        | `easing`       | 缓动函数 |
+| `delay`       | `delay`        | 延迟     |
+| `repeat`      | 循环调度       | 重复次数 |
+| `repeatType`  | 循环类型       | 重复类型 |
+| `yoyo`        | `thereAndBack` | 往返动画 |
 
 ### Variants
 
-| Framer Motion | AniMaker | 说明 |
-|---------------|----------|------|
-| `variants` | 配置对象 | 变体定义 |
-| `initial="hidden"` | 初始状态 | 初始变体 |
-| `animate="visible"` | 动画状态 | 目标变体 |
+| Framer Motion        | Kinema   | 说明     |
+| -------------------- | -------- | -------- |
+| `variants`           | 配置对象 | 变体定义 |
+| `initial="hidden"`   | 初始状态 | 初始变体 |
+| `animate="visible"`  | 动画状态 | 目标变体 |
 | `whileHover="hover"` | 悬停变体 | 悬停状态 |
 
 ### 手势
 
-| Framer Motion | AniMaker | 说明 |
-|---------------|----------|------|
+| Framer Motion  | Kinema   | 说明     |
+| -------------- | -------- | -------- |
 | `onHoverStart` | 事件监听 | 悬停开始 |
-| `onHoverEnd` | 事件监听 | 悬停结束 |
-| `onTap` | 事件监听 | 点击 |
-| `onPan` | 事件监听 | 拖拽 |
-| `onPinch` | 事件监听 | 缩放 |
+| `onHoverEnd`   | 事件监听 | 悬停结束 |
+| `onTap`        | 事件监听 | 点击     |
+| `onPan`        | 事件监听 | 拖拽     |
+| `onPinch`      | 事件监听 | 缩放     |
 
 ---
 
@@ -178,8 +181,9 @@ function MyComponent() {
 ### 示例 1: 基础动画
 
 **Framer Motion 代码：**
+
 ```jsx
-import { motion } from "framer-motion";
+import { motion } from 'framer-motion';
 
 function BasicAnimation() {
   return (
@@ -187,24 +191,25 @@ function BasicAnimation() {
       initial={{ opacity: 0, x: -100 }}
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: 100 }}
-      transition={{ duration: 1, ease: "easeInOut" }}
-      style={{ width: 100, height: 100, background: "blue" }}
+      transition={{ duration: 1, ease: 'easeInOut' }}
+      style={{ width: 100, height: 100, background: 'blue' }}
     />
   );
 }
 ```
 
-**AniMaker 代码：**
+**Kinema 代码：**
+
 ```typescript
-import { createScene, VectorObject } from '@animaker/core';
+import { createScene, VectorObject } from '@kinema/core';
 import {
   FadeInAnimation,
   FadeOutAnimation,
   MoveAnimation,
   AnimationGroup,
-  CompositionType
-} from '@animaker/core/animation';
-import { easeInOut } from '@animaker/core/easing';
+  CompositionType,
+} from '@kinema/core/animation';
+import { easeInOut } from '@kinema/core/easing';
 
 const scene = createScene();
 
@@ -218,9 +223,9 @@ const enter = new AnimationGroup(
   box,
   [
     new FadeInAnimation(box, { duration: 1, easing: easeInOut }),
-    new MoveAnimation(box, { x: 0, y: 0, z: 0 }, { duration: 1, easing: easeInOut })
+    new MoveAnimation(box, { x: 0, y: 0, z: 0 }, { duration: 1, easing: easeInOut }),
   ],
-  CompositionType.Parallel
+  CompositionType.Parallel,
 );
 
 // 退出动画
@@ -228,14 +233,14 @@ const exit = new AnimationGroup(
   box,
   [
     new FadeOutAnimation(box, { duration: 1, easing: easeInOut }),
-    new MoveAnimation(box, { x: 2, y: 0, z: 0 }, { duration: 1, easing: easeInOut })
+    new MoveAnimation(box, { x: 2, y: 0, z: 0 }, { duration: 1, easing: easeInOut }),
   ],
-  CompositionType.Parallel
+  CompositionType.Parallel,
 );
 
 // React 集成
 import { useEffect } from 'react';
-import { useScene } from '@animaker/react';
+import { useScene } from '@kinema/react';
 
 function BasicAnimation() {
   const scene = useScene();
@@ -252,20 +257,21 @@ function BasicAnimation() {
     };
   }, []);
 
-  return null;  // 由 Scene 组件渲染
+  return null; // 由 Scene 组件渲染
 }
 ```
 
 ### 示例 2: Variants
 
 **Framer Motion 代码：**
+
 ```jsx
-import { motion } from "framer-motion";
+import { motion } from 'framer-motion';
 
 const variants = {
   hidden: { opacity: 0, x: -100 },
   visible: { opacity: 1, x: 0 },
-  hover: { scale: 1.2, transition: { duration: 0.2 } }
+  hover: { scale: 1.2, transition: { duration: 0.2 } },
 };
 
 function VariantsExample() {
@@ -275,23 +281,24 @@ function VariantsExample() {
       initial="hidden"
       animate="visible"
       whileHover="hover"
-      style={{ width: 100, height: 100, background: "red" }}
+      style={{ width: 100, height: 100, background: 'red' }}
     />
   );
 }
 ```
 
-**AniMaker 代码：**
+**Kinema 代码：**
+
 ```typescript
-import { VectorObject } from '@animaker/core';
+import { VectorObject } from '@kinema/core';
 import {
   FadeInAnimation,
   MoveAnimation,
   ScaleAnimation,
   AnimationGroup,
   CompositionType
-} from '@animaker/core/animation';
-import { easeInOut, smooth } from '@animaker/core/easing';
+} from '@kinema/core/animation';
+import { easeInOut, smooth } from '@kinema/core/easing';
 
 // 定义变体配置
 const variants = {
@@ -357,13 +364,14 @@ function VariantsExample() {
 ### 示例 3: AnimatePresence
 
 **Framer Motion 代码：**
+
 ```jsx
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence } from 'framer-motion';
 
 function List({ items }) {
   return (
     <AnimatePresence>
-      {items.map(item => (
+      {items.map((item) => (
         <motion.div
           key={item.id}
           initial={{ opacity: 0, y: -20 }}
@@ -379,20 +387,24 @@ function List({ items }) {
 }
 ```
 
-**AniMaker 代码：**
+**Kinema 代码：**
+
 ```typescript
-import { VectorObject, TextObject } from '@animaker/core';
+import { VectorObject, TextObject } from '@kinema/core';
 import {
   FadeInAnimation,
   FadeOutAnimation,
   MoveAnimation,
   AnimationGroup,
-  CompositionType
-} from '@animaker/core/animation';
-import { smooth } from '@animaker/core/easing';
+  CompositionType,
+} from '@kinema/core/animation';
+import { smooth } from '@kinema/core/easing';
 
 // 创建列表项
-function createListItem(text: string, index: number): {
+function createListItem(
+  text: string,
+  index: number,
+): {
   textObj: TextObject;
   bgObj: RenderObject;
   enterAnim: Animation;
@@ -413,10 +425,18 @@ function createListItem(text: string, index: number): {
     [
       new FadeInAnimation(bg, { duration: 0.3, easing: smooth }),
       new FadeInAnimation(text, { duration: 0.3, easing: smooth }),
-      new MoveAnimation(bg, { x: 0, y: -index * 0.8 + 0.2, z: 0 }, { duration: 0.3, easing: smooth }),
-      new MoveAnimation(text, { x: 0, y: -index * 0.8 + 0.2, z: 0 }, { duration: 0.3, easing: smooth })
+      new MoveAnimation(
+        bg,
+        { x: 0, y: -index * 0.8 + 0.2, z: 0 },
+        { duration: 0.3, easing: smooth },
+      ),
+      new MoveAnimation(
+        text,
+        { x: 0, y: -index * 0.8 + 0.2, z: 0 },
+        { duration: 0.3, easing: smooth },
+      ),
     ],
-    CompositionType.Parallel
+    CompositionType.Parallel,
   );
 
   // 退出动画
@@ -425,10 +445,18 @@ function createListItem(text: string, index: number): {
     [
       new FadeOutAnimation(bg, { duration: 0.3, easing: smooth }),
       new FadeOutAnimation(text, { duration: 0.3, easing: smooth }),
-      new MoveAnimation(bg, { x: 0, y: -index * 0.8 - 0.2, z: 0 }, { duration: 0.3, easing: smooth }),
-      new MoveAnimation(text, { x: 0, y: -index * 0.8 - 0.2, z: 0 }, { duration: 0.3, easing: smooth })
+      new MoveAnimation(
+        bg,
+        { x: 0, y: -index * 0.8 - 0.2, z: 0 },
+        { duration: 0.3, easing: smooth },
+      ),
+      new MoveAnimation(
+        text,
+        { x: 0, y: -index * 0.8 - 0.2, z: 0 },
+        { duration: 0.3, easing: smooth },
+      ),
     ],
-    CompositionType.Parallel
+    CompositionType.Parallel,
   );
 
   return { textObj: text, bgObj: bg, enterAnim: enter, exitAnim: exit };
@@ -454,7 +482,7 @@ function List({ items }: { items: Array<{ id: string; text: string }> }) {
 
     // 移除旧项
     listItems.current.forEach((listItem, id) => {
-      if (!items.find(item => item.id === id)) {
+      if (!items.find((item) => item.id === id)) {
         scene.schedule(listItem.exitAnim, 0);
 
         // 动画完成后移除
@@ -473,36 +501,36 @@ function List({ items }: { items: Array<{ id: string; text: string }> }) {
 ### 示例 4: Layout 动画
 
 **Framer Motion 代码：**
+
 ```jsx
-import { motion, LayoutGroup } from "framer-motion";
+import { motion, LayoutGroup } from 'framer-motion';
 
 function LayoutExample() {
   const [items, setItems] = useState([1, 2, 3]);
 
   return (
     <LayoutGroup>
-      {items.map(item => (
+      {items.map((item) => (
         <motion.div
           key={item}
           layout
           transition={{ duration: 0.5 }}
-          style={{ width: 50, height: 50, background: "blue", margin: 10 }}
+          style={{ width: 50, height: 50, background: 'blue', margin: 10 }}
         />
       ))}
 
-      <button onClick={() => setItems([...items, items.length + 1])}>
-        Add
-      </button>
+      <button onClick={() => setItems([...items, items.length + 1])}>Add</button>
     </LayoutGroup>
   );
 }
 ```
 
-**AniMaker 代码：**
+**Kinema 代码：**
+
 ```typescript
-import { VectorObject } from '@animaker/core';
-import { MoveAnimation, AnimationGroup, CompositionType } from '@animaker/core/animation';
-import { smooth } from '@animaker/core/easing';
+import { VectorObject } from '@kinema/core';
+import { MoveAnimation, AnimationGroup, CompositionType } from '@kinema/core/animation';
+import { smooth } from '@kinema/core/easing';
 
 // 计算布局
 function calculateLayout(count: number): Point3D[] {
@@ -591,15 +619,15 @@ function LayoutExample() {
 ### 安装 React 集成包
 
 ```bash
-npm install @animaker/react
+npm install @kinema/react
 ```
 
 ### Scene 组件
 
 ```tsx
-import { Scene, useScene } from '@animaker/react';
-import { VectorObject } from '@animaker/core';
-import { FadeInAnimation } from '@animaker/core/animation';
+import { Scene, useScene } from '@kinema/react';
+import { VectorObject } from '@kinema/core';
+import { FadeInAnimation } from '@kinema/core/animation';
 
 function MyAnimation() {
   const scene = useScene();
@@ -620,12 +648,7 @@ function MyAnimation() {
 
 function App() {
   return (
-    <Scene
-      width={1920}
-      height={1080}
-      backgroundColor="#1a1a2e"
-      fps={60}
-    >
+    <Scene width={1920} height={1080} backgroundColor="#1a1a2e" fps={60}>
       <MyAnimation />
     </Scene>
   );
@@ -635,19 +658,25 @@ function App() {
 ### useAnimation Hook
 
 ```typescript
-import { useAnimation } from '@animaker/react';
-import { MoveAnimation } from '@animaker/core/animation';
-import { smooth } from '@animaker/core/easing';
+import { useAnimation } from '@kinema/react';
+import { MoveAnimation } from '@kinema/core/animation';
+import { smooth } from '@kinema/core/easing';
 
 function AnimatedBox() {
   const { target, animate } = useAnimation();
 
   useEffect(() => {
     // 移动动画
-    animate(new MoveAnimation(target, { x: 2, y: 0, z: 0 }, {
-      duration: 1,
-      easing: smooth
-    }));
+    animate(
+      new MoveAnimation(
+        target,
+        { x: 2, y: 0, z: 0 },
+        {
+          duration: 1,
+          easing: smooth,
+        },
+      ),
+    );
   }, []);
 
   return null;
@@ -657,8 +686,8 @@ function AnimatedBox() {
 ### usePresence Hook
 
 ```typescript
-import { usePresence } from '@animaker/react';
-import { FadeOutAnimation } from '@animaker/core/animation';
+import { usePresence } from '@kinema/react';
+import { FadeOutAnimation } from '@kinema/core/animation';
 
 function ListItem({ onExit }: { onExit: () => void }) {
   const { target } = usePresence();
@@ -686,9 +715,9 @@ function ListItem({ onExit }: { onExit: () => void }) {
 
 ### 准备阶段
 
-- [ ] 安装 AniMaker 和 React 集成包
+- [ ] 安装 Kinema 和 React 集成包
 - [ ] 设置 Scene 组件
-- [ ] 了解 AniMaker 对象模型
+- [ ] 了解 Kinema 对象模型
 
 ### 迁移阶段
 
@@ -708,7 +737,7 @@ function ListItem({ onExit }: { onExit: () => void }) {
 
 ## 相关文档
 
-- [动画创建入门](../animation-basics.md) - AniMaker 动画基础
+- [动画创建入门](../animation-basics.md) - Kinema 动画基础
 - [React 集成](../../api/react.md) - React API 文档
 - [自定义动画](../custom-animations.md) - 创建自定义动画
 - [性能优化指南](../performance.md) - 性能优化建议

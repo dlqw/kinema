@@ -1,7 +1,7 @@
 import { defineConfig } from 'vitepress';
 
 export default defineConfig({
-  title: 'AniMaker',
+  title: 'Kinema',
   description: '现代化动画渲染框架',
 
   themeConfig: {
@@ -11,7 +11,7 @@ export default defineConfig({
       { text: '开发者', link: '/development/' },
       { text: 'API', link: '/api/' },
       { text: '示例', link: '/examples/' },
-      { text: 'GitHub', link: 'https://github.com/your-username/animaker' },
+      { text: 'GitHub', link: 'https://github.com/your-username/kinema' },
     ],
 
     sidebar: {
@@ -103,9 +103,7 @@ export default defineConfig({
       ],
     },
 
-    socialLinks: [
-      { icon: 'github', link: 'https://github.com/your-username/animaker' },
-    ],
+    socialLinks: [{ icon: 'github', link: 'https://github.com/your-username/kinema' }],
 
     search: {
       provider: 'local',

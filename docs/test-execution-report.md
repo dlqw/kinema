@@ -1,4 +1,4 @@
-# AniMaker 测试执行报告
+# Kinema 测试执行报告
 
 **报告日期**: 2025-03-19
 **测试框架**: Vitest v2.0.0
@@ -7,6 +7,7 @@
 ## 测试套件概览
 
 ### 测试文件统计
+
 - **总测试文件数**: 10
 - **测试代码总行数**: ~5,100 行
 - **单元测试文件**: 8
@@ -15,26 +16,29 @@
 ### 测试文件列表
 
 #### 单元测试 (Unit Tests)
-| 文件 | 行数 | 说明 |
-|------|------|------|
-| `tests/unit/core/RenderObject.test.ts` | 430 | RenderObject基类及子类测试 |
-| `tests/unit/core/Animation.test.ts` | 640 | Animation基类和动画类型测试 |
-| `tests/unit/core/Scene.test.ts` | 590 | Scene场景管理功能测试 |
-| `tests/unit/core/Easing.test.ts` | 590 | 缓动函数测试 |
-| `tests/unit/render/RenderEngine.test.ts` | 420 | 渲染引擎初始化和循环测试 |
-| `tests/unit/render/Capability.test.ts` | 510 | GPU能力检测测试 |
-| `tests/unit/render/GraphicsDevice.test.ts` | 650 | 图形设备创建和降级测试 |
-| `tests/unit/utils/math.test.ts` | 270 | 数学工具函数测试 |
+
+| 文件                                       | 行数 | 说明                        |
+| ------------------------------------------ | ---- | --------------------------- |
+| `tests/unit/core/RenderObject.test.ts`     | 430  | RenderObject基类及子类测试  |
+| `tests/unit/core/Animation.test.ts`        | 640  | Animation基类和动画类型测试 |
+| `tests/unit/core/Scene.test.ts`            | 590  | Scene场景管理功能测试       |
+| `tests/unit/core/Easing.test.ts`           | 590  | 缓动函数测试                |
+| `tests/unit/render/RenderEngine.test.ts`   | 420  | 渲染引擎初始化和循环测试    |
+| `tests/unit/render/Capability.test.ts`     | 510  | GPU能力检测测试             |
+| `tests/unit/render/GraphicsDevice.test.ts` | 650  | 图形设备创建和降级测试      |
+| `tests/unit/utils/math.test.ts`            | 270  | 数学工具函数测试            |
 
 #### 集成测试 (Integration Tests)
-| 文件 | 行数 | 说明 |
-|------|------|------|
+
+| 文件                                              | 行数               | 说明             |
+| ------------------------------------------------- | ------------------ | ---------------- |
 | `tests/integration/rendering/scene-graph.test.ts` | 场景图渲染集成测试 |
-| `tests/integration/rendering/pipeline.test.ts` | 620 | 渲染管线集成测试 |
+| `tests/integration/rendering/pipeline.test.ts`    | 620                | 渲染管线集成测试 |
 
 ## 测试执行指南
 
 ### 前置条件
+
 ```bash
 # 安装依赖
 npm install
@@ -81,25 +85,28 @@ open coverage/index.html
 
 基于已编写的测试文件，预期覆盖率如下：
 
-| 模块 | 预期行覆盖率 | 预期分支覆盖率 | 说明 |
-|------|-------------|---------------|------|
-| 核心类型 (packages/core/src/types/) | 85%+ | 80%+ | 全面测试 |
-| 核心实现 (packages/core/src/core/) | 40% | 30% | 需要补充测试 |
-| 工具函数 (src/utils/) | 90%+ | 85%+ | 完整测试 |
-| 渲染引擎 (src/render/core/) | 75%+ | 70%+ | 良好覆盖 |
-| 图形设备 (src/render/graphics/) | 60% | 50% | 需要补充实现测试 |
+| 模块                                | 预期行覆盖率 | 预期分支覆盖率 | 说明             |
+| ----------------------------------- | ------------ | -------------- | ---------------- |
+| 核心类型 (packages/core/src/types/) | 85%+         | 80%+           | 全面测试         |
+| 核心实现 (packages/core/src/core/)  | 40%          | 30%            | 需要补充测试     |
+| 工具函数 (src/utils/)               | 90%+         | 85%+           | 完整测试         |
+| 渲染引擎 (src/render/core/)         | 75%+         | 70%+           | 良好覆盖         |
+| 图形设备 (src/render/graphics/)     | 60%          | 50%            | 需要补充实现测试 |
 
 ### 覆盖率未达标模块分析
 
 #### 1. packages/core/src/core/
+
 **问题**: 实现类缺少对应测试
 
 **需要补充的测试**:
+
 - `VectorObject.test.ts` - 向量对象测试
 - `TextObject.test.ts` - 文本对象测试
 - `GroupObject.test.ts` - 组对象测试
 
 **改进建议**:
+
 ```typescript
 // VectorObject.test.ts 需要测试的内容：
 describe('VectorObject', () => {
@@ -112,17 +119,21 @@ describe('VectorObject', () => {
 ```
 
 #### 2. src/render/graphics/webgpu/
+
 **问题**: WebGPU 设备实现缺少测试
 
 **需要补充的测试**:
+
 - `WebGPUDevice.test.ts` - WebGPU 特定功能测试
 - WebGPU 管线创建测试
 - WebGPU 资源绑定测试
 
 #### 3. src/render/graphics/webgl2/
+
 **问题**: WebGL2 设备实现缺少测试
 
 **需要补充的测试**:
+
 - `WebGL2Device.test.ts` - WebGL2 特定功能测试
 - WebGL 上下文管理测试
 - WebGL 扩展使用测试
@@ -130,6 +141,7 @@ describe('VectorObject', () => {
 ## 测试执行状态
 
 ### 当前状态
+
 ⚠️ **依赖未安装** - 需要先运行 `npm install`
 
 ### 预期执行结果
@@ -137,6 +149,7 @@ describe('VectorObject', () => {
 基于已编写的测试内容，预期执行结果：
 
 #### 单元测试预期结果
+
 ```
 ✓ tests/unit/core/RenderObject.test.ts (50+ tests)
 ✓ tests/unit/core/Animation.test.ts (60+ tests)
@@ -149,12 +162,14 @@ describe('VectorObject', () => {
 ```
 
 #### 集成测试预期结果
+
 ```
 ✓ tests/integration/rendering/scene-graph.test.ts (15+ tests)
 ✓ tests/integration/rendering/pipeline.test.ts (40+ tests)
 ```
 
 ### 预期测试统计
+
 - **总测试用例数**: ~465+
 - **预期通过率**: 100% (所有测试使用 Mock API)
 - **预期执行时间**: <5 秒
@@ -244,12 +259,14 @@ jobs:
 ## 下一步行动
 
 ### 立即行动
+
 1. 安装依赖: `npm install`
 2. 运行测试: `npm test`
 3. 生成覆盖率: `npm run test:coverage`
 4. 查看覆盖率报告: `open coverage/index.html`
 
 ### 后续改进
+
 1. 根据覆盖率报告补充缺失测试
 2. 为新功能编写测试先行 (TDD)
 3. 定期执行测试审查
@@ -258,6 +275,7 @@ jobs:
 ## 测试文档
 
 相关测试文档:
+
 - [项目结构审查报告](./project-structure-audit-report.md)
 - [测试覆盖率总结](./test-coverage-summary.md)
 - [渲染引擎测试总结](./render-engine-tests-summary.md)

@@ -1,6 +1,6 @@
 # 性能问题 FAQ
 
-关于 AniMaker 性能优化和调试的常见问题解答。
+关于 Kinema 性能优化和调试的常见问题解答。
 
 ---
 
@@ -52,7 +52,7 @@ for (let i = 0; i < 1000; i++) {
 function optimizeRendering(objects: RenderObject[]) {
   // 按颜色分组
   const grouped = new Map<string, RenderObject[]>();
-  objects.forEach(obj => {
+  objects.forEach((obj) => {
     const color = obj.getState().styles.get('fillColor') as string;
     if (!grouped.has(color)) {
       grouped.set(color, []);
@@ -63,7 +63,7 @@ function optimizeRendering(objects: RenderObject[]) {
   // 批量渲染相同颜色的对象
   grouped.forEach((objs, color) => {
     renderer.setFillColor(color);
-    objs.forEach(obj => renderer.render(obj));
+    objs.forEach((obj) => renderer.render(obj));
   });
 }
 ```
@@ -77,7 +77,7 @@ interface LODObject {
 }
 
 function renderWithLOD(objects: LODObject[], cameraPosition: Point3D) {
-  objects.forEach(obj => {
+  objects.forEach((obj) => {
     const distance = calculateDistance(cameraPosition, obj.getPosition());
     const variant = obj.getVariantForDistance(distance);
     renderer.render(variant);
@@ -88,13 +88,13 @@ function renderWithLOD(objects: LODObject[], cameraPosition: Point3D) {
 ### 4. 启用性能监控
 
 ```typescript
-import { PerformanceMonitor } from '@animaker/core';
+import { PerformanceMonitor } from '@kinema/core';
 
 const monitor = new PerformanceMonitor({
   enableFPS: true,
   enableMemory: true,
   enableRenderTime: true,
-  reportInterval: 1000
+  reportInterval: 1000,
 });
 
 monitor.attach(scene);
@@ -125,10 +125,11 @@ setInterval(() => {
 **症状：** 动画看起来不连贯，有跳跃感
 
 **解决方案：**
+
 ```typescript
 // 检查帧率配置
 const scene = createScene({
-  fps: 60  // 确保使用足够高的帧率
+  fps: 60, // 确保使用足够高的帧率
 });
 
 // 监控实际帧率
@@ -143,6 +144,7 @@ if (actualFPS < 30) {
 **症状：** 每帧渲染耗时过长
 
 **解决方案：**
+
 ```typescript
 // 检查绘制调用次数
 console.log('Draw calls:', renderer.getDrawCalls());
@@ -152,7 +154,7 @@ function batchRender(objects: RenderObject[]) {
   renderer.saveState();
 
   // 批量设置属性
-  objects.forEach(obj => {
+  objects.forEach((obj) => {
     renderer.setTransform(obj.getTransform());
     renderer.render(obj);
   });
@@ -166,6 +168,7 @@ function batchRender(objects: RenderObject[]) {
 **症状：** 随着时间推移性能下降
 
 **解决方案：**
+
 ```typescript
 // 检测内存泄漏
 class MemoryLeakDetector {
@@ -183,7 +186,8 @@ class MemoryLeakDetector {
 
     for (let i = 1; i < keys.length; i++) {
       const diff = this.snapshots.get(keys[i])! - this.snapshots.get(keys[i - 1])!;
-      if (diff > 1024 * 1024) {  // 超过 1MB
+      if (diff > 1024 * 1024) {
+        // 超过 1MB
         leaks.push(`${keys[i - 1]} -> ${keys[i]}: +${diff / 1024 / 1024}MB`);
       }
     }
@@ -208,6 +212,7 @@ console.log(detector.detectLeaks());
 **症状：** 界面响应缓慢
 
 **解决方案：**
+
 ```typescript
 // 使用 Web Workers 进行计算
 class WorkerManager {
@@ -250,13 +255,13 @@ function cleanupScene(scene: Scene): Scene {
   const objects = scene.getObjects();
 
   // 移除已完成动画的对象
-  const toRemove = objects.filter(obj => {
+  const toRemove = objects.filter((obj) => {
     const state = obj.getState();
     return !state.visible || state.transform.opacity <= 0;
   });
 
   let cleanedScene = scene;
-  toRemove.forEach(obj => {
+  toRemove.forEach((obj) => {
     cleanedScene = cleanedScene.removeObject(state.id);
   });
 
@@ -300,12 +305,12 @@ pool.release(particle);
 ```typescript
 // ❌ 不好的做法：频繁克隆大对象
 function process(obj: LargeObject): LargeObject {
-  return obj.clone();  // 每次都创建新副本
+  return obj.clone(); // 每次都创建新副本
 }
 
 // ✅ 好的做法：使用不可变更新
 function process(obj: LargeObject): LargeObject {
-  return obj.withProperty(newValue);  // 只更新需要修改的部分
+  return obj.withProperty(newValue); // 只更新需要修改的部分
 }
 ```
 
@@ -337,7 +342,7 @@ class TextureAtlas {
 
 ### 问题
 
-AniMaker 可以处理多少个对象？有硬性限制吗？
+Kinema 可以处理多少个对象？有硬性限制吗？
 
 ### 回答
 
@@ -346,11 +351,11 @@ AniMaker 可以处理多少个对象？有硬性限制吗？
 ### 推荐对象数量
 
 | 设备级别 | 最大对象数 | 最大动画数 |
-|----------|------------|------------|
-| 高端桌面 | 1000+ | 500+ |
-| 中端桌面 | 500+ | 200+ |
-| 移动设备 | 200+ | 100+ |
-| 低端设备 | 100+ | 50+ |
+| -------- | ---------- | ---------- |
+| 高端桌面 | 1000+      | 500+       |
+| 中端桌面 | 500+       | 200+       |
+| 移动设备 | 200+       | 100+       |
+| 低端设备 | 100+       | 50+        |
 
 **性能测试代码：**
 
@@ -358,20 +363,18 @@ AniMaker 可以处理多少个对象？有硬性限制吗？
 function benchmarkObjectCount(): void {
   const counts = [100, 500, 1000, 2000, 5000];
 
-  counts.forEach(count => {
+  counts.forEach((count) => {
     const scene = createScene();
 
     // 创建指定数量的对象
-    const objects = Array.from({ length: count }, () =>
-      VectorObject.circle(0.1)
-    );
+    const objects = Array.from({ length: count }, () => VectorObject.circle(0.1));
 
     scene.addObjects(...objects);
 
     // 测试性能
     const startTime = performance.now();
 
-    for (let t = 0; t < 5; t += 1/60) {
+    for (let t = 0; t < 5; t += 1 / 60) {
       scene.updateTo(t);
     }
 
@@ -400,8 +403,8 @@ function isCloseEnough(object: RenderObject, camera: Point3D, maxDistance: numbe
 
 // 3. 使用动态加载
 function loadObjectsOnDemand(scene: Scene): void {
-  const visibleObjects = objects.filter(obj =>
-    isVisible(obj, currentViewport) && isCloseEnough(obj, cameraPosition, 100)
+  const visibleObjects = objects.filter(
+    (obj) => isVisible(obj, currentViewport) && isCloseEnough(obj, cameraPosition, 100),
   );
 
   scene.clear();
@@ -421,29 +424,29 @@ WebGPU 渲染器比 Canvas2D 快多少？应该选择哪个？
 
 **性能对比：**
 
-| 操作 | Canvas2D | WebGPU | 提升 |
-|------|----------|--------|------|
-| 简单绘制 (100 对象) | 5ms | 2ms | 2.5x |
-| 复杂绘制 (1000 对象) | 50ms | 10ms | 5x |
-| 粒子系统 (1000 粒子) | 100ms | 15ms | 6.7x |
-| 3D 渲染 | 不支持 | 20ms | N/A |
+| 操作                 | Canvas2D | WebGPU | 提升 |
+| -------------------- | -------- | ------ | ---- |
+| 简单绘制 (100 对象)  | 5ms      | 2ms    | 2.5x |
+| 复杂绘制 (1000 对象) | 50ms     | 10ms   | 5x   |
+| 粒子系统 (1000 粒子) | 100ms    | 15ms   | 6.7x |
+| 3D 渲染              | 不支持   | 20ms   | N/A  |
 
 **选择建议：**
 
 ```typescript
 // 1. 自动选择（推荐）
 const scene = createScene({
-  renderer: 'auto'  // 自动选择最佳渲染器
+  renderer: 'auto', // 自动选择最佳渲染器
 });
 
 // 2. 手动选择 WebGPU
 const scene = createScene({
-  renderer: 'webgpu'
+  renderer: 'webgpu',
 });
 
 // 3. 手动选择 Canvas2D
 const scene = createScene({
-  renderer: 'canvas2d'
+  renderer: 'canvas2d',
 });
 ```
 
@@ -452,9 +455,7 @@ const scene = createScene({
 ```typescript
 async function benchmarkRenderers(): Promise<void> {
   const scene = createScene();
-  const objects = Array.from({ length: 1000 }, () =>
-    VectorObject.circle(0.1)
-  );
+  const objects = Array.from({ length: 1000 }, () => VectorObject.circle(0.1));
 
   scene.addObjects(...objects);
 
@@ -482,14 +483,14 @@ renderer.renderInstanced(prototype, instances);
 const computePipeline = device.createComputePipeline({
   compute: {
     module: device.createShaderModule({ code: computeShader }),
-    entryPoint: 'main'
-  }
+    entryPoint: 'main',
+  },
 });
 
 // 3. 批量更新缓冲区
 const stagingBuffer = device.createBuffer({
   size: totalSize,
-  mappedAtCreation: true
+  mappedAtCreation: true,
 });
 
 // 写入数据
@@ -503,7 +504,7 @@ stagingBuffer.unmap();
 
 ### 问题
 
-AniMaker 初始化需要很长时间，如何加快启动速度？
+Kinema 初始化需要很长时间，如何加快启动速度？
 
 ### 回答
 
