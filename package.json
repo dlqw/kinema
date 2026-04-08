@@ -20,7 +20,7 @@
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
     "test:ui": "vitest --ui",
-    "test:integration": "vitest run --config vitest.config.ts --dir tests/integration",
+    "test:integration": "vitest run --config vitest.config.ts tests/integration",
     "test:staged": "vitest run --passWithNoTests",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
