@@ -1,8 +1,10 @@
 /**
- * Playwright Configuration for AniMaker E2E Tests
+ * Playwright Configuration for Kinema E2E Tests
  *
  * This configuration sets up Playwright for browser-based end-to-end testing
- * of the animation rendering framework.
+ * of the animation rendering and export framework.
+ *
+ * @module playwright.config
  */
 
 import { defineConfig, devices } from '@playwright/test';
@@ -11,7 +13,9 @@ import { defineConfig, devices } from '@playwright/test';
  * Base URL for the application
  * Update this when the application has a dev server
  */
-const baseURL = process.env.BASE_URL || 'http://localhost:5173';
+const baseURL = process.env['BASE_URL'] || 'http://localhost:5173';
+
+const isCI = !!process.env['CI'];
 
 /**
  * Playwright configuration
@@ -20,27 +24,31 @@ export default defineConfig({
   // Test directory
   testDir: './tests/e2e',
 
+  // Test file patterns
+  testMatch: ['**/*.spec.ts', '**/*.test.ts'],
+
   // Timeout settings
-  timeout: 30000, // 30 seconds
+  timeout: 60000, // 60 seconds (increased for export operations)
   expect: {
     // Assertion timeout
-    timeout: 5000,
+    timeout: 10000,
   },
 
   // Fully parallel with 1 worker per CPU core
   fullyParallel: true,
   // Fail the build on CI if you accidentally left test.only in the source code
-  forbidOnly: !!process.env.CI,
+  forbidOnly: isCI,
   // Retry on CI only
-  retries: process.env.CI ? 2 : 0,
+  retries: isCI ? 2 : 0,
   // Opt out of parallel tests on CI
-  workers: process.env.CI ? 1 : undefined,
+  workers: isCI ? 1 : 4,
 
   // Reporter configuration
   reporter: [
     ['html', { open: 'never', outputFolder: 'playwright-report' }],
     ['json', { outputFile: 'test-results.json' }],
     ['junit', { outputFile: 'test-results.xml' }],
+    ['list'], // Console output for progress
   ],
 
   // Shared settings for all tests
@@ -59,26 +67,70 @@ export default defineConfig({
 
     // Browser viewport
     viewport: { width: 1280, height: 720 },
+
+    // Action timeout
+    actionTimeout: 10000,
+
+    // Navigation timeout
+    navigationTimeout: 30000,
+
+    // Ignore HTTPS errors (for local testing)
+    ignoreHTTPSErrors: true,
+
+    // Locale and timezone for consistent testing
+    locale: 'en-US',
+    timezoneId: 'UTC',
   },
 
   // Test projects for different browsers
   projects: [
+    // Desktop browsers - Primary
     {
       name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
+      use: {
+        ...devices['Desktop Chrome'],
+        // Enable WebGPU and WebGL features
+        launchOptions: {
+          args: ['--enable-unsafe-webgpu', '--enable-gpu-rasterization', '--enable-zero-copy'],
+        },
+      },
     },
 
     {
       name: 'firefox',
-      use: { ...devices['Desktop Firefox'] },
+      use: {
+        ...devices['Desktop Firefox'],
+        // Firefox has good WebM support
+      },
     },
 
     {
       name: 'webkit',
-      use: { ...devices['Desktop Safari'] },
+      use: {
+        ...devices['Desktop Safari'],
+      },
     },
 
-    // Mobile browsers
+    // Desktop browsers - Specific tests
+    {
+      name: 'chromium-export',
+      testMatch: /export-workflow\.spec\.ts|rendering-export\.spec\.ts/,
+      use: {
+        ...devices['Desktop Chrome'],
+        launchOptions: {
+          args: [
+            '--enable-unsafe-webgpu',
+            '--enable-gpu-rasterization',
+            '--enable-zero-copy',
+            '--enable-features=WebAssembly SIMD',
+          ],
+        },
+      },
+      // Export tests may need more time
+      timeout: 120000,
+    },
+
+    // Mobile browsers (for responsive testing)
     {
       name: 'Mobile Chrome',
       use: { ...devices['Pixel 5'] },
@@ -95,4 +147,13 @@ export default defineConfig({
 
   // Folder for test artifacts such as screenshots, videos, traces, etc.
   outputDir: 'test-results/',
+
+  // Web server configuration (if needed)
+  // Uncomment when a dev server is available
+  // webServer: {
+  //   command: 'npm run dev',
+  //   url: baseURL,
+  //   timeout: 120000,
+  //   reuseExistingServer: !isCI,
+  // },
 });

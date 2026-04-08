@@ -1,5 +1,5 @@
 /**
- * AniMaker 文档构建脚本
+ * Kinema 文档构建脚本
  */
 
 import fs from 'fs';
