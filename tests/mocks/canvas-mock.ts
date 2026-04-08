@@ -6,8 +6,14 @@
 export class CanvasRenderingContext2DMock {
   private fills: string[] = [];
   private strokes: string[] = [];
-  private transforms: Array<{ a: number; b: number; c: number; d: number; e: number; f: number }> =
-    [];
+  private transformsList: Array<{
+    a: number;
+    b: number;
+    c: number;
+    d: number;
+    e: number;
+    f: number;
+  }> = [];
   private transformStack: Array<{
     a: number;
     b: number;
@@ -47,7 +53,7 @@ export class CanvasRenderingContext2DMock {
     this.strokes.push(`strokeRect(${x}, ${y}, ${w}, ${h})`);
   }
 
-  clearRect(x: number, y: number, w: number, h: number): void {
+  clearRect(_x: number, _y: number, _w: number, _h: number): void {
     // Clear operation - no tracking needed
   }
 
@@ -67,23 +73,37 @@ export class CanvasRenderingContext2DMock {
     // Path operation
   }
 
-  moveTo(x: number, y: number): void {
+  moveTo(_x: number, _y: number): void {
     // Path operation
   }
 
-  lineTo(x: number, y: number): void {
+  lineTo(_x: number, _y: number): void {
     // Path operation
   }
 
-  quadraticCurveTo(cpx: number, cpy: number, x: number, y: number): void {
+  quadraticCurveTo(_cpx: number, _cpy: number, _x: number, _y: number): void {
     // Path operation
   }
 
-  bezierCurveTo(cp1x: number, cp1y: number, cp2x: number, cp2y: number, x: number, y: number): void {
+  bezierCurveTo(
+    _cp1x: number,
+    _cp1y: number,
+    _cp2x: number,
+    _cp2y: number,
+    _x: number,
+    _y: number,
+  ): void {
     // Path operation
   }
 
-  arc(x: number, y: number, radius: number, startAngle: number, endAngle: number, anticlockwise?: boolean): void {
+  arc(
+    _x: number,
+    _y: number,
+    _radius: number,
+    _startAngle: number,
+    _endAngle: number,
+    _anticlockwise?: boolean,
+  ): void {
     // Path operation
   }
 
@@ -109,7 +129,7 @@ export class CanvasRenderingContext2DMock {
   translate(x: number, y: number): void {
     this.currentTransform.e += x;
     this.currentTransform.f += y;
-    this.transforms.push({ ...this.currentTransform });
+    this.transformsList.push({ ...this.currentTransform });
   }
 
   rotate(angle: number): void {
@@ -124,7 +144,7 @@ export class CanvasRenderingContext2DMock {
       e,
       f,
     };
-    this.transforms.push({ ...this.currentTransform });
+    this.transformsList.push({ ...this.currentTransform });
   }
 
   scale(x: number, y: number): void {
@@ -132,7 +152,7 @@ export class CanvasRenderingContext2DMock {
     this.currentTransform.b *= x;
     this.currentTransform.c *= y;
     this.currentTransform.d *= y;
-    this.transforms.push({ ...this.currentTransform });
+    this.transformsList.push({ ...this.currentTransform });
   }
 
   transform(a: number, b: number, c: number, d: number, e: number, f: number): void {
@@ -145,36 +165,43 @@ export class CanvasRenderingContext2DMock {
       e: current.e + current.a * e + current.c * f,
       f: current.f + current.b * e + current.d * f,
     };
-    this.transforms.push({ ...this.currentTransform });
+    this.transformsList.push({ ...this.currentTransform });
   }
 
   setTransform(a: number, b: number, c: number, d: number, e: number, f: number): void {
     this.currentTransform = { a, b, c, d, e, f };
-    this.transforms.push({ ...this.currentTransform });
+    this.transformsList.push({ ...this.currentTransform });
   }
 
   resetTransform(): void {
     this.currentTransform = { a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 };
-    this.transforms.push({ ...this.currentTransform });
+    this.transformsList.push({ ...this.currentTransform });
   }
 
-  createLinearGradient(x0: number, y0: number, x1: number, y1: number): CanvasGradient {
+  createLinearGradient(_x0: number, _y0: number, _x1: number, _y1: number): CanvasGradient {
     return {
-      addColorStop(offset: number, color: string): void {
+      addColorStop(_offset: number, _color: string): void {
         // Mock implementation
       },
     };
   }
 
-  createRadialGradient(x0: number, y0: number, r0: number, x1: number, y1: number, r1: number): CanvasGradient {
+  createRadialGradient(
+    _x0: number,
+    _y0: number,
+    _r0: number,
+    _x1: number,
+    _y1: number,
+    _r1: number,
+  ): CanvasGradient {
     return {
-      addColorStop(offset: number, color: string): void {
+      addColorStop(_offset: number, _color: string): void {
         // Mock implementation
       },
     };
   }
 
-  createPattern(image: CanvasImageSource, repetition: string): CanvasPattern {
+  createPattern(_image: CanvasImageSource, _repetition: string): CanvasPattern {
     return {} as CanvasPattern;
   }
 
@@ -188,7 +215,7 @@ export class CanvasRenderingContext2DMock {
   }
 
   getTransforms(): Array<{ a: number; b: number; c: number; d: number; e: number; f: number }> {
-    return [...this.transforms];
+    return [...this.transformsList];
   }
 
   getLastFill(): string | undefined {
@@ -202,7 +229,7 @@ export class CanvasRenderingContext2DMock {
   reset(): void {
     this.fills = [];
     this.strokes = [];
-    this.transforms = [];
+    this.transformsList = [];
     this.transformStack = [];
     this.currentTransform = { a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 };
   }

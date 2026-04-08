@@ -104,11 +104,25 @@ export function setupCanvasMock() {
       // Mock implementation
     }
 
-    bezierCurveTo(_cp1x: number, _cp1y: number, _cp2x: number, _cp2y: number, _x: number, _y: number): void {
+    bezierCurveTo(
+      _cp1x: number,
+      _cp1y: number,
+      _cp2x: number,
+      _cp2y: number,
+      _x: number,
+      _y: number,
+    ): void {
       // Mock implementation
     }
 
-    arc(_x: number, _y: number, _radius: number, _startAngle: number, _endAngle: number, _anticlockwise?: boolean): void {
+    arc(
+      _x: number,
+      _y: number,
+      _radius: number,
+      _startAngle: number,
+      _endAngle: number,
+      _anticlockwise?: boolean,
+    ): void {
       // Mock implementation
     }
 
@@ -160,7 +174,17 @@ export function setupCanvasMock() {
       // Mock implementation
     }
 
-    drawImage(_image: CanvasImageSource, _dx: number, _dy: number, _dw?: number, _dh?: number, _sx?: number, _sy?: number, _sw?: number, _sh?: number): void {
+    drawImage(
+      _image: CanvasImageSource,
+      _dx: number,
+      _dy: number,
+      _dw?: number,
+      _dh?: number,
+      _sx?: number,
+      _sy?: number,
+      _sw?: number,
+      _sh?: number,
+    ): void {
       // Mock implementation
     }
 
@@ -176,7 +200,14 @@ export function setupCanvasMock() {
       } as CanvasGradient;
     }
 
-    createRadialGradient(_x0: number, _y0: number, _r0: number, _x1: number, _y1: number, _r1: number): CanvasGradient {
+    createRadialGradient(
+      _x0: number,
+      _y0: number,
+      _r0: number,
+      _x1: number,
+      _y1: number,
+      _r1: number,
+    ): CanvasGradient {
       return {
         addColorStop(_offset: number, _color: string): void {
           // Mock implementation
@@ -211,7 +242,7 @@ export function setupCanvasMock() {
     toBlob(callback: (blob: Blob | null) => void, type?: string, _quality?: number): void {
       // Simulate async blob creation
       setTimeout(() => {
-        const mockData = new Uint8Array([0x89, 0x50, 0x4E, 0x47]); // PNG header
+        const mockData = new Uint8Array([0x89, 0x50, 0x4e, 0x47]); // PNG header
         const blob = new Blob([mockData], { type: type || 'image/png' });
         callback(blob);
       }, 0);
@@ -222,8 +253,7 @@ export function setupCanvasMock() {
     }
 
     captureStream(_frameRate?: number): MediaStream {
-      // Return a mock MediaStream
-      return new MockMediaStream();
+      return new MockMediaStream() as unknown as MediaStream;
     }
   }
 
@@ -233,11 +263,11 @@ export function setupCanvasMock() {
     id = 'mock-stream-' + Math.random().toString(36).slice(2);
 
     getTracks(): MediaStreamTrack[] {
-      return [new MockMediaStreamTrack()];
+      return [new MockMediaStreamTrack() as unknown as MediaStreamTrack];
     }
 
     getVideoTracks(): MediaStreamTrack[] {
-      return [new MockMediaStreamTrack()];
+      return [new MockMediaStreamTrack() as unknown as MediaStreamTrack];
     }
 
     getAudioTracks(): MediaStreamTrack[] {

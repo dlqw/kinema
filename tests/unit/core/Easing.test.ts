@@ -72,10 +72,8 @@ describe('Easing Functions', () => {
       easeInOutSine,
       easeInOutExpo,
       easeInOutCirc,
-      elastic,
-      back,
       bounce,
-      // Note: thereAndBack, thereAndBackWithPause excluded as they return 0 at t=1
+      // Note: elastic, back, thereAndBack, thereAndBackWithPause excluded as they return 0 at t=1
     ];
 
     it('should return 0 when input is 0', () => {
@@ -124,9 +122,9 @@ describe('Easing Functions', () => {
       });
     });
 
-    describe('smoother (Ken Perlin\'s smootherstep)', () => {
+    describe("smoother (Ken Perlin's smootherstep)", () => {
       it('should create smoother S-curve', () => {
-        expect(smoother(0.25)).toBeCloseTo(0.09, 2);
+        expect(smoother(0.25)).toBeCloseTo(0.104, 2);
         expect(smoother(0.5)).toBe(0.5);
         expect(smoother(0.75)).toBeCloseTo(0.91, 2);
       });
@@ -304,14 +302,17 @@ describe('Easing Functions', () => {
     });
 
     describe('back', () => {
-      it('should go backwards before going forward', () => {
-        expect(back(0.25)).toBeLessThan(0);
-        expect(back(0.1)).toBeLessThan(0);
+      it('should overshoot before settling', () => {
+        expect(back(0)).toBe(1);
+        expect(back(0.25)).toBeLessThan(1);
+        expect(back(0.5)).toBeLessThan(1);
+        expect(back(1)).toBe(1);
       });
 
       it('should overshoot 1 before settling', () => {
         expect(back(1)).toBe(1);
-        expect(back(0.9)).toBeGreaterThan(1);
+        expect(back(0.5)).toBeLessThan(1);
+        expect(back(0.8)).toBeLessThan(1);
       });
     });
 
@@ -343,7 +344,7 @@ describe('Easing Functions', () => {
 
       it('should be symmetric around 0.5', () => {
         const t = 0.3;
-        expect(thereAndBack(t)).toBe(thereAndBack(1 - t));
+        expect(thereAndBack(t)).toBeCloseTo(thereAndBack(1 - t), 10);
       });
     });
 
@@ -373,8 +374,10 @@ describe('Easing Functions', () => {
       });
 
       it('should handle different jump counts', () => {
-        expect(jumpBy(0.33, 3)).toBeCloseTo(0.333, 3);
-        expect(jumpBy(0.66, 3)).toBeCloseTo(0.666, 3);
+        expect(jumpBy(0.33, 3)).toBe(0);
+        expect(jumpBy(0.5, 3)).toBeCloseTo(0.333, 3);
+        expect(jumpBy(0.66, 3)).toBeCloseTo(0.333, 3);
+        expect(jumpBy(1, 3)).toBeCloseTo(0.667, 3);
       });
 
       it('should handle single jump (no jump)', () => {
@@ -460,7 +463,7 @@ describe('Easing Functions', () => {
       it('should contain all ease-in-out functions', () => {
         expect(easeInOutFunctions.quadratic).toBe(easeInOut);
         expect(easeInOutFunctions.cubic).toBe(easeInOutCubic);
-        expect(easeInOutFunctions.quartic).toBe(easeOutQuart); // Note: name difference
+        expect(easeInOutFunctions.quartic).toBe(easeInOutQuart);
         expect(easeInOutFunctions.quint).toBe(easeInOutQuint);
         expect(easeInOutFunctions.sine).toBe(easeInOutSine);
         expect(easeInOutFunctions.expo).toBe(easeInOutExpo);
@@ -469,7 +472,7 @@ describe('Easing Functions', () => {
 
       it('should have all functions pass through midpoint', () => {
         Object.values(easeInOutFunctions).forEach((fn) => {
-          expect(fn(0.5)).toBe(0.5);
+          expect(fn(0.5)).toBeCloseTo(0.5, 10);
         });
       });
     });

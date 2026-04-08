@@ -4,7 +4,7 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { RenderEngine, RenderAPI } from '../../../src/render/core/RenderEngine';
+import { RenderEngine, RenderAPI } from '../../packages/core/src/render/core/RenderEngine';
 
 // Mock GPU APIs
 const mockRequestAnimationFrame = vi.fn();
@@ -125,7 +125,7 @@ describe('RenderEngine', () => {
 
       expect(engine1).toBe(engine2);
       expect(console.warn).toHaveBeenCalledWith(
-        'RenderEngine already initialized. Returning existing instance.'
+        'RenderEngine already initialized. Returning existing instance.',
       );
     });
 
@@ -135,7 +135,7 @@ describe('RenderEngine', () => {
       await expect(
         RenderEngine.init({
           canvas: mockCanvas as any,
-        })
+        }),
       ).rejects.toThrow('No supported graphics API found');
     });
 
@@ -152,7 +152,7 @@ describe('RenderEngine', () => {
       (RenderEngine as any).instance = null;
 
       expect(() => RenderEngine.get()).toThrow(
-        'RenderEngine not initialized. Call RenderEngine.init() first.'
+        'RenderEngine not initialized. Call RenderEngine.init() first.',
       );
     });
   });
