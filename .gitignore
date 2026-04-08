@@ -37,6 +37,9 @@ docs/ci-cd-setup.md
 docs/test-execution-report.md
 docs/test-coverage-summary.md
 docs/render-engine-tests-summary.md
+docs/CONTRIBUTING-DOCS.md
+docs/milestones/
+docs/test-status-tracking.md
 RELEASE.md
 
 # Temporary files
