@@ -5,8 +5,10 @@
  * exports, with verification of output files.
  */
 
-import { test, expect, fs } from '@playwright/test';
+import { test, expect } from '@playwright/test';
 import path from 'path';
+import { promises as fsPromises } from 'fs';
+import fs from 'fs';
 
 test.describe('Export Workflow', () => {
   const exportDir = 'test-results/exports';
@@ -60,11 +62,11 @@ test.describe('Export Workflow', () => {
     expect(download.suggestedFilename()).toMatch(/\.(mp4|webm)$/);
 
     // Verify file metadata
-    const stats = await fs.stat(download.path());
+    const stats = await fsPromises.stat(download.path());
     expect(stats.size).toBeGreaterThan(1000); // At least 1KB
 
     // Cleanup
-    await fs.unlink(download.path());
+    await fsPromises.unlink(download.path());
   });
 
   test('should export animation as GIF', async ({ page }) => {
@@ -94,12 +96,12 @@ test.describe('Export Workflow', () => {
     expect(download.suggestedFilename()).toMatch(/\.gif$/);
 
     // Verify it's a valid GIF (has GIF header)
-    const buffer = await fs.readFile(download.path());
+    const buffer = await fsPromises.readFile(download.path());
     const header = buffer.slice(0, 6).toString('hex');
     expect(header).toBe('474946383961'); // 'GIF89a' in hex
 
     // Cleanup
-    await fs.unlink(download.path());
+    await fsPromises.unlink(download.path());
   });
 
   test('should export as image sequence', async ({ page }) => {
@@ -130,11 +132,11 @@ test.describe('Export Workflow', () => {
     expect(download.suggestedFilename()).toMatch(/\.(zip|tar\.gz)$/);
 
     // Verify file size is reasonable
-    const stats = await fs.stat(download.path());
+    const stats = await fsPromises.stat(download.path());
     expect(stats.size).toBeGreaterThan(500);
 
     // Cleanup
-    await fs.unlink(download.path());
+    await fsPromises.unlink(download.path());
   });
 
   test('should export single frame as image', async ({ page }) => {
@@ -158,7 +160,7 @@ test.describe('Export Workflow', () => {
     expect(download.suggestedFilename()).toMatch(/\.(png|jpg|jpeg)$/);
 
     // Verify it's a valid image
-    const buffer = await fs.readFile(download.path());
+    const buffer = await fsPromises.readFile(download.path());
 
     // Check PNG header (if PNG)
     if (download.suggestedFilename().endsWith('.png')) {
@@ -167,7 +169,7 @@ test.describe('Export Workflow', () => {
     }
 
     // Cleanup
-    await fs.unlink(download.path());
+    await fsPromises.unlink(download.path());
   });
 
   test('should export with custom resolution', async ({ page }) => {
@@ -481,7 +483,7 @@ test.describe('Export - File Verification', () => {
     await expect(img).toBeVisible();
 
     // Clean up
-    await fs.unlink(download.path());
+    await fsPromises.unlink(download.path());
   });
 
   test('should export with custom frame rate and duration', async ({ page }) => {
