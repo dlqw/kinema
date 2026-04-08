@@ -1,20 +1,29 @@
 {
   "app": {
-    "name": "AniMaker",
-    "title": "AniMaker Video Workstation"
+    "name": "Kinema",
+    "title": "Kinema Video Workstation"
   },
   "menu": {
     "file": "File",
     "edit": "Edit",
     "view": "View",
-    "help": "Help"
-  },
-  "welcome": {
-    "title": "Welcome to AniMaker",
-    "subtitle": "Video Workstation v{{version}}",
+    "help": "Help",
     "newProject": "New Project",
     "openProject": "Open Project",
-    "recentProjects": "Recent Projects"
+    "saveProject": "Save",
+    "saveProjectAs": "Save Options",
+    "closeProject": "Close Project",
+    "export": "Export"
+  },
+  "welcome": {
+    "title": "Welcome to Kinema",
+    "subtitle": "Video Workstation v{{version}}",
+    "description": "Build project files, manage recent work, and produce export handoff packages from one desktop surface.",
+    "newProject": "New Project",
+    "openProject": "Open Project",
+    "recentProjects": "Recent Projects",
+    "openRecent": "Continue from recent work",
+    "emptyRecent": "No recent projects yet."
   },
   "theme": {
     "light": "Light",
@@ -29,6 +38,119 @@
     "ready": "Ready",
     "loading": "Loading...",
     "saving": "Saving...",
-    "saved": "Saved"
+    "saved": "Saved",
+    "exporting": "Exporting..."
+  },
+  "project": {
+    "title": "Project",
+    "new": "New Project",
+    "open": "Open Project",
+    "save": "Save Project",
+    "create": "Create Project",
+    "saveAs": "Save As...",
+    "browse": "Browse...",
+    "opening": "Opening...",
+    "name": "Project Name",
+    "namePlaceholder": "Enter a project name",
+    "location": "Location",
+    "locationPlaceholder": "Choose a workspace folder",
+    "unsavedChanges": "You have unsaved changes",
+    "current": "Current Project",
+    "summary": "Project Summary",
+    "setup": "Project Setup",
+    "recentTitle": "Project History",
+    "path": "Project File",
+    "createdAt": "Created",
+    "updatedAt": "Updated",
+    "state": "Status",
+    "modifiedState": "Modified",
+    "savedState": "Saved",
+    "noPath": "Not saved yet",
+    "frameWidth": "Frame Width",
+    "frameHeight": "Frame Height",
+    "fps": "Project FPS",
+    "backgroundColor": "Background Color",
+    "sceneCount": "Scene Count",
+    "totalDuration": "Timeline Duration",
+    "error": {
+      "nameRequired": "Project name is required",
+      "locationRequired": "Location is required",
+      "createFailed": "Failed to create project",
+      "openFailed": "Failed to open project",
+      "saveFailed": "Failed to save project"
+    }
+  },
+  "common": {
+    "cancel": "Cancel",
+    "ok": "OK",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "browse": "Browse",
+    "open": "Open",
+    "close": "Close",
+    "remove": "Remove",
+    "clear": "Clear",
+    "creating": "Creating..."
+  },
+  "workspace": {
+    "title": "Workspace",
+    "editor": "Editor",
+    "scenes": "Scenes",
+    "sceneBoard": "Scene Board",
+    "subtitle": "A clean control surface for the current project",
+    "description": "The workstation now supports the full file lifecycle, recent-project recall, and export package generation while timeline editing is still under active construction.",
+    "editorDescription": "Edit project settings, manage scene drafts, and shape the exported project package directly from the workstation.",
+    "availableNow": "Available now",
+    "projectOps": "Project lifecycle",
+    "projectOpsDesc": "Create, open, save, save as, and close `.kinema` projects without leaving the workstation shell.",
+    "recentOps": "Recent project recall",
+    "recentOpsDesc": "Persistent recent-project cards make it possible to jump back into active work quickly.",
+    "exportOps": "Export handoff",
+    "exportOpsDesc": "Generate downstream render-plan or snapshot JSON packages with tracked progress and cancellation.",
+    "nextTitle": "Next focus",
+    "roadmap": "Scene editing and preview",
+    "roadmapDetails": "Timeline composition, scene authoring, and true media rendering are the next product milestones."
+  },
+  "export": {
+    "title": "Export Console",
+    "subtitle": "Produce a structured handoff package for downstream rendering or review.",
+    "target": "Output Target",
+    "width": "Width",
+    "height": "Height",
+    "fps": "Frame Rate",
+    "quality": "Quality",
+    "start": "Export Package",
+    "cancel": "Cancel Export",
+    "lastOutput": "Last Output",
+    "note": "This workstation slice exports render-plan and snapshot artifacts. Full scene-to-video rendering still needs dedicated editor and renderer integration.",
+    "targets": {
+      "renderPlan": "Render Plan JSON",
+      "projectSnapshot": "Project Snapshot JSON"
+    },
+    "status": {
+      "ready": "Ready to export",
+      "completed": "Export completed.",
+      "cancelled": "Export cancelled."
+    },
+    "errors": {
+      "failed": "Export failed."
+    }
+  },
+  "scene": {
+    "selected": "Selected Scene",
+    "editor": "Scene Editor",
+    "name": "Scene Name",
+    "duration": "Duration",
+    "notes": "Notes",
+    "enabled": "Enabled",
+    "disabled": "Disabled",
+    "add": "Add Scene",
+    "duplicate": "Duplicate",
+    "remove": "Remove",
+    "noNotes": "No notes yet."
+  },
+  "notifications": {
+    "settingsSyncFailed": "Failed to synchronize workstation settings."
   }
 }

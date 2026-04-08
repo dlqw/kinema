@@ -1,20 +1,29 @@
 {
   "app": {
-    "name": "AniMaker",
-    "title": "AniMaker 视频工作站"
+    "name": "Kinema",
+    "title": "Kinema 视频工作站"
   },
   "menu": {
     "file": "文件",
     "edit": "编辑",
     "view": "视图",
-    "help": "帮助"
-  },
-  "welcome": {
-    "title": "欢迎使用 AniMaker",
-    "subtitle": "视频工作站 v{{version}}",
+    "help": "帮助",
     "newProject": "新建项目",
     "openProject": "打开项目",
-    "recentProjects": "最近项目"
+    "saveProject": "保存",
+    "saveProjectAs": "保存选项",
+    "closeProject": "关闭项目",
+    "export": "导出"
+  },
+  "welcome": {
+    "title": "欢迎使用 Kinema",
+    "subtitle": "视频工作站 v{{version}}",
+    "description": "在同一个桌面工作台里完成项目文件管理、最近项目回访，以及导出交付包。",
+    "newProject": "新建项目",
+    "openProject": "打开项目",
+    "recentProjects": "最近项目",
+    "openRecent": "从最近工作继续",
+    "emptyRecent": "还没有最近项目。"
   },
   "theme": {
     "light": "亮色",
@@ -29,6 +38,119 @@
     "ready": "就绪",
     "loading": "加载中...",
     "saving": "保存中...",
-    "saved": "已保存"
+    "saved": "已保存",
+    "exporting": "导出中..."
+  },
+  "project": {
+    "title": "项目",
+    "new": "新建项目",
+    "open": "打开项目",
+    "save": "保存项目",
+    "create": "创建项目",
+    "saveAs": "另存为...",
+    "browse": "浏览...",
+    "opening": "打开中...",
+    "name": "项目名称",
+    "namePlaceholder": "输入项目名称",
+    "location": "保存位置",
+    "locationPlaceholder": "选择工作目录",
+    "unsavedChanges": "您有未保存的更改",
+    "current": "当前项目",
+    "summary": "项目摘要",
+    "setup": "项目设置",
+    "recentTitle": "项目历史",
+    "path": "项目文件",
+    "createdAt": "创建时间",
+    "updatedAt": "更新时间",
+    "state": "状态",
+    "modifiedState": "已修改",
+    "savedState": "已保存",
+    "noPath": "尚未保存",
+    "frameWidth": "画面宽度",
+    "frameHeight": "画面高度",
+    "fps": "项目帧率",
+    "backgroundColor": "背景颜色",
+    "sceneCount": "场景数量",
+    "totalDuration": "时间线时长",
+    "error": {
+      "nameRequired": "请输入项目名称",
+      "locationRequired": "请选择保存位置",
+      "createFailed": "创建项目失败",
+      "openFailed": "打开项目失败",
+      "saveFailed": "保存项目失败"
+    }
+  },
+  "common": {
+    "cancel": "取消",
+    "ok": "确定",
+    "save": "保存",
+    "delete": "删除",
+    "edit": "编辑",
+    "browse": "浏览",
+    "open": "打开",
+    "close": "关闭",
+    "remove": "移除",
+    "clear": "清空",
+    "creating": "创建中..."
+  },
+  "workspace": {
+    "title": "工作台",
+    "editor": "编辑器",
+    "scenes": "场景",
+    "sceneBoard": "场景面板",
+    "subtitle": "为当前项目准备的清爽控制面板",
+    "description": "工作站目前已经接通完整的文件生命周期、最近项目回访和导出交付包；时间线编辑与场景制作仍在继续建设。",
+    "editorDescription": "现在可以直接在工作站里编辑项目设置、维护场景草稿，并塑造最终导出的项目交付包。",
+    "availableNow": "当前可用",
+    "projectOps": "项目生命周期",
+    "projectOpsDesc": "可以直接在工作站里新建、打开、保存、另存为和关闭 `.kinema` 项目。",
+    "recentOps": "最近项目回访",
+    "recentOpsDesc": "持久化最近项目卡片，便于快速回到正在推进的工作。",
+    "exportOps": "导出交付",
+    "exportOpsDesc": "生成渲染计划或项目快照 JSON 包，并且提供进度与取消控制。",
+    "nextTitle": "下一阶段",
+    "roadmap": "场景编辑与预览",
+    "roadmapDetails": "时间线编排、场景编辑和真实媒体渲染，是接下来的核心产品里程碑。"
+  },
+  "export": {
+    "title": "导出控制台",
+    "subtitle": "为下游渲染或评审生成结构化交付包。",
+    "target": "输出目标",
+    "width": "宽度",
+    "height": "高度",
+    "fps": "帧率",
+    "quality": "质量",
+    "start": "导出交付包",
+    "cancel": "取消导出",
+    "lastOutput": "最近输出",
+    "note": "当前工作站阶段导出的是渲染计划和项目快照产物。完整的场景到视频渲染，仍需要后续编辑器与渲染器集成。",
+    "targets": {
+      "renderPlan": "渲染计划 JSON",
+      "projectSnapshot": "项目快照 JSON"
+    },
+    "status": {
+      "ready": "已准备导出",
+      "completed": "导出完成。",
+      "cancelled": "导出已取消。"
+    },
+    "errors": {
+      "failed": "导出失败。"
+    }
+  },
+  "scene": {
+    "selected": "当前场景",
+    "editor": "场景编辑器",
+    "name": "场景名称",
+    "duration": "时长",
+    "notes": "备注",
+    "enabled": "启用",
+    "disabled": "禁用",
+    "add": "新增场景",
+    "duplicate": "复制",
+    "remove": "删除",
+    "noNotes": "还没有备注。"
+  },
+  "notifications": {
+    "settingsSyncFailed": "同步工作站设置失败。"
   }
 }

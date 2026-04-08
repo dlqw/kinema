@@ -1,24 +1,57 @@
 {
-  "appId": "com.animaker.workstation",
-  "productName": "AniMaker Workstation",
+  "appId": "com.kinema.workstation",
+  "productName": "Kinema Workstation",
+  "copyright": "Copyright © 2024-2026 Kinema Team",
   "directories": {
     "output": "release"
   },
-  "files": [
-    "dist-electron",
-    "dist"
-  ],
+  "files": ["dist-electron", "dist"],
+  "extraMetadata": {
+    "main": "./dist-electron/main/index.js"
+  },
   "win": {
-    "target": ["nsis"],
-    "icon": "resources/icon.png"
+    "target": [
+      {
+        "target": "nsis",
+        "arch": ["x64"]
+      }
+    ],
+    "icon": "resources/icon.png",
+    "artifactName": "Kinema-Workstation-${version}-Setup.${ext}"
+  },
+  "nsis": {
+    "oneClick": false,
+    "perMachine": false,
+    "allowToChangeInstallationDirectory": true,
+    "deleteAppDataOnUninstall": false,
+    "shortcutName": "Kinema Workstation"
   },
   "mac": {
-    "target": ["dmg"],
-    "icon": "resources/icon.png"
+    "target": [
+      {
+        "target": "dmg",
+        "arch": ["universal"]
+      }
+    ],
+    "icon": "resources/icon.png",
+    "artifactName": "Kinema-Workstation-${version}.${ext}",
+    "category": "public.app-category.graphics-design"
+  },
+  "dmg": {
+    "contents": [
+      { "x": 130, "y": 220 },
+      { "x": 410, "y": 220, "type": "link", "path": "/Applications" }
+    ]
   },
   "linux": {
-    "target": ["AppImage"],
+    "target": [
+      {
+        "target": "AppImage",
+        "arch": ["x64"]
+      }
+    ],
     "icon": "resources/icon.png",
+    "artifactName": "Kinema-Workstation-${version}.${ext}",
     "category": "Graphics"
   }
 }

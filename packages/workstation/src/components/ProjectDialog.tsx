@@ -1,55 +1,64 @@
 /**
  * New Project Dialog Component
  *
- * Dialog for creating a new AniMaker project
+ * Dialog for creating a new Kinema project
  */
 
-import { useState } from 'react'
-import { useTranslation } from 'react-i18next'
-import { useProjectStore } from '../stores'
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useProjectStore } from '../stores';
 
 interface NewProjectDialogProps {
-  isOpen: boolean
-  onClose: () => void
+  isOpen: boolean;
+  onClose: () => void;
 }
 
 export function NewProjectDialog({ isOpen, onClose }: NewProjectDialogProps) {
-  const { t } = useTranslation()
-  const { createProject, isLoading, error } = useProjectStore()
+  const { t } = useTranslation();
+  const { createProject, isLoading, error } = useProjectStore();
 
-  const [projectName, setProjectName] = useState('')
-  const [projectPath, setProjectPath] = useState('')
+  const [projectName, setProjectName] = useState('');
+  const [projectPath, setProjectPath] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
 
     if (!projectName.trim()) {
-      return
+      return;
     }
 
-    const success = await createProject(projectName, projectPath || undefined)
+    const success = await createProject(projectName, projectPath || undefined);
 
     if (success) {
-      setProjectName('')
-      setProjectPath('')
-      onClose()
+      setProjectName('');
+      setProjectPath('');
+      onClose();
     }
-  }
+  };
 
   const handleBrowse = async () => {
-    // In Electron, this would open a directory picker
-    // For now, we'll use a text input
-    // In production: const result = await window.api.selectDirectory()
-  }
+    const result = await window.api.selectDirectory();
+    if (result.success && result.path) {
+      setProjectPath(result.path);
+    }
+  };
 
-  if (!isOpen) return null
+  const handleSubmitSync = (e: React.FormEvent) => {
+    void handleSubmit(e);
+  };
+
+  const handleBrowseClick = () => {
+    void handleBrowse();
+  };
+
+  if (!isOpen) return null;
 
   return (
     <div className="dialog-overlay" onClick={onClose}>
       <div className="dialog-content" onClick={(e) => e.stopPropagation()}>
         <h2>{t('project.new')}</h2>
 
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmitSync}>
           <div className="form-group">
             <label htmlFor="projectName">{t('project.name')}</label>
             <input
@@ -76,7 +85,7 @@ export function NewProjectDialog({ isOpen, onClose }: NewProjectDialogProps) {
               />
               <button
                 type="button"
-                onClick={handleBrowse}
+                onClick={handleBrowseClick}
                 disabled={isLoading}
                 className="btn-browse"
               >
@@ -85,19 +94,10 @@ export function NewProjectDialog({ isOpen, onClose }: NewProjectDialogProps) {
             </div>
           </div>
 
-          {error && (
-            <div className="error-message">
-              {error}
-            </div>
-          )}
+          {error && <div className="error-message">{error}</div>}
 
           <div className="dialog-actions">
-            <button
-              type="button"
-              onClick={onClose}
-              disabled={isLoading}
-              className="btn-cancel"
-            >
+            <button type="button" onClick={onClose} disabled={isLoading} className="btn-cancel">
               {t('common.cancel')}
             </button>
             <button
@@ -111,7 +111,7 @@ export function NewProjectDialog({ isOpen, onClose }: NewProjectDialogProps) {
         </form>
       </div>
     </div>
-  )
+  );
 }
 
-export default NewProjectDialog
+export default NewProjectDialog;

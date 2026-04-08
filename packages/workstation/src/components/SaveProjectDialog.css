@@ -1,0 +1,44 @@
+/**
+ * Save Project Dialog Styles
+ */
+
+.dialog-small {
+  max-width: 400px;
+}
+
+.save-info {
+  padding: 12px 0;
+}
+
+.save-project-name {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+}
+
+.save-project-name .label {
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+
+.save-project-name .value {
+  color: var(--color-text-primary);
+}
+
+.save-modified {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+  padding: 8px 12px;
+  background-color: rgba(206, 145, 120, 0.15);
+  border: 1px solid var(--color-warning);
+  border-radius: 4px;
+  font-size: 13px;
+  color: var(--color-warning);
+}
+
+.save-modified .warning {
+  font-size: 16px;
+}
