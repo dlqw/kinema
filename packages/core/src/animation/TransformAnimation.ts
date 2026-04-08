@@ -40,7 +40,7 @@ export class TransformAnimation extends Animation {
   constructor(
     target: RenderObject,
     private readonly endState: RenderObjectState,
-    config: AnimationConfig = {}
+    config: AnimationConfig = {},
   ) {
     super(target, config);
     this.startState = target.getState();
@@ -74,7 +74,7 @@ export class TransformAnimation extends Animation {
   private interpolateTransform(
     start: Transform,
     end: Transform,
-    alpha: number
+    alpha: number,
   ): Partial<Transform> {
     const lerp = (s: number, e: number): number => s + (e - s) * alpha;
 
@@ -82,19 +82,19 @@ export class TransformAnimation extends Animation {
       position: {
         x: lerp(start.position.x, end.position.x),
         y: lerp(start.position.y, end.position.y),
-        z: lerp(start.position.z, end.position.z)
+        z: lerp(start.position.z, end.position.z),
       },
       rotation: {
         x: lerp(start.rotation.x, end.rotation.x),
         y: lerp(start.rotation.y, end.rotation.y),
-        z: lerp(start.rotation.z, end.rotation.z)
+        z: lerp(start.rotation.z, end.rotation.z),
       },
       scale: {
         x: lerp(start.scale.x, end.scale.x),
         y: lerp(start.scale.y, end.scale.y),
-        z: lerp(start.scale.z, end.scale.z)
+        z: lerp(start.scale.z, end.scale.z),
       },
-      opacity: lerp(start.opacity, end.opacity)
+      opacity: lerp(start.opacity, end.opacity),
     };
   }
 
@@ -109,14 +109,14 @@ export class TransformAnimation extends Animation {
   static toPosition(
     target: RenderObject,
     position: { x: number; y: number; z: number },
-    config: AnimationConfig = {}
+    config: AnimationConfig = {},
   ): TransformAnimation {
     const endState = {
       ...target.getState(),
       transform: {
         ...target.getState().transform,
-        position
-      }
+        position,
+      },
     };
     return new TransformAnimation(target, endState, config);
   }
@@ -132,14 +132,14 @@ export class TransformAnimation extends Animation {
   static toRotation(
     target: RenderObject,
     rotation: { x: number; y: number; z: number },
-    config: AnimationConfig = {}
+    config: AnimationConfig = {},
   ): TransformAnimation {
     const endState = {
       ...target.getState(),
       transform: {
         ...target.getState().transform,
-        rotation
-      }
+        rotation,
+      },
     };
     return new TransformAnimation(target, endState, config);
   }
@@ -155,14 +155,14 @@ export class TransformAnimation extends Animation {
   static toScale(
     target: RenderObject,
     scale: { x: number; y: number; z: number },
-    config: AnimationConfig = {}
+    config: AnimationConfig = {},
   ): TransformAnimation {
     const endState = {
       ...target.getState(),
       transform: {
         ...target.getState().transform,
-        scale
-      }
+        scale,
+      },
     };
     return new TransformAnimation(target, endState, config);
   }
@@ -178,14 +178,14 @@ export class TransformAnimation extends Animation {
   static toOpacity(
     target: RenderObject,
     opacity: number,
-    config: AnimationConfig = {}
+    config: AnimationConfig = {},
   ): TransformAnimation {
     const endState = {
       ...target.getState(),
       transform: {
         ...target.getState().transform,
-        opacity: Math.max(0, Math.min(1, opacity))
-      }
+        opacity: Math.max(0, Math.min(1, opacity)),
+      },
     };
     return new TransformAnimation(target, endState, config);
   }

@@ -85,6 +85,7 @@
    - 理由: `console.log` 接受任意类型
 
 2. **画布绘制函数** (1 处)
+
    ```typescript
    drawImage(...args: any[]): void
    ```

@@ -184,8 +184,7 @@ test.describe('Export Workflow', () => {
     await page.click('[data-testid="export-start-button"]');
 
     // Verify export respects resolution setting
-    const resolutionText = await page.locator('[data-testid="export-resolution"]')
-      .inputValue();
+    const resolutionText = await page.locator('[data-testid="export-resolution"]').inputValue();
 
     expect(resolutionText).toBe('1920x1080');
   });
@@ -209,7 +208,8 @@ test.describe('Export Workflow', () => {
     await expect(page.locator('[data-testid="export-progress"]')).toBeVisible();
 
     // Verify progress updates
-    const progressText = await page.locator('[data-testid="export-progress-percent"]')
+    const progressText = await page
+      .locator('[data-testid="export-progress-percent"]')
       .textContent();
 
     expect(progressText).toBeDefined();
@@ -246,9 +246,7 @@ test.describe('Export Workflow', () => {
     await expect(page.locator('[data-testid="export-cancelled"]')).toBeVisible();
 
     // Verify no partial file was created
-    const files = fs.readdirSync('test-results/exports').filter(
-      f => !f.startsWith('.')
-    );
+    const files = fs.readdirSync('test-results/exports').filter((f) => !f.startsWith('.'));
 
     // Should be empty or only contain test artifacts
     expect(files.length).toBe(0);
@@ -267,8 +265,9 @@ test.describe('Export Workflow', () => {
     await page.click('[data-testid="export-start-button"]');
 
     // Should show validation error
-    await expect(page.locator('[data-testid="export-error"] >> text=Duration must be positive'))
-      .toBeVisible();
+    await expect(
+      page.locator('[data-testid="export-error"] >> text=Duration must be positive'),
+    ).toBeVisible();
 
     // Fix duration
     await page.fill('[data-testid="export-duration"]', '5');
@@ -334,7 +333,8 @@ test.describe('Export Workflow', () => {
     await page.click('[data-testid="export-video-button"]');
 
     // Check aspect ratio in export settings
-    const exportAspectRatio = await page.locator('[data-testid="export-aspect-ratio"]')
+    const exportAspectRatio = await page
+      .locator('[data-testid="export-aspect-ratio"]')
       .textContent();
 
     expect(exportAspectRatio).toBe('16:9');
@@ -391,7 +391,7 @@ test.describe('Export Workflow', () => {
 
     // Check if transparency option is available
     const transparencyOption = page.locator('[data-testid="export-transparency"]');
-    const hasTransparency = await transparencyOption.count() > 0;
+    const hasTransparency = (await transparencyOption.count()) > 0;
 
     if (hasTransparency) {
       await page.check('[data-testid="export-transparency"]');
@@ -414,7 +414,7 @@ test.describe('Export Workflow', () => {
 
     // Check if preview is shown
     const previewCanvas = page.locator('[data-testid="export-preview-canvas"]');
-    const hasPreview = await previewCanvas.count() > 0;
+    const hasPreview = (await previewCanvas.count()) > 0;
 
     if (hasPreview) {
       await expect(previewCanvas).toBeVisible();
@@ -493,7 +493,7 @@ test.describe('Export - File Verification', () => {
     await page.click('[data-testid="add-animation-button"]');
     await page.selectOption('[data-testid="animation-type"]', 'bounce');
     await page.fill('[data-testid="animation-duration"]', '2000');
-    await page.click('[data-testid="animation-apply-button']');
+    await page.click('[data-testid="animation-apply-button"]');
 
     // Configure export with custom settings
     await page.click('[data-testid="export-video-button"]');
@@ -507,12 +507,10 @@ test.describe('Export - File Verification', () => {
     await page.click('[data-testid="export-start-button"]');
 
     // Verify settings were applied
-    const frameRate = await page.locator('[data-testid="video-framerate"]')
-      .inputValue();
+    const frameRate = await page.locator('[data-testid="video-framerate"]').inputValue();
     expect(frameRate).toBe('120');
 
-    const duration = await page.locator('[data-testid="export-duration"]')
-      .inputValue();
+    const duration = await page.locator('[data-testid="export-duration"]').inputValue();
     expect(duration).toBe('2');
   });
 });
@@ -558,7 +556,7 @@ test.describe('Export - Performance', () => {
     await page.click('[data-testid="add-animation-button"]');
     await page.selectOption('[data-testid="animation-type"]', 'move');
     await page.fill('[data-testid="animation-duration"]', '30000'); // 30 seconds
-    await page.click('[data-testid="animation-apply-button']');
+    await page.click('[data-testid="animation-apply-button"]');
 
     // Start export
     await page.click('[data-testid="export-video-button"]');
@@ -577,9 +575,7 @@ test.describe('Export - Performance', () => {
     // Verify no export file was created (or if created, it was cleaned up)
     const exportDirExists = fs.existsSync('test-results/exports');
     if (exportDirExists) {
-      const files = fs.readdirSync('test-results/exports').filter(
-        f => !f.startsWith('.')
-      );
+      const files = fs.readdirSync('test-results/exports').filter((f) => !f.startsWith('.'));
       expect(files.length).toBe(0);
     }
   });
@@ -598,8 +594,8 @@ test.describe('Export - Edge Cases', () => {
     const errorOrWarning = page.locator('[data-testid="export-error"]');
     const completeIndicator = page.locator('[data-testid="export-complete"]');
 
-    const hasError = await errorOrWarning.count() > 0;
-    const isComplete = await completeIndicator.count() > 0;
+    const hasError = (await errorOrWarning.count()) > 0;
+    const isComplete = (await completeIndicator.count()) > 0;
 
     expect(hasError || isComplete).toBeTruthy();
   });
@@ -624,7 +620,7 @@ test.describe('Export - Edge Cases', () => {
 
     // Should either stop playback, show warning, or proceed
     const warning = page.locator('[data-testid="export-while-playing-warning"]');
-    const hasWarning = await warning.count() > 0;
+    const hasWarning = (await warning.count()) > 0;
 
     // If no warning, export should still work
     expect(true).toBeTruthy();

@@ -395,7 +395,7 @@ describe('Timeline', () => {
       expect(listener).toHaveBeenCalledWith(
         expect.objectContaining({
           type: TimelineEventType.Play,
-        })
+        }),
       );
     });
 
@@ -419,7 +419,7 @@ describe('Timeline', () => {
         expect.objectContaining({
           type: TimelineEventType.Play,
           time: 0,
-        })
+        }),
       );
     });
 
@@ -433,7 +433,7 @@ describe('Timeline', () => {
       expect(listener).toHaveBeenCalledWith(
         expect.objectContaining({
           type: TimelineEventType.Pause,
-        })
+        }),
       );
     });
 
@@ -448,7 +448,7 @@ describe('Timeline', () => {
         expect.objectContaining({
           type: TimelineEventType.Stop,
           time: 0,
-        })
+        }),
       );
     });
 
@@ -462,7 +462,7 @@ describe('Timeline', () => {
         expect.objectContaining({
           type: TimelineEventType.Seek,
           time: 5,
-        })
+        }),
       );
     });
 
@@ -478,7 +478,7 @@ describe('Timeline', () => {
         expect.objectContaining({
           type: TimelineEventType.Keyframe,
           time: 5,
-        })
+        }),
       );
     });
 
@@ -493,7 +493,7 @@ describe('Timeline', () => {
         expect.objectContaining({
           type: TimelineEventType.Marker,
           time: 5,
-        })
+        }),
       );
     });
 
@@ -506,7 +506,7 @@ describe('Timeline', () => {
       expect(listener).toHaveBeenCalledWith(
         expect.objectContaining({
           type: TimelineEventType.Loop,
-        })
+        }),
       );
     });
 

@@ -27,7 +27,7 @@ class MockRenderObject {
     public id: string,
     public visible: boolean = true,
     public opacity: number = 1,
-    public position: { x: number; y: number } = { x: 0, y: 0 }
+    public position: { x: number; y: number } = { x: 0, y: 0 },
   ) {}
 
   getState() {

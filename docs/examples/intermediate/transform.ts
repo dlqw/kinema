@@ -10,20 +10,15 @@
  * @module examples/intermediate/transform
  */
 
-import {
-  createScene,
-  Scene
-} from '../../../../packages/core/src/types/scene';
-import {
-  VectorObject
-} from '../../../../packages/core/src/types/objects';
+import { createScene, Scene } from '../../../../packages/core/src/types/scene';
+import { VectorObject } from '../../../../packages/core/src/types/objects';
 import {
   MoveAnimation,
   RotateAnimation,
   ScaleAnimation,
   FadeInAnimation,
   AnimationGroup,
-  CompositionType
+  CompositionType,
 } from '../../../../packages/core/src/types/animation';
 import {
   smooth,
@@ -31,7 +26,7 @@ import {
   easeInCubic,
   easeOutCubic,
   easeOutBack,
-  bounce
+  bounce,
 } from '../../../../packages/core/src/types/easing';
 
 /**
@@ -50,7 +45,7 @@ export function createMoveAnimationExample(): Scene {
     width: 1280,
     height: 720,
     backgroundColor: '#1a1a2e',
-    fps: 60
+    fps: 60,
   });
 
   // ============================================
@@ -59,10 +54,10 @@ export function createMoveAnimationExample(): Scene {
 
   // 创建四个圆形，分别向不同方向移动
   const circles: VectorObject[] = [
-    VectorObject.circle(0.3, { x: -3, y: 2, z: 0 }, undefined, { color: '#e74c3c', opacity: 1 }),  // 红色
-    VectorObject.circle(0.3, { x: 3, y: 2, z: 0 }, undefined, { color: '#3498db', opacity: 1 }),   // 蓝色
+    VectorObject.circle(0.3, { x: -3, y: 2, z: 0 }, undefined, { color: '#e74c3c', opacity: 1 }), // 红色
+    VectorObject.circle(0.3, { x: 3, y: 2, z: 0 }, undefined, { color: '#3498db', opacity: 1 }), // 蓝色
     VectorObject.circle(0.3, { x: -3, y: -2, z: 0 }, undefined, { color: '#2ecc71', opacity: 1 }), // 绿色
-    VectorObject.circle(0.3, { x: 3, y: -2, z: 0 }, undefined, { color: '#f39c12', opacity: 1 })   // 黄色
+    VectorObject.circle(0.3, { x: 3, y: -2, z: 0 }, undefined, { color: '#f39c12', opacity: 1 }), // 黄色
   ];
 
   let currentScene: Scene = scene.addObjects(...circles);
@@ -74,12 +69,12 @@ export function createMoveAnimationExample(): Scene {
   // 圆 1：向右移动
   const moveRight: MoveAnimation = new MoveAnimation(
     circles[0],
-    { x: 3, y: 2, z: 0 },  // 目标位置
+    { x: 3, y: 2, z: 0 }, // 目标位置
     {
       duration: 2,
       easing: smooth,
-      name: 'move-right'
-    }
+      name: 'move-right',
+    },
   );
 
   // 圆 2：向左移动
@@ -89,8 +84,8 @@ export function createMoveAnimationExample(): Scene {
     {
       duration: 2,
       easing: smooth,
-      name: 'move-left'
-    }
+      name: 'move-left',
+    },
   );
 
   // 圆 3：向上移动
@@ -100,8 +95,8 @@ export function createMoveAnimationExample(): Scene {
     {
       duration: 2,
       easing: smooth,
-      name: 'move-up'
-    }
+      name: 'move-up',
+    },
   );
 
   // 圆 4：对角线移动（右下）
@@ -110,9 +105,9 @@ export function createMoveAnimationExample(): Scene {
     { x: 0, y: -2, z: 0 },
     {
       duration: 2,
-      easing: easeInOut,  // 使用不同的缓动
-      name: 'move-diagonal'
-    }
+      easing: easeInOut, // 使用不同的缓动
+      name: 'move-diagonal',
+    },
   );
 
   // ============================================
@@ -139,53 +134,47 @@ export function createRotateAnimationExample(): Scene {
     width: 1280,
     height: 720,
     backgroundColor: '#0f0f1e',
-    fps: 60
+    fps: 60,
   });
 
   // 创建三个矩形，分别绕不同轴旋转
   const rects: VectorObject[] = [
-    VectorObject.rectangle(1.5, 1.5, { x: -3, y: 0, z: 0 }, undefined, { color: '#e74c3c', opacity: 1 }),
-    VectorObject.rectangle(1.5, 1.5, { x: 0, y: 0, z: 0 }, undefined, { color: '#3498db', opacity: 1 }),
-    VectorObject.rectangle(1.5, 1.5, { x: 3, y: 0, z: 0 }, undefined, { color: '#2ecc71', opacity: 1 })
+    VectorObject.rectangle(1.5, 1.5, { x: -3, y: 0, z: 0 }, undefined, {
+      color: '#e74c3c',
+      opacity: 1,
+    }),
+    VectorObject.rectangle(1.5, 1.5, { x: 0, y: 0, z: 0 }, undefined, {
+      color: '#3498db',
+      opacity: 1,
+    }),
+    VectorObject.rectangle(1.5, 1.5, { x: 3, y: 0, z: 0 }, undefined, {
+      color: '#2ecc71',
+      opacity: 1,
+    }),
   ];
 
   let currentScene: Scene = scene.addObjects(...rects);
 
   // 矩形 1：绕 Z 轴旋转（2D 平面旋转）
-  const rotateZ: RotateAnimation = new RotateAnimation(
-    rects[0],
-    'z',
-    360,
-    {
-      duration: 3,
-      easing: smooth,
-      name: 'rotate-z'
-    }
-  );
+  const rotateZ: RotateAnimation = new RotateAnimation(rects[0], 'z', 360, {
+    duration: 3,
+    easing: smooth,
+    name: 'rotate-z',
+  });
 
   // 矩形 2：绕 X 轴旋转（3D 翻转效果）
-  const rotateX: RotateAnimation = new RotateAnimation(
-    rects[1],
-    'x',
-    360,
-    {
-      duration: 3,
-      easing: smooth,
-      name: 'rotate-x'
-    }
-  );
+  const rotateX: RotateAnimation = new RotateAnimation(rects[1], 'x', 360, {
+    duration: 3,
+    easing: smooth,
+    name: 'rotate-x',
+  });
 
   // 矩形 3：绕 Y 轴旋转（3D 翻转效果）
-  const rotateY: RotateAnimation = new RotateAnimation(
-    rects[2],
-    'y',
-    360,
-    {
-      duration: 3,
-      easing: smooth,
-      name: 'rotate-y'
-    }
-  );
+  const rotateY: RotateAnimation = new RotateAnimation(rects[2], 'y', 360, {
+    duration: 3,
+    easing: smooth,
+    name: 'rotate-y',
+  });
 
   currentScene = currentScene.schedule(rotateZ, 0);
   currentScene = currentScene.schedule(rotateX, 0);
@@ -206,7 +195,7 @@ export function createScaleAnimationExample(): Scene {
     width: 1280,
     height: 720,
     backgroundColor: '#1a1a2e',
-    fps: 60
+    fps: 60,
   });
 
   // 创建多个对象展示不同缩放效果
@@ -220,7 +209,7 @@ export function createScaleAnimationExample(): Scene {
     // 4. 垂直拉伸
     VectorObject.circle(0.4, { x: 3.5, y: 2, z: 0 }, undefined, { color: '#2ecc71', opacity: 1 }),
     // 5. 弹跳效果
-    VectorObject.circle(0.4, { x: 0, y: -1.5, z: 0 }, undefined, { color: '#3498db', opacity: 1 })
+    VectorObject.circle(0.4, { x: 0, y: -1.5, z: 0 }, undefined, { color: '#3498db', opacity: 1 }),
   ];
 
   let currentScene: Scene = scene.addObjects(...objects);
@@ -228,23 +217,23 @@ export function createScaleAnimationExample(): Scene {
   // 1. 均匀放大（0.3 → 1.0）
   const scaleUp: ScaleAnimation = new ScaleAnimation(
     objects[0],
-    { x: 2, y: 2, z: 1 },  // 放大 2 倍
+    { x: 2, y: 2, z: 1 }, // 放大 2 倍
     {
       duration: 2,
       easing: easeOutCubic,
-      name: 'scale-up'
-    }
+      name: 'scale-up',
+    },
   );
 
   // 2. 均匀缩小（0.6 → 0.2）
   const scaleDown: ScaleAnimation = new ScaleAnimation(
     objects[1],
-    { x: 0.33, y: 0.33, z: 1 },  // 缩小到 1/3
+    { x: 0.33, y: 0.33, z: 1 }, // 缩小到 1/3
     {
       duration: 2,
       easing: easeInCubic,
-      name: 'scale-down'
-    }
+      name: 'scale-down',
+    },
   );
 
   // 3. 水平拉伸
@@ -253,9 +242,9 @@ export function createScaleAnimationExample(): Scene {
     { x: 2, y: 1, z: 1 },
     {
       duration: 2,
-      easing: easeOutBack,  // 带回弹效果
-      name: 'stretch-horizontal'
-    }
+      easing: easeOutBack, // 带回弹效果
+      name: 'stretch-horizontal',
+    },
   );
 
   // 4. 垂直拉伸
@@ -265,8 +254,8 @@ export function createScaleAnimationExample(): Scene {
     {
       duration: 2,
       easing: easeOutBack,
-      name: 'stretch-vertical'
-    }
+      name: 'stretch-vertical',
+    },
   );
 
   // 5. 弹跳缩放效果（缩放序列）
@@ -274,23 +263,35 @@ export function createScaleAnimationExample(): Scene {
     objects[4],
     [
       // 放大
-      new ScaleAnimation(objects[4], { x: 1.5, y: 1.5, z: 1 }, {
-        duration: 0.4,
-        easing: easeOutBack
-      }),
+      new ScaleAnimation(
+        objects[4],
+        { x: 1.5, y: 1.5, z: 1 },
+        {
+          duration: 0.4,
+          easing: easeOutBack,
+        },
+      ),
       // 缩小
-      new ScaleAnimation(objects[4], { x: 0.8, y: 0.8, z: 1 }, {
-        duration: 0.3,
-        easing: easeOutBack
-      }),
+      new ScaleAnimation(
+        objects[4],
+        { x: 0.8, y: 0.8, z: 1 },
+        {
+          duration: 0.3,
+          easing: easeOutBack,
+        },
+      ),
       // 恢复
-      new ScaleAnimation(objects[4], { x: 1, y: 1, z: 1 }, {
-        duration: 0.3,
-        easing: bounce  // 弹跳效果
-      })
+      new ScaleAnimation(
+        objects[4],
+        { x: 1, y: 1, z: 1 },
+        {
+          duration: 0.3,
+          easing: bounce, // 弹跳效果
+        },
+      ),
     ],
     CompositionType.Sequence,
-    { duration: 1, easing: smooth }
+    { duration: 1, easing: smooth },
   );
 
   // 调度所有动画
@@ -315,29 +316,32 @@ export function createCombinedTransformExample(): Scene {
     width: 1280,
     height: 720,
     backgroundColor: '#0f0f1e',
-    fps: 60
+    fps: 60,
   });
 
   // 创建一个火箭形状（使用矩形组合）
   const rocketBody: VectorObject = VectorObject.rectangle(
-    0.4, 1.2,
+    0.4,
+    1.2,
     { x: 0, y: 0, z: 0 },
     { color: '#ecf0f1', width: 0.02 },
-    { color: '#bdc3c7', opacity: 0 }
+    { color: '#bdc3c7', opacity: 0 },
   );
 
   const rocketFin1: VectorObject = VectorObject.rectangle(
-    0.3, 0.4,
+    0.3,
+    0.4,
     { x: -0.15, y: 0.4, z: 0 },
     { color: '#e74c3c', width: 0.02 },
-    { color: '#c0392b', opacity: 0 }
+    { color: '#c0392b', opacity: 0 },
   );
 
   const rocketFin2: VectorObject = VectorObject.rectangle(
-    0.3, 0.4,
+    0.3,
+    0.4,
     { x: 0.15, y: 0.4, z: 0 },
     { color: '#e74c3c', width: 0.02 },
-    { color: '#c0392b', opacity: 0 }
+    { color: '#c0392b', opacity: 0 },
   );
 
   let currentScene: Scene = scene.addObjects(rocketBody, rocketFin1, rocketFin2);
@@ -348,9 +352,9 @@ export function createCombinedTransformExample(): Scene {
     [
       new FadeInAnimation(rocketBody, { duration: 0.5, easing: smooth }),
       new FadeInAnimation(rocketFin1, { duration: 0.5, easing: smooth }),
-      new FadeInAnimation(rocketFin2, { duration: 0.5, easing: smooth })
+      new FadeInAnimation(rocketFin2, { duration: 0.5, easing: smooth }),
     ],
-    CompositionType.Parallel
+    CompositionType.Parallel,
   );
 
   // 阶段 2：发射（向上移动 + 旋转 + 缩放）
@@ -358,50 +362,74 @@ export function createCombinedTransformExample(): Scene {
     rocketBody,
     [
       // 向上移动
-      new MoveAnimation(rocketBody, { x: 0, y: 3, z: 0 }, {
-        duration: 2,
-        easing: easeInCubic
-      }),
+      new MoveAnimation(
+        rocketBody,
+        { x: 0, y: 3, z: 0 },
+        {
+          duration: 2,
+          easing: easeInCubic,
+        },
+      ),
       // 轻微旋转
       new RotateAnimation(rocketBody, 'z', 45, {
         duration: 2,
-        easing: smooth
+        easing: smooth,
       }),
       // 翼跟随移动
-      new MoveAnimation(rocketFin1, { x: -0.15, y: 3.4, z: 0 }, {
-        duration: 2,
-        easing: easeInCubic
-      }),
-      new MoveAnimation(rocketFin2, { x: 0.15, y: 3.4, z: 0 }, {
-        duration: 2,
-        easing: easeInCubic
-      })
+      new MoveAnimation(
+        rocketFin1,
+        { x: -0.15, y: 3.4, z: 0 },
+        {
+          duration: 2,
+          easing: easeInCubic,
+        },
+      ),
+      new MoveAnimation(
+        rocketFin2,
+        { x: 0.15, y: 3.4, z: 0 },
+        {
+          duration: 2,
+          easing: easeInCubic,
+        },
+      ),
     ],
-    CompositionType.Parallel
+    CompositionType.Parallel,
   );
 
   // 阶段 3：旋转返回
   const returnGroup: AnimationGroup = new AnimationGroup(
     rocketBody,
     [
-      new MoveAnimation(rocketBody, { x: 0, y: 0, z: 0 }, {
-        duration: 1.5,
-        easing: easeOutCubic
-      }),
+      new MoveAnimation(
+        rocketBody,
+        { x: 0, y: 0, z: 0 },
+        {
+          duration: 1.5,
+          easing: easeOutCubic,
+        },
+      ),
       new RotateAnimation(rocketBody, 'z', -45, {
         duration: 1.5,
-        easing: smooth
+        easing: smooth,
       }),
-      new MoveAnimation(rocketFin1, { x: -0.15, y: 0.4, z: 0 }, {
-        duration: 1.5,
-        easing: easeOutCubic
-      }),
-      new MoveAnimation(rocketFin2, { x: 0.15, y: 0.4, z: 0 }, {
-        duration: 1.5,
-        easing: easeOutCubic
-      })
+      new MoveAnimation(
+        rocketFin1,
+        { x: -0.15, y: 0.4, z: 0 },
+        {
+          duration: 1.5,
+          easing: easeOutCubic,
+        },
+      ),
+      new MoveAnimation(
+        rocketFin2,
+        { x: 0.15, y: 0.4, z: 0 },
+        {
+          duration: 1.5,
+          easing: easeOutCubic,
+        },
+      ),
     ],
-    CompositionType.Parallel
+    CompositionType.Parallel,
   );
 
   // 调度动画序列
@@ -424,7 +452,7 @@ export function createPathAnimationExample(): Scene {
     width: 1280,
     height: 720,
     backgroundColor: '#1a1a2e',
-    fps: 60
+    fps: 60,
   });
 
   // 创建一个小球
@@ -432,37 +460,33 @@ export function createPathAnimationExample(): Scene {
     0.3,
     { x: -4, y: 0, z: 0 },
     { color: '#e74c3c', width: 0.05 },
-    { color: '#c0392b', opacity: 1 }
+    { color: '#c0392b', opacity: 1 },
   );
 
   let currentScene: Scene = scene.addObject(ball);
 
   // 创建沿路径移动的动画序列（近似圆形路径）
   const pathPoints: Array<{ x: number; y: number; z: number }> = [
-    { x: -4, y: 0, z: 0 },   // 起点（左）
-    { x: -2, y: 2, z: 0 },   // 上左
-    { x: 0, y: 3, z: 0 },    // 顶
-    { x: 2, y: 2, z: 0 },    // 上右
-    { x: 4, y: 0, z: 0 },    // 右
-    { x: 2, y: -2, z: 0 },   // 下右
-    { x: 0, y: -3, z: 0 },   // 底
-    { x: -2, y: -2, z: 0 },  // 下左
-    { x: -4, y: 0, z: 0 }    // 回到起点
+    { x: -4, y: 0, z: 0 }, // 起点（左）
+    { x: -2, y: 2, z: 0 }, // 上左
+    { x: 0, y: 3, z: 0 }, // 顶
+    { x: 2, y: 2, z: 0 }, // 上右
+    { x: 4, y: 0, z: 0 }, // 右
+    { x: 2, y: -2, z: 0 }, // 下右
+    { x: 0, y: -3, z: 0 }, // 底
+    { x: -2, y: -2, z: 0 }, // 下左
+    { x: -4, y: 0, z: 0 }, // 回到起点
   ];
 
   // 为每个路径段创建移动动画
   pathPoints.forEach((point, index) => {
-    if (index === 0) return;  // 跳过起点
+    if (index === 0) return; // 跳过起点
 
-    const moveAlongPath: MoveAnimation = new MoveAnimation(
-      ball,
-      point,
-      {
-        duration: 0.5,
-        easing: smooth,
-        name: `path-segment-${index}`
-      }
-    );
+    const moveAlongPath: MoveAnimation = new MoveAnimation(ball, point, {
+      duration: 0.5,
+      easing: smooth,
+      name: `path-segment-${index}`,
+    });
 
     currentScene = currentScene.schedule(moveAlongPath, index * 0.5);
   });

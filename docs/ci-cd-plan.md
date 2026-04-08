@@ -3,6 +3,7 @@
 ## 持续集成 (CI)
 
 ### 触发条件
+
 - 推送到任何分支
 - 创建 Pull Request
 - 手动触发
@@ -109,16 +110,19 @@ jobs:
 ## 分支策略
 
 ### 主要分支
+
 - `main`: 生产就绪代码
 - `develop`: 开发主分支
 
 ### 功能分支
+
 - `feat/*`: 新功能
 - `fix/*`: Bug 修复
 - `refactor/*`: 重构
 - `docs/*`: 文档更新
 
 ### 工作流
+
 1. 从 `develop` 创建功能分支
 2. 完成开发后提交 PR
 3. CI 检查通过
@@ -129,36 +133,43 @@ jobs:
 ## 本地开发
 
 ### 安装依赖
+
 ```bash
 pnpm install
 ```
 
 ### 开发模式
+
 ```bash
 pnpm run dev
 ```
 
 ### 运行测试
+
 ```bash
 pnpm run test:watch
 ```
 
 ### 类型检查
+
 ```bash
 pnpm run typecheck
 ```
 
 ### 代码检查
+
 ```bash
 pnpm run lint
 ```
 
 ### 格式化代码
+
 ```bash
 pnpm run format
 ```
 
 ### 完整 CI 流程
+
 ```bash
 pnpm run ci
 ```
