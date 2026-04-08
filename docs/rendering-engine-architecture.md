@@ -1,8 +1,8 @@
-# AniMaker 底层渲染引擎架构设计
+# Kinema 底层渲染引擎架构设计
 
 ## 1. 概述
 
-本文档定义 AniMaker 动画渲染框架的底层渲染引擎架构。该架构基于 WebGPU 标准，提供高性能的 2D/3D 混合渲染能力，专为动画制作场景优化。
+本文档定义 Kinema 动画渲染框架的底层渲染引擎架构。该架构基于 WebGPU 标准，提供高性能的 2D/3D 混合渲染能力，专为动画制作场景优化。
 
 ### 1.1 设计目标
 
@@ -27,7 +27,7 @@
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                    AniMaker Render Engine                    │
+│                    Kinema Render Engine                    │
 ├─────────────────────────────────────────────────────────────┤
 │                                                               │
 │  ┌─────────────────────────────────────────────────────┐    │
@@ -377,11 +377,11 @@ class PipelineManager {
 
 ```typescript
 enum RenderQueueType {
-  Background = 1000,     // 背景（天空盒等）
-  Opaque = 2000,         // 不透明物体
-  AlphaTest = 2500,      // Alpha 测试
-  Transparent = 3000,    // 透明物体
-  Overlay = 4000,        // 叠加层（UI等）
+  Background = 1000, // 背景（天空盒等）
+  Opaque = 2000, // 不透明物体
+  AlphaTest = 2500, // Alpha 测试
+  Transparent = 3000, // 透明物体
+  Overlay = 4000, // 叠加层（UI等）
 }
 
 class RenderQueue {
@@ -611,14 +611,11 @@ class ShaderVariantGenerator {
   // 从基础着色器生成变体
   generateVariants(
     baseShader: string,
-    variantDefinitions: VariantDefinition[]
+    variantDefinitions: VariantDefinition[],
   ): Map<string, string>;
 
   // 运行时着色器组合
-  buildShader(
-    template: ShaderTemplate,
-    defines: Record<string, any>
-  ): string;
+  buildShader(template: ShaderTemplate, defines: Record<string, any>): string;
 }
 
 // 变体定义示例
@@ -753,6 +750,7 @@ const FeatureCompatibility = {
 ## 10. 后续开发计划
 
 ### 10.1 第一阶段：核心基础
+
 - [ ] WebGPU 上下文初始化
 - [ ] 基础图形设备抽象
 - [ ] 缓冲和纹理管理
@@ -760,6 +758,7 @@ const FeatureCompatibility = {
 - [ ] 简单几何体渲染
 
 ### 10.2 第二阶段：渲染管线
+
 - [ ] 渲染通道设计
 - [ ] 渲染队列系统
 - [ ] 材质系统
@@ -767,12 +766,14 @@ const FeatureCompatibility = {
 - [ ] 混合和透明度
 
 ### 10.3 第三阶段：动画支持
+
 - [ ] 骨骼蒙皮渲染
 - [ ] 变形目标渲染
 - [ ] 粒子系统
 - [ ] GPU 计算着色器集成
 
 ### 10.4 第四阶段：优化和工具
+
 - [ ] 批量渲染优化
 - [ ] 资源管理优化
 - [ ] 性能分析工具

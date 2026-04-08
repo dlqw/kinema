@@ -1,35 +1,35 @@
 /**
  * 场景6: 对比收尾 (5:00 - 5:30)
  *
- * - AniMaker vs Manim 对比 (0-15s)
+ * - Kinema vs Manim 对比 (0-15s)
  * - 核心优势总结 (15-25s)
  * - 行动号召 (25-30s)
  */
 
-import { Scene, Circle, Rectangle, Text, Group, Line } from '../../src'
-import type { RenderObject } from '../../src'
-import { colors, videoConfig } from '../main'
-import { Easing } from '../../src/easing'
+import { Scene, Circle, Rectangle, Text, Group, Line } from '../../src';
+import type { RenderObject } from '../../src';
+import { colors, videoConfig } from '../main';
+import { Easing } from '../../src/easing';
 
 // Type aliases to avoid DOM type conflicts
-type AnimText = ReturnType<typeof Text>
-type AnimCircle = ReturnType<typeof Circle>
+type AnimText = ReturnType<typeof Text>;
+type AnimCircle = ReturnType<typeof Circle>;
 
 // === 对比表格 ===
 
 function createComparisonTable(scene: Scene, startTime: number) {
-  const centerX = videoConfig.width / 2
-  const centerY = videoConfig.height / 2
+  const centerX = videoConfig.width / 2;
+  const centerY = videoConfig.height / 2;
 
   // 标题
   const title = Text({
     x: centerX,
     y: 100,
-    content: 'AniMaker vs Manim',
+    content: 'Kinema vs Manim',
     fontSize: 42,
     color: colors.text.primary,
     opacity: 0,
-  })
+  });
 
   scene.timeline.add({
     target: title,
@@ -39,20 +39,20 @@ function createComparisonTable(scene: Scene, startTime: number) {
     from: 0,
     to: 1,
     easing: Easing.easeOut,
-  })
+  });
 
   // 对比项目
   const comparisons = [
-    { feature: '类型系统', manim: '动态类型', animaker: '静态类型 ✅' },
-    { feature: '错误检测', manim: '运行时', animaker: '编译时 ✅' },
-    { feature: '导出格式', manim: '视频', animaker: '10+ 格式 ✅' },
-    { feature: '渲染方式', manim: 'CPU', animaker: 'GPU 加速 ✅' },
-    { feature: '学习曲线', manim: '陡峭', animaker: '平缓 ✅' },
-  ]
+    { feature: '类型系统', manim: '动态类型', kinema: '静态类型 ✅' },
+    { feature: '错误检测', manim: '运行时', kinema: '编译时 ✅' },
+    { feature: '导出格式', manim: '视频', kinema: '10+ 格式 ✅' },
+    { feature: '渲染方式', manim: 'CPU', kinema: 'GPU 加速 ✅' },
+    { feature: '学习曲线', manim: '陡峭', kinema: '平缓 ✅' },
+  ];
 
-  const tableY = 180
-  const rowHeight = 60
-  const colWidth = 400
+  const tableY = 180;
+  const rowHeight = 60;
+  const colWidth = 400;
 
   // 表头
   const headerBg = Rectangle({
@@ -62,15 +62,15 @@ function createComparisonTable(scene: Scene, startTime: number) {
     height: 50,
     color: '#21262D',
     opacity: 0,
-  })
+  });
 
   const headers = [
     { text: '特性', x: centerX - 450 },
     { text: '🐍 Manim', x: centerX - 150 },
-    { text: '📦 AniMaker', x: centerX + 250 },
-  ]
+    { text: '📦 Kinema', x: centerX + 250 },
+  ];
 
-  const headerTexts: AnimText[] = []
+  const headerTexts: AnimText[] = [];
   headers.forEach((h) => {
     const text = Text({
       x: h.x,
@@ -79,15 +79,15 @@ function createComparisonTable(scene: Scene, startTime: number) {
       fontSize: 20,
       color: colors.text.primary,
       opacity: 0,
-    })
-    headerTexts.push(text)
-  })
+    });
+    headerTexts.push(text);
+  });
 
   // 数据行
-  const rowElements: any[] = []
+  const rowElements: any[] = [];
 
   comparisons.forEach((row, i) => {
-    const y = tableY + 60 + i * rowHeight
+    const y = tableY + 60 + i * rowHeight;
 
     // 行背景（交替颜色）
     const rowBg = Rectangle({
@@ -97,8 +97,8 @@ function createComparisonTable(scene: Scene, startTime: number) {
       height: rowHeight - 2,
       color: i % 2 === 0 ? '#161B22' : '#0D1117',
       opacity: 0,
-    })
-    rowElements.push(rowBg)
+    });
+    rowElements.push(rowBg);
 
     // 特性名称
     const featureText = Text({
@@ -108,8 +108,8 @@ function createComparisonTable(scene: Scene, startTime: number) {
       fontSize: 18,
       color: colors.text.primary,
       opacity: 0,
-    })
-    rowElements.push(featureText)
+    });
+    rowElements.push(featureText);
 
     // Manim 值
     const manimText = Text({
@@ -119,19 +119,19 @@ function createComparisonTable(scene: Scene, startTime: number) {
       fontSize: 18,
       color: colors.text.secondary,
       opacity: 0,
-    })
-    rowElements.push(manimText)
+    });
+    rowElements.push(manimText);
 
-    // AniMaker 值
-    const animakerText = Text({
+    // Kinema 值
+    const kinemaText = Text({
       x: centerX + 250,
       y: y + 18,
-      content: row.animaker,
+      content: row.kinema,
       fontSize: 18,
       color: colors.success,
       opacity: 0,
-    })
-    rowElements.push(animakerText)
+    });
+    rowElements.push(kinemaText);
 
     // 分隔线
     const separator = Line({
@@ -142,9 +142,9 @@ function createComparisonTable(scene: Scene, startTime: number) {
       color: '#30363D',
       width: 1,
       opacity: 0,
-    })
-    rowElements.push(separator)
-  })
+    });
+    rowElements.push(separator);
+  });
 
   // 字幕
   const subtitle = Text({
@@ -154,7 +154,7 @@ function createComparisonTable(scene: Scene, startTime: number) {
     fontSize: 24,
     color: colors.text.accent,
     opacity: 0,
-  })
+  });
 
   // 动画：表格出现
   scene.timeline.add({
@@ -165,7 +165,7 @@ function createComparisonTable(scene: Scene, startTime: number) {
     from: 0,
     to: 1,
     easing: Easing.easeOut,
-  })
+  });
 
   headerTexts.forEach((text, i) => {
     scene.timeline.add({
@@ -176,8 +176,8 @@ function createComparisonTable(scene: Scene, startTime: number) {
       from: 0,
       to: 1,
       easing: Easing.easeOut,
-    })
-  })
+    });
+  });
 
   // 行数据出现
   rowElements.forEach((el, i) => {
@@ -189,8 +189,8 @@ function createComparisonTable(scene: Scene, startTime: number) {
       from: 0,
       to: 1,
       easing: Easing.easeOut,
-    })
-  })
+    });
+  });
 
   // 字幕
   scene.timeline.add({
@@ -201,7 +201,7 @@ function createComparisonTable(scene: Scene, startTime: number) {
     from: 0,
     to: 1,
     easing: Easing.easeOut,
-  })
+  });
 
   // 清理
   scene.timeline.add({
@@ -212,9 +212,8 @@ function createComparisonTable(scene: Scene, startTime: number) {
     from: 1,
     to: 0,
     easing: Easing.easeIn,
-  })
-
-  ;[headerBg, ...headerTexts, subtitle, ...rowElements].forEach((el) => {
+  });
+  [headerBg, ...headerTexts, subtitle, ...rowElements].forEach((el) => {
     scene.timeline.add({
       target: el,
       startTime: startTime + 13,
@@ -223,26 +222,26 @@ function createComparisonTable(scene: Scene, startTime: number) {
       from: 1,
       to: 0,
       easing: Easing.easeIn,
-    })
-  })
+    });
+  });
 
   // 添加元素
-  scene.add(title, headerBg, ...headerTexts, subtitle, ...rowElements)
+  scene.add(title, headerBg, ...headerTexts, subtitle, ...rowElements);
 }
 
 // === 核心优势总结 ===
 
 function createAdvantagesSummary(scene: Scene, startTime: number) {
-  const centerX = videoConfig.width / 2
-  const centerY = videoConfig.height / 2
+  const centerX = videoConfig.width / 2;
+  const centerY = videoConfig.height / 2;
 
   const advantages = [
     { icon: '🎯', title: '类型安全', desc: '编译时保护' },
     { icon: '⚡', title: '高性能', desc: 'WebGPU 加速' },
     { icon: '🎨', title: '易用性', desc: '简洁 API' },
-  ]
+  ];
 
-  const advantageElements: any[] = []
+  const advantageElements: any[] = [];
 
   // 容器背景
   const containerBg = Rectangle({
@@ -254,12 +253,12 @@ function createAdvantagesSummary(scene: Scene, startTime: number) {
     cornerRadius: 20,
     border: { color: colors.brand, width: 2 },
     opacity: 0,
-  })
+  });
 
   // 三个优势
   advantages.forEach((adv, i) => {
-    const x = centerX - 250 + i * 250
-    const y = centerY
+    const x = centerX - 250 + i * 250;
+    const y = centerY;
 
     // 图标
     const icon = Text({
@@ -268,8 +267,8 @@ function createAdvantagesSummary(scene: Scene, startTime: number) {
       content: adv.icon,
       fontSize: 48,
       opacity: 0,
-    })
-    advantageElements.push(icon)
+    });
+    advantageElements.push(icon);
 
     // 标题
     const title = Text({
@@ -279,8 +278,8 @@ function createAdvantagesSummary(scene: Scene, startTime: number) {
       fontSize: 28,
       color: colors.brand,
       opacity: 0,
-    })
-    advantageElements.push(title)
+    });
+    advantageElements.push(title);
 
     // 描述
     const desc = Text({
@@ -290,9 +289,9 @@ function createAdvantagesSummary(scene: Scene, startTime: number) {
       fontSize: 18,
       color: colors.text.secondary,
       opacity: 0,
-    })
-    advantageElements.push(desc)
-  })
+    });
+    advantageElements.push(desc);
+  });
 
   // 动画
   scene.timeline.add({
@@ -303,7 +302,7 @@ function createAdvantagesSummary(scene: Scene, startTime: number) {
     from: 0,
     to: 1,
     easing: Easing.easeOut,
-  })
+  });
 
   // 从中心扩展
   scene.timeline.add({
@@ -314,12 +313,12 @@ function createAdvantagesSummary(scene: Scene, startTime: number) {
     from: 0.8,
     to: 1,
     easing: Easing.easeOut,
-  })
+  });
 
   // 优势依次出现（从下往上）
   advantageElements.forEach((el, i) => {
-    const delay = Math.floor(i / 3) * 0.3 // 同一行同时出现
-    const rowOffset = (i % 3) * 0.1 // 同一列错开
+    const delay = Math.floor(i / 3) * 0.3; // 同一行同时出现
+    const rowOffset = (i % 3) * 0.1; // 同一列错开
 
     scene.timeline.add({
       target: el,
@@ -329,7 +328,7 @@ function createAdvantagesSummary(scene: Scene, startTime: number) {
       from: 0,
       to: 1,
       easing: Easing.easeOut,
-    })
+    });
 
     // 轻微上浮效果
     scene.timeline.add({
@@ -340,8 +339,8 @@ function createAdvantagesSummary(scene: Scene, startTime: number) {
       from: (el as any).y + 20,
       to: (el as any).y,
       easing: Easing.easeOut,
-    })
-  })
+    });
+  });
 
   // 清理
   scene.timeline.add({
@@ -352,7 +351,7 @@ function createAdvantagesSummary(scene: Scene, startTime: number) {
     from: 1,
     to: 0,
     easing: Easing.easeIn,
-  })
+  });
 
   advantageElements.forEach((el) => {
     scene.timeline.add({
@@ -363,32 +362,32 @@ function createAdvantagesSummary(scene: Scene, startTime: number) {
       from: 1,
       to: 0,
       easing: Easing.easeIn,
-    })
-  })
+    });
+  });
 
   // 添加元素
-  scene.add(containerBg, ...advantageElements)
+  scene.add(containerBg, ...advantageElements);
 }
 
 // === 行动号召 ===
 
 function createCallToAction(scene: Scene, startTime: number) {
-  const centerX = videoConfig.width / 2
-  const centerY = videoConfig.height / 2
+  const centerX = videoConfig.width / 2;
+  const centerY = videoConfig.height / 2;
 
   // 粒子背景效果（简化为小圆点）
-  const particles: AnimCircle[] = []
+  const particles: AnimCircle[] = [];
   for (let i = 0; i < 30; i++) {
-    const angle = (i / 30) * Math.PI * 2
-    const radius = 300 + Math.random() * 100
+    const angle = (i / 30) * Math.PI * 2;
+    const radius = 300 + Math.random() * 100;
     const particle = Circle({
       x: centerX + Math.cos(angle) * radius,
       y: centerY + Math.sin(angle) * radius,
       radius: 2 + Math.random() * 3,
       color: colors.brand,
       opacity: 0,
-    })
-    particles.push(particle)
+    });
+    particles.push(particle);
   }
 
   // Logo
@@ -400,7 +399,7 @@ function createCallToAction(scene: Scene, startTime: number) {
     strokeColor: colors.brand,
     strokeWidth: 4,
     opacity: 0,
-  })
+  });
 
   const logoInner = Circle({
     x: centerX,
@@ -408,7 +407,7 @@ function createCallToAction(scene: Scene, startTime: number) {
     radius: 50,
     color: colors.brand,
     opacity: 0,
-  })
+  });
 
   const logoPlay = Text({
     x: centerX - 15,
@@ -417,17 +416,17 @@ function createCallToAction(scene: Scene, startTime: number) {
     fontSize: 36,
     color: colors.background,
     opacity: 0,
-  })
+  });
 
   const logoText = Text({
     x: centerX,
     y: centerY + 70,
-    content: 'AniMaker',
+    content: 'Kinema',
     fontSize: 36,
     fontFamily: 'Inter, sans-serif',
     color: colors.text.primary,
     opacity: 0,
-  })
+  });
 
   // 号召文字
   const ctaText = Text({
@@ -437,26 +436,26 @@ function createCallToAction(scene: Scene, startTime: number) {
     fontSize: 28,
     color: colors.text.accent,
     opacity: 0,
-  })
+  });
 
   // 链接
   const githubLink = Text({
     x: centerX,
     y: centerY + 180,
-    content: '🔗 github.com/animaker/animaker',
+    content: '🔗 github.com/kinema/kinema',
     fontSize: 20,
     color: colors.brand,
     opacity: 0,
-  })
+  });
 
   const docsLink = Text({
     x: centerX,
     y: centerY + 215,
-    content: '📚 docs.animaker.dev',
+    content: '📚 docs.kinema.dev',
     fontSize: 20,
     color: colors.brand,
     opacity: 0,
-  })
+  });
 
   // 底部信息
   const footerText = Text({
@@ -466,7 +465,7 @@ function createCallToAction(scene: Scene, startTime: number) {
     fontSize: 16,
     color: colors.text.secondary,
     opacity: 0,
-  })
+  });
 
   // 动画
   // 粒子出现并旋转
@@ -479,7 +478,7 @@ function createCallToAction(scene: Scene, startTime: number) {
       from: 0,
       to: 0.6,
       easing: Easing.easeOut,
-    })
+    });
 
     // 轨道旋转
     scene.timeline.add({
@@ -491,8 +490,8 @@ function createCallToAction(scene: Scene, startTime: number) {
       to: 360,
       easing: Easing.linear,
       repeat: -1,
-    })
-  })
+    });
+  });
 
   // Logo 聚合出现
   scene.timeline.add({
@@ -503,7 +502,7 @@ function createCallToAction(scene: Scene, startTime: number) {
     from: 0,
     to: 1,
     easing: Easing.easeOut,
-  })
+  });
 
   scene.timeline.add({
     target: logoOuter,
@@ -513,7 +512,7 @@ function createCallToAction(scene: Scene, startTime: number) {
     from: 0,
     to: 1,
     easing: Easing.easeOutBack,
-  })
+  });
 
   scene.timeline.add({
     target: logoInner,
@@ -523,7 +522,7 @@ function createCallToAction(scene: Scene, startTime: number) {
     from: 0,
     to: 1,
     easing: Easing.easeOut,
-  })
+  });
 
   scene.timeline.add({
     target: logoPlay,
@@ -533,7 +532,7 @@ function createCallToAction(scene: Scene, startTime: number) {
     from: 0,
     to: 1,
     easing: Easing.easeOut,
-  })
+  });
 
   scene.timeline.add({
     target: logoText,
@@ -543,7 +542,7 @@ function createCallToAction(scene: Scene, startTime: number) {
     from: 0,
     to: 1,
     easing: Easing.easeOut,
-  })
+  });
 
   // 文字出现
   scene.timeline.add({
@@ -554,7 +553,7 @@ function createCallToAction(scene: Scene, startTime: number) {
     from: 0,
     to: 1,
     easing: Easing.easeOut,
-  })
+  });
 
   scene.timeline.add({
     target: githubLink,
@@ -564,7 +563,7 @@ function createCallToAction(scene: Scene, startTime: number) {
     from: 0,
     to: 1,
     easing: Easing.easeOut,
-  })
+  });
 
   scene.timeline.add({
     target: docsLink,
@@ -574,7 +573,7 @@ function createCallToAction(scene: Scene, startTime: number) {
     from: 0,
     to: 1,
     easing: Easing.easeOut,
-  })
+  });
 
   scene.timeline.add({
     target: footerText,
@@ -584,7 +583,7 @@ function createCallToAction(scene: Scene, startTime: number) {
     from: 0,
     to: 1,
     easing: Easing.easeOut,
-  })
+  });
 
   // Logo 脉动效果
   scene.timeline.add({
@@ -595,7 +594,7 @@ function createCallToAction(scene: Scene, startTime: number) {
     from: 1,
     to: 1.1,
     easing: Easing.easeOut,
-  })
+  });
 
   scene.timeline.add({
     target: logoInner,
@@ -605,12 +604,12 @@ function createCallToAction(scene: Scene, startTime: number) {
     from: 1.1,
     to: 1,
     easing: Easing.easeIn,
-  })
+  });
 
   // 添加元素
-  particles.forEach((p) => scene.add(p))
-  scene.add(logoOuter, logoInner, logoPlay, logoText)
-  scene.add(ctaText, githubLink, docsLink, footerText)
+  particles.forEach((p) => scene.add(p));
+  scene.add(logoOuter, logoInner, logoPlay, logoText);
+  scene.add(ctaText, githubLink, docsLink, footerText);
 }
 
 // === 创建完整场景 ===
@@ -622,16 +621,16 @@ export function createComparisonScene(): Scene {
     backgroundColor: videoConfig.backgroundColor,
     fps: videoConfig.fps,
     duration: 30,
-  })
+  });
 
   // 对比表格 (0-15s)
-  createComparisonTable(scene, 0)
+  createComparisonTable(scene, 0);
 
   // 核心优势 (15-25s)
-  createAdvantagesSummary(scene, 15)
+  createAdvantagesSummary(scene, 15);
 
   // 行动号召 (25-30s)
-  createCallToAction(scene, 25)
+  createCallToAction(scene, 25);
 
-  return scene
+  return scene;
 }

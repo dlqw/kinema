@@ -199,7 +199,7 @@ describe('Scene', () => {
       const withObjects = scene.addObjects(testObject1, testObject2, testObject3);
       const removed = withObjects.removeObjects(
         testObject1.getState().id,
-        testObject2.getState().id
+        testObject2.getState().id,
       );
 
       expect(removed.getObjects()).toHaveLength(1);
@@ -228,7 +228,9 @@ describe('Scene', () => {
       const withModified = withObject1.addObject(modifiedObject1 as any);
 
       expect(withModified.getObjects()).toHaveLength(1);
-      expect(withModified.getObject(testObject1.getState().id)?.getState().position.x).toBe(50);
+      expect(
+        withModified.getObject(testObject1.getState().id)?.getState().transform.position.x,
+      ).toBe(50);
     });
   });
 
@@ -277,10 +279,14 @@ describe('Scene', () => {
 
     it('should schedule multiple animations simultaneously', () => {
       const anim1 = new FadeInAnimation(testObject1, { duration: 1, easing: smooth });
-      const anim2 = new MoveAnimation(testObject2, { x: 100, y: 0, z: 0 }, {
-        duration: 1,
-        easing: smooth,
-      });
+      const anim2 = new MoveAnimation(
+        testObject2,
+        { x: 100, y: 0, z: 0 },
+        {
+          duration: 1,
+          easing: smooth,
+        },
+      );
 
       const scheduled = scene.scheduleAll([anim1, anim2]);
 
@@ -487,10 +493,7 @@ describe('Scene', () => {
     it('should support method chaining', () => {
       const builder = sceneBuilder();
 
-      const result = builder
-        .withDimensions(1280, 720)
-        .withBackgroundColor('#ffffff')
-        .withFps(30);
+      const result = builder.withDimensions(1280, 720).withBackgroundColor('#ffffff').withFps(30);
 
       expect(result).toBe(builder); // Builder returns itself
     });
@@ -512,11 +515,7 @@ describe('Scene', () => {
     });
 
     it('should handle removing objects from empty scene', () => {
-      const updated = scene.removeObjects(
-        'id1' as any,
-        'id2' as any,
-        'id3' as any
-      );
+      const updated = scene.removeObjects('id1' as any, 'id2' as any, 'id3' as any);
 
       expect(updated.getObjects()).toHaveLength(0);
     });

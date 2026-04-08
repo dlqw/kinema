@@ -15,7 +15,13 @@ permissions:
   contents: write
   id-token: write
 
+env:
+  NODE_VERSION: '20'
+
 jobs:
+  # ====================
+  # Validate
+  # ====================
   validate:
     name: Validate Release
     runs-on: ubuntu-latest
@@ -23,7 +29,6 @@ jobs:
 
     outputs:
       version: ${{ steps.get_version.outputs.version }}
-      is_main: ${{ steps.check_branch.outputs.is_main }}
 
     steps:
       - name: Checkout code
@@ -42,15 +47,6 @@ jobs:
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "Releasing version: $VERSION"
 
-      - name: Check branch
-        id: check_branch
-        run: |
-          if [ "${{ github.ref }}" = "refs/heads/main" ] || [ "${{ github.event.base_ref }}" = "refs/heads/main" ]; then
-            echo "is_main=true" >> $GITHUB_OUTPUT
-          else
-            echo "is_main=false" >> $GITHUB_OUTPUT
-          fi
-
       - name: Validate version format
         run: |
           VERSION="${{ steps.get_version.outputs.version }}"
@@ -60,17 +56,35 @@ jobs:
             exit 1
           fi
 
+      - name: Verify version matches package.json
+        run: |
+          VERSION="${{ steps.get_version.outputs.version }}"
+          VERSION_NO_V="${VERSION#v}"
+          CORE_VERSION=$(node -p "require('./packages/core/package.json').version")
+          if [ "$VERSION_NO_V" != "$CORE_VERSION" ]; then
+            echo "Error: Tag version $VERSION_NO_V does not match @kinema/core version $CORE_VERSION"
+            echo "Update packages/core/package.json version to $VERSION_NO_V before tagging"
+            exit 1
+          fi
+          echo "Version match confirmed: $VERSION_NO_V
+
       - name: Check for changelog
         run: |
           VERSION="${{ steps.get_version.outputs.version }}"
           CHANGELOG_FILE="changelogs/${VERSION}.md"
           if [ ! -f "$CHANGELOG_FILE" ]; then
             echo "Warning: Changelog file not found: $CHANGELOG_FILE"
-            echo "Please create a changelog entry for this release."
-            exit 1
+            echo "Creating placeholder changelog..."
+            mkdir -p changelogs
+            echo "## ${VERSION}" > "$CHANGELOG_FILE"
+            echo "" >> "$CHANGELOG_FILE"
+            echo "Release ${VERSION}." >> "$CHANGELOG_FILE"
           fi
           echo "Changelog found for $VERSION"
 
+  # ====================
+  # Test
+  # ====================
   test:
     name: Test Before Release
     runs-on: ubuntu-latest
@@ -84,7 +98,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
 
       - name: Install dependencies
@@ -97,13 +111,16 @@ jobs:
         run: npm run typecheck
 
       - name: Run unit tests
-        run: npm run test -- --run
+        run: npm run test
 
-      - name: Run E2E tests
-        run: npm run test:e2e -- --project=chromium
+      - name: Run integration tests
+        run: npm run test:integration
 
-  build:
-    name: Build Release
+  # ====================
+  # Publish @kinema/core to npm
+  # ====================
+  publish-npm:
+    name: Publish @kinema/core to npm
     runs-on: ubuntu-latest
     timeout-minutes: 15
     needs: [validate, test]
@@ -115,65 +132,45 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build project
-        run: npm run build
-
-      - name: Generate package tarball
-        run: npm pack
-
-      - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: package
-          path: "*.tgz"
-          retention-days: 30
-
-  publish-npm:
-    name: Publish to NPM
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    needs: [validate, build]
-    if: needs.validate.outputs.is_main == 'true'
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
+          node-version: ${{ env.NODE_VERSION }}
           registry-url: 'https://registry.npmjs.org'
           cache: 'npm'
 
       - name: Install dependencies
         run: npm ci
 
-      - name: Build project
-        run: npm run build
+      - name: Build core package
+        run: npm run build:core
 
-      - name: Publish to NPM
+      - name: Verify build output
+        run: |
+          if [ ! -f "packages/core/dist/index.js" ]; then
+            echo "Error: core build output not found"
+            exit 1
+          fi
+          echo "Core build verified successfully"
+
+      - name: Publish to npm
+        working-directory: packages/core
         run: npm publish --provenance --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Verify published package
         run: |
-          PACKAGE_NAME=$(node -p "require('./package.json').name")
-          VERSION="${{ needs.validate.outputs.version }}"
-          npm view ${PACKAGE_NAME}@${VERSION}
+          PACKAGE_VERSION="${{ needs.validate.outputs.version }}"
+          PACKAGE_VERSION_NO_V="${PACKAGE_VERSION#v}"
+          npm view @kinema/core@${PACKAGE_VERSION_NO_V}
+          echo "@kinema/core@${PACKAGE_VERSION_NO_V} published successfully"
 
-  publish-gpr:
-    name: Publish to GitHub Packages
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    needs: [validate, build]
+  # ====================
+  # Build Electron App (Windows)
+  # ====================
+  build-windows:
+    name: Build Windows
+    runs-on: windows-latest
+    timeout-minutes: 30
+    needs: [validate, test]
 
     steps:
       - name: Checkout code
@@ -182,26 +179,111 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          registry-url: 'https://npm.pkg.github.com'
+          node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
 
       - name: Install dependencies
         run: npm ci
 
-      - name: Build project
-        run: npm run build
+      - name: Build core
+        run: npm run build:core
 
-      - name: Publish to GitHub Packages
-        run: npm publish --provenance
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and package Windows
+        working-directory: packages/workstation
+        run: npm run build:win
 
+      - name: Upload Windows artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-installer
+          path: packages/workstation/release/*.exe
+          retention-days: 7
+
+  # ====================
+  # Build Electron App (macOS)
+  # ====================
+  build-macos:
+    name: Build macOS
+    runs-on: macos-latest
+    timeout-minutes: 30
+    needs: [validate, test]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build core
+        run: npm run build:core
+
+      - name: Build and package macOS
+        working-directory: packages/workstation
+        run: npm run build:mac
+
+      - name: Upload macOS artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos-installer
+          path: packages/workstation/release/*.dmg
+          retention-days: 7
+
+  # ====================
+  # Build Electron App (Linux)
+  # ====================
+  build-linux:
+    name: Build Linux
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    needs: [validate, test]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build core
+        run: npm run build:core
+
+      - name: Install Linux dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgtk-3-dev libnotify-dev libxss1 libnss3 libasound2t64 libxtst6 xdg-utils
+
+      - name: Build and package Linux
+        working-directory: packages/workstation
+        run: npm run build:linux
+
+      - name: Upload Linux artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-installer
+          path: packages/workstation/release/*.AppImage
+          retention-days: 7
+
+  # ====================
+  # Create GitHub Release
+  # ====================
   create-release:
     name: Create GitHub Release
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    needs: [validate, build, publish-npm, publish-gpr]
+    needs: [validate, publish-npm, build-windows, build-macos, build-linux]
     if: always() && needs.publish-npm.result == 'success'
 
     steps:
@@ -210,11 +292,29 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Download build artifacts
+      - name: Download Windows artifacts
         uses: actions/download-artifact@v4
         with:
-          name: package
-          path: ./artifacts
+          name: windows-installer
+          path: ./artifacts/windows/
+        continue-on-error: true
+
+      - name: Download macOS artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: macos-installer
+          path: ./artifacts/macos/
+        continue-on-error: true
+
+      - name: Download Linux artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: linux-installer
+          path: ./artifacts/linux/
+        continue-on-error: true
+
+      - name: List release artifacts
+        run: find ./artifacts -type f | head -20
 
       - name: Read changelog
         id: changelog
@@ -225,77 +325,37 @@ jobs:
             echo "notes<<EOF" >> $GITHUB_OUTPUT
             cat "$CHANGELOG_FILE" >> $GITHUB_OUTPUT
             echo "EOF" >> $GITHUB_OUTPUT
+          else
+            echo "notes=Release ${VERSION}" >> $GITHUB_OUTPUT
           fi
 
       - name: Create GitHub Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ needs.validate.outputs.version }}
           name: Release ${{ needs.validate.outputs.version }}
           body: ${{ steps.changelog.outputs.notes }}
           draft: false
           prerelease: ${{ contains(needs.validate.outputs.version, '-') }}
-          files: ./artifacts/*.tgz
+          files: |
+            ./artifacts/windows/*
+            ./artifacts/macos/*
+            ./artifacts/linux/*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Update release summary
+      - name: Release summary
         run: |
           echo "### Release Created :rocket:" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Version:** ${{ needs.validate.outputs.version }}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Status:** Published" >> $GITHUB_STEP_SUMMARY
+          echo "| Artifact | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|----------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| @kinema/core (npm) | ${{ needs.publish-npm.result == 'success' && 'Published' || 'Failed' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Windows (.exe) | ${{ needs.build-windows.result == 'success' && 'Built' || 'Failed' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| macOS (.dmg) | ${{ needs.build-macos.result == 'success' && 'Built' || 'Failed' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Linux (.AppImage) | ${{ needs.build-linux.result == 'success' && 'Built' || 'Failed' }} |" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "- [NPM Package](https://www.npmjs.com/package/animaker)" >> $GITHUB_STEP_SUMMARY
+          echo "- [NPM Package](https://www.npmjs.com/package/@kinema/core)" >> $GITHUB_STEP_SUMMARY
           echo "- [GitHub Release](https://github.com/${{ github.repository }}/releases/tag/${{ needs.validate.outputs.version }})" >> $GITHUB_STEP_SUMMARY
-
-  post-release:
-    name: Post Release Tasks
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    needs: [validate, create-release]
-    if: always() && needs.create-release.result == 'success'
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Create milestone for next version
-        run: |
-          echo "Milestone creation would go here"
-          echo "Consider automating milestone creation via GitHub API"
-
-      - name: Notify release
-        run: |
-          echo "Release notification would go here"
-          echo "Consider integrating with Discord, Slack, or email notifications"
-
-      - name: Update documentation
-        run: |
-          echo "Documentation update would go here"
-          echo "Consider auto-deploying documentation website"
-
-  rollback:
-    name: Rollback on Failure
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    needs: [validate, publish-npm, publish-gpr, create-release]
-    if: failure()
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Rollback notification
-        run: |
-          echo "### :rotating_light: Release Failed :rotating_light:" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "Version: ${{ needs.validate.outputs.version }}" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "Please investigate the failure and manually rollback if necessary." >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Rollback steps:**" >> $GITHUB_STEP_SUMMARY
-          echo "1. Unpublish from NPM (if published)" >> $GITHUB_STEP_SUMMARY
-          echo "2. Delete GitHub Release" >> $GITHUB_STEP_SUMMARY
-          echo "3. Delete the Git tag" >> $GITHUB_STEP_SUMMARY

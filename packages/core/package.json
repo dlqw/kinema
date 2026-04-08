@@ -1,0 +1,60 @@
+{
+  "name": "@kinema/core",
+  "version": "0.1.0",
+  "description": "Kinema Core - High-performance 2D animation rendering framework",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "clean": "node -e \"const fs=require('fs'); fs.rmSync('dist',{recursive:true,force:true});\"",
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "npm run clean && npm run build"
+  },
+  "keywords": [
+    "animation",
+    "rendering",
+    "webgl",
+    "webgpu",
+    "canvas",
+    "2d",
+    "graphics",
+    "typescript",
+    "video",
+    "motion-graphics",
+    "keyframe"
+  ],
+  "author": "Kinema Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dlqw/kinema.git",
+    "directory": "packages/core"
+  },
+  "homepage": "https://github.com/dlqw/kinema#readme",
+  "bugs": {
+    "url": "https://github.com/dlqw/kinema/issues"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "dependencies": {
+    "gl-matrix": "^3.4.3"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.5"
+  },
+  "files": [
+    "dist"
+  ]
+}

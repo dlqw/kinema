@@ -29,10 +29,7 @@ export class FadeInAnimation extends Animation {
    * @param target - Target render object
    * @param config - Animation configuration
    */
-  constructor(
-    target: RenderObject,
-    config: AnimationConfig = {}
-  ) {
+  constructor(target: RenderObject, config: AnimationConfig = {}) {
     super(target, config);
   }
 
@@ -42,7 +39,7 @@ export class FadeInAnimation extends Animation {
    * @param alpha - Progress value [0, 1]
    * @returns Object with interpolated opacity
    */
-  protected interpolateAt(alpha: Alpha): RenderObject {
+  protected override interpolateAt(alpha: Alpha): RenderObject {
     return this.target.withOpacity(alpha);
   }
 
@@ -53,10 +50,7 @@ export class FadeInAnimation extends Animation {
    * @param duration - Animation duration in seconds
    * @returns A new FadeInAnimation
    */
-  static create(
-    target: RenderObject,
-    duration: number = 1
-  ): FadeInAnimation {
+  static create(target: RenderObject, duration: number = 1): FadeInAnimation {
     return new FadeInAnimation(target, { duration });
   }
 }
@@ -79,10 +73,7 @@ export class FadeOutAnimation extends Animation {
    * @param target - Target render object
    * @param config - Animation configuration
    */
-  constructor(
-    target: RenderObject,
-    config: AnimationConfig = {}
-  ) {
+  constructor(target: RenderObject, config: AnimationConfig = {}) {
     super(target, { ...config, removeOnComplete: config.removeOnComplete ?? true });
   }
 
@@ -92,7 +83,7 @@ export class FadeOutAnimation extends Animation {
    * @param alpha - Progress value [0, 1]
    * @returns Object with interpolated opacity
    */
-  protected interpolateAt(alpha: Alpha): RenderObject {
+  protected override interpolateAt(alpha: Alpha): RenderObject {
     return this.target.withOpacity(1 - alpha);
   }
 
@@ -107,7 +98,7 @@ export class FadeOutAnimation extends Animation {
   static create(
     target: RenderObject,
     duration: number = 1,
-    removeOnComplete: boolean = true
+    removeOnComplete: boolean = true,
   ): FadeOutAnimation {
     return new FadeOutAnimation(target, { duration, removeOnComplete });
   }
@@ -137,7 +128,7 @@ export class FadeToAnimation extends Animation {
   constructor(
     target: RenderObject,
     private readonly targetOpacity: number,
-    config: AnimationConfig = {}
+    config: AnimationConfig = {},
   ) {
     super(target, config);
     this.startOpacity = target.getState().transform.opacity;
@@ -149,7 +140,7 @@ export class FadeToAnimation extends Animation {
    * @param alpha - Progress value [0, 1]
    * @returns Object with interpolated opacity
    */
-  protected interpolateAt(alpha: Alpha): RenderObject {
+  protected override interpolateAt(alpha: Alpha): RenderObject {
     const opacity = this.startOpacity + (this.targetOpacity - this.startOpacity) * alpha;
     return this.target.withOpacity(opacity);
   }
@@ -165,11 +156,13 @@ export class FadeToAnimation extends Animation {
   static create(
     target: RenderObject,
     targetOpacity: number,
-    duration: number = 1
+    duration: number = 1,
   ): FadeToAnimation {
     return new FadeToAnimation(target, targetOpacity, { duration });
   }
 }
 
-// Default export
+/**
+ * Default export
+ */
 export default FadeInAnimation;

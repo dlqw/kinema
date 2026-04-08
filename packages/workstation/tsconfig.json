@@ -11,12 +11,12 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
+    "jsx": "react-jsx",
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"],
       "@stores/*": ["src/stores/*"],
-      "@components/*": ["src/components/*"],
-      "@animaker/core": ["../core/src"]
+      "@kinema/core": ["../core/src"]
     }
   },
   "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.d.ts"],

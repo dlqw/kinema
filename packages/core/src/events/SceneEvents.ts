@@ -419,7 +419,7 @@ export type SceneEventEmitter = EventEmitter<SceneEvents>;
  * Helper type for scene event handler
  */
 export type SceneEventHandler<K extends keyof SceneEvents> = (
-  data: EventData<SceneEvents[K]>
+  data: EventData<SceneEvents[K]>,
 ) => void | Promise<void>;
 
 /**
@@ -448,16 +448,19 @@ export function createObjectAddedData(
   objectId: ObjectId,
   parentId: ObjectId | undefined,
   index: number,
-  timestamp: number
+  timestamp: number,
 ): ObjectAddedData {
-  return {
+  const result: ObjectAddedData = {
     sceneId,
     object,
     objectId,
-    parentId,
     index,
     timestamp,
   };
+  if (parentId !== undefined) {
+    result.parentId = parentId;
+  }
+  return result;
 }
 
 /**
@@ -469,16 +472,19 @@ export function createObjectRemovedData(
   objectId: ObjectId,
   parentId: ObjectId | undefined,
   index: number,
-  timestamp: number
+  timestamp: number,
 ): ObjectRemovedData {
-  return {
+  const result: ObjectRemovedData = {
     sceneId,
     object,
     objectId,
-    parentId,
     index,
     timestamp,
   };
+  if (parentId !== undefined) {
+    result.parentId = parentId;
+  }
+  return result;
 }
 
 /**
@@ -491,7 +497,7 @@ export function createFrameRenderData(
   deltaTime: number,
   fps: number,
   objectCount: number,
-  context?: any
+  context?: any,
 ): FrameRenderData {
   return {
     sceneId,
@@ -513,7 +519,7 @@ export function createSceneUpdateData(
   deltaTime: number,
   elapsedTime: number,
   sceneTime: number,
-  timeScale: number
+  timeScale: number,
 ): SceneUpdateData {
   return {
     sceneId,

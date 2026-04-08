@@ -272,7 +272,7 @@ export type AnimationEventEmitter = EventEmitter<AnimationEvents>;
  * Helper type for animation event handler
  */
 export type AnimationEventHandler<K extends keyof AnimationEvents> = (
-  data: EventData<AnimationEvents[K]>
+  data: EventData<AnimationEvents[K]>,
 ) => void | Promise<void>;
 
 /**
@@ -297,7 +297,7 @@ export function createAnimationEventData(
   animationType: string,
   target: any,
   duration: number,
-  loops: boolean
+  loops: boolean,
 ): AnimationStartData {
   return {
     animationId,
@@ -316,15 +316,18 @@ export function createAnimationUpdateData(
   progress: number,
   elapsedTime: number,
   currentValue: any,
-  easingValue?: number
+  easingValue?: number,
 ): AnimationUpdateData {
-  return {
+  const result: AnimationUpdateData = {
     animationId,
     progress,
     elapsedTime,
     currentValue,
-    easingValue,
   };
+  if (easingValue !== undefined) {
+    result.easingValue = easingValue;
+  }
+  return result;
 }
 
 /**
@@ -336,7 +339,7 @@ export function createAnimationCompleteData(
   target: any,
   totalTime: number,
   loopsCompleted: number,
-  cancelled: boolean
+  cancelled: boolean,
 ): AnimationCompleteData {
   return {
     animationId,
@@ -355,7 +358,7 @@ export function createAnimationRepeatData(
   animationId: string,
   loopNumber: number,
   totalLoops: number | 'infinite',
-  elapsedTime: number
+  elapsedTime: number,
 ): AnimationRepeatData {
   return {
     animationId,

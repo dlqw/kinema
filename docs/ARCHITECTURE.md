@@ -1,4 +1,4 @@
-# AniMaker 文档架构设计
+# Kinema 文档架构设计
 
 ## 文档工具栈
 
@@ -89,7 +89,7 @@ docs/
 
 ### 指南文档模板
 
-```markdown
+````markdown
 # 标题
 
 简介段落，说明本文档的内容。
@@ -119,12 +119,13 @@ docs/
 
 - [相关链接](../path/to/page.md)
 ```
+````
 
 ### API 文档模板
 
 TypeDoc 自动生成，遵循 JSDoc 规范：
 
-```typescript
+````typescript
 /**
  * 类的简短描述
  *
@@ -145,7 +146,7 @@ class ClassName {
     // 实现
   }
 }
-```
+````
 
 ## 样式指南
 

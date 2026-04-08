@@ -1,6 +1,6 @@
 # 动画创建入门教程
 
-欢迎来到 AniMaker 动画创建入门教程！本教程将带你从零开始学习如何使用 AniMaker 创建精美的动画。
+欢迎来到 Kinema 动画创建入门教程！本教程将带你从零开始学习如何使用 Kinema 创建精美的动画。
 
 ## 目录
 
@@ -13,14 +13,14 @@
 
 ## 第一章：基础概念介绍
 
-在开始创建动画之前，我们需要理解 AniMaker 的三个核心概念：**Scene（场景）**、**RenderObject（渲染对象）** 和 **Animation（动画）**。
+在开始创建动画之前，我们需要理解 Kinema 的三个核心概念：**Scene（场景）**、**RenderObject（渲染对象）** 和 **Animation（动画）**。
 
 ### 1.1 Scene（场景）
 
 Scene 是动画的容器，类似于电影中的一个场景。它管理着所有可渲染的对象，控制动画的播放时间线。
 
 ```typescript
-import { createScene } from '@animaker/core';
+import { createScene } from '@kinema/core';
 
 // 创建一个默认场景（1920x1080，黑色背景，60fps）
 const scene = createScene();
@@ -30,11 +30,12 @@ const customScene = createScene({
   width: 1280,
   height: 720,
   backgroundColor: '#1a1a2e',
-  fps: 30
+  fps: 30,
 });
 ```
 
 **Scene 的核心特性：**
+
 - **不可变性**：所有操作都返回新的 Scene 实例
 - **时间管理**：跟踪当前时间，管理动画播放
 - **对象管理**：添加、移除、查找渲染对象
@@ -45,18 +46,19 @@ const customScene = createScene({
 RenderObject 是场景中任何可见元素的基础。它可以是简单的几何形状（圆形、矩形）、文本、图像，或复杂的组合对象。
 
 ```typescript
-import { Circle } from '@animaker/core';
+import { Circle } from '@kinema/core';
 
 // 创建一个圆形
 const circle = new Circle({
   radius: 1,
   fillColor: '#3498db',
   strokeColor: '#2980b9',
-  strokeWidth: 0.05
+  strokeWidth: 0.05,
 });
 ```
 
 **RenderObject 的核心属性：**
+
 - **Transform（变换）**：位置、旋转、缩放、透明度
 - **Style（样式）**：填充颜色、描边颜色、线宽等
 - **Z-Index**：渲染顺序（值越大越靠前）
@@ -66,22 +68,27 @@ const circle = new Circle({
 Animation 描述了 RenderObject 的属性如何随时间变化。每个动画都有一个目标对象和持续时间。
 
 ```typescript
-import { FadeIn, MoveAnimation } from '@animaker/core';
+import { FadeIn, MoveAnimation } from '@kinema/core';
 
 // 淡入动画
 const fadeIn = new FadeIn(circle, {
   duration: 1,
-  easing: smooth
+  easing: smooth,
 });
 
 // 移动动画
-const moveRight = new MoveAnimation(circle, { x: 2, y: 0, z: 0 }, {
-  duration: 2,
-  easing: easeInOut
-});
+const moveRight = new MoveAnimation(
+  circle,
+  { x: 2, y: 0, z: 0 },
+  {
+    duration: 2,
+    easing: easeInOut,
+  },
+);
 ```
 
 **Animation 的核心特性：**
+
 - **目标对象**：要动画化的 RenderObject
 - **持续时间**：动画时长（秒）
 - **缓动函数**：控制动画的速度曲线
@@ -89,19 +96,19 @@ const moveRight = new MoveAnimation(circle, { x: 2, y: 0, z: 0 }, {
 
 ### 1.4 与 Manim 的对比
 
-如果你熟悉 Manim（Python 数学动画引擎），你会发现 AniMaker 有相似的设计理念：
+如果你熟悉 Manim（Python 数学动画引擎），你会发现 Kinema 有相似的设计理念：
 
-| 概念 | Manim | AniMaker | 说明 |
-|------|-------|----------|------|
-| 场景 | `Scene` | `Scene` | 动画容器 |
-| 对象 | `Mobject` | `RenderObject` | 可渲染元素 |
-| 动画 | `Animation` | `Animation` | 属性变化描述 |
-| 播放 | `play()` | `schedule()` | 添加到时间线 |
-| 变换 | `animate()` | `withTransform()` | 不可变更新 |
+| 概念 | Manim       | Kinema            | 说明         |
+| ---- | ----------- | ----------------- | ------------ |
+| 场景 | `Scene`     | `Scene`           | 动画容器     |
+| 对象 | `Mobject`   | `RenderObject`    | 可渲染元素   |
+| 动画 | `Animation` | `Animation`       | 属性变化描述 |
+| 播放 | `play()`    | `schedule()`      | 添加到时间线 |
+| 变换 | `animate()` | `withTransform()` | 不可变更新   |
 
 **主要区别：**
 
-1. **类型安全**：AniMaker 使用 TypeScript，提供完整的类型检查
+1. **类型安全**：Kinema 使用 TypeScript，提供完整的类型检查
 2. **不可变性**：所有对象操作返回新实例，避免副作用
 3. **Web 原生**：直接在浏览器中渲染，无需视频导出
 4. **实时预览**：动画可以实时播放和交互
@@ -114,7 +121,7 @@ class MyScene(Scene):
         self.play(Create(circle))
         self.play(circle.animate.shift(RIGHT()))
 
-// AniMaker 风格（TypeScript）
+// Kinema 风格（TypeScript）
 const scene = createScene();
 const circle = new Circle({ radius: 1 });
 let currentScene = scene.addObject(circle);
@@ -133,17 +140,18 @@ currentScene = currentScene.schedule(
 ### 2.1 环境配置
 
 **前置条件：**
+
 - Node.js 18+
 - npm 或 pnpm
 
-**安装 AniMaker：**
+**安装 Kinema：**
 
 ```bash
 # 使用 npm
-npm install @animaker/core
+npm install @kinema/core
 
 # 使用 pnpm
-pnpm add @animaker/core
+pnpm add @kinema/core
 ```
 
 **创建项目结构：**
@@ -162,29 +170,29 @@ my-animation/
 ```html
 <!DOCTYPE html>
 <html lang="zh-CN">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>我的第一个 AniMaker 动画</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>我的第一个 Kinema 动画</title>
     <style>
-        body {
-            margin: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            background: #0f0f1e;
-        }
-        canvas {
-            box-shadow: 0 0 50px rgba(52, 152, 219, 0.3);
-            border-radius: 8px;
-        }
+      body {
+        margin: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        background: #0f0f1e;
+      }
+      canvas {
+        box-shadow: 0 0 50px rgba(52, 152, 219, 0.3);
+        border-radius: 8px;
+      }
     </style>
-</head>
-<body>
-    <canvas id="animaker"></canvas>
+  </head>
+  <body>
+    <canvas id="kinema"></canvas>
     <script type="module" src="/src/main.ts"></script>
-</body>
+  </body>
 </html>
 ```
 
@@ -194,15 +202,15 @@ my-animation/
 
 ```typescript
 // src/main.ts
-import { createScene, Circle, Rectangle, Square } from '@animaker/core';
-import { smooth, easeInOut } from '@animaker/core/easing';
+import { createScene, Circle, Rectangle, Square } from '@kinema/core';
+import { smooth, easeInOut } from '@kinema/core/easing';
 
 // 创建场景
 const scene = createScene({
   width: 1280,
   height: 720,
   backgroundColor: '#0f0f1e',
-  fps: 60
+  fps: 60,
 });
 
 // 创建一个圆形
@@ -210,7 +218,7 @@ const circle = new Circle({
   radius: 0.5,
   fillColor: '#e74c3c',
   strokeColor: '#c0392b',
-  strokeWidth: 0.05
+  strokeWidth: 0.05,
 }).withPosition(-3, 1, 0); // 初始位置在左侧
 
 // 创建一个矩形
@@ -218,7 +226,7 @@ const rectangle = new Rectangle({
   width: 1.5,
   height: 1,
   fillColor: '#3498db',
-  cornerRadius: 0.1
+  cornerRadius: 0.1,
 }).withPosition(-3, -1, 0);
 
 // 创建一个正方形
@@ -226,7 +234,7 @@ const square = new Square({
   sideLength: 1,
   fillColor: '#2ecc71',
   strokeColor: '#27ae60',
-  strokeWidth: 0.05
+  strokeWidth: 0.05,
 }).withPosition(3, 0, 0); // 初始位置在右侧
 
 // 将对象添加到场景
@@ -240,31 +248,31 @@ let currentScene = scene.addObjects(circle, rectangle, square);
 #### 移动动画（MoveAnimation）
 
 ```typescript
-import { MoveAnimation } from '@animaker/core';
+import { MoveAnimation } from '@kinema/core';
 
 // 圆形从左向右移动
 const moveCircle = new MoveAnimation(
   circle,
-  { x: 3, y: 1, z: 0 },  // 目标位置
+  { x: 3, y: 1, z: 0 }, // 目标位置
   {
     duration: 2,
     easing: smooth,
-    name: 'move-circle'
-  }
+    name: 'move-circle',
+  },
 );
 
 // 矩形对角线移动
 const moveRectangle = new MoveAnimation(
   rectangle,
   { x: 2, y: 2, z: 0 },
-  { duration: 1.5, easing: easeInOut }
+  { duration: 1.5, easing: easeInOut },
 );
 
 // 正方形从右向左移动
 const moveSquare = new MoveAnimation(
   square,
   { x: -3, y: 0, z: 0 },
-  { duration: 2.5, easing: smooth }
+  { duration: 2.5, easing: smooth },
 );
 
 // 调度动画（串行执行）
@@ -276,23 +284,21 @@ currentScene = currentScene.schedule(moveSquare, 1); // 延迟 1 秒
 #### 旋转动画（RotateAnimation）
 
 ```typescript
-import { RotateAnimation } from '@animaker/core';
+import { RotateAnimation } from '@kinema/core';
 
 // 圆形旋转 360 度
 const rotateCircle = new RotateAnimation(
   circle,
-  'z',              // 旋转轴
-  360,              // 旋转度数
-  { duration: 2, easing: smooth }
+  'z', // 旋转轴
+  360, // 旋转度数
+  { duration: 2, easing: smooth },
 );
 
 // 矩形绕 X 轴旋转（3D 效果）
-const rotateRectangle = new RotateAnimation(
-  rectangle,
-  'x',
-  180,
-  { duration: 1.5, easing: easeInOut }
-);
+const rotateRectangle = new RotateAnimation(rectangle, 'x', 180, {
+  duration: 1.5,
+  easing: easeInOut,
+});
 
 currentScene = currentScene.schedule(rotateCircle, 2);
 currentScene = currentScene.schedule(rotateRectangle, 2.5);
@@ -301,18 +307,18 @@ currentScene = currentScene.schedule(rotateRectangle, 2.5);
 #### 淡入淡出动画（FadeIn/FadeOut）
 
 ```typescript
-import { FadeInAnimation, FadeOutAnimation } from '@animaker/core';
+import { FadeInAnimation, FadeOutAnimation } from '@kinema/core';
 
 // 圆形淡入
 const fadeInCircle = new FadeInAnimation(circle, {
   duration: 1,
-  easing: smooth
+  easing: smooth,
 });
 
 // 正方形淡出
 const fadeOutSquare = new FadeOutAnimation(square, {
   duration: 1,
-  easing: smooth
+  easing: smooth,
 });
 
 // 先淡入，再淡出
@@ -326,27 +332,22 @@ currentScene = currentScene.schedule(fadeOutSquare, 4);
 
 ```typescript
 // src/main.ts
-import {
-  createScene,
-  Circle,
-  Rectangle,
-  Square
-} from '@animaker/core';
+import { createScene, Circle, Rectangle, Square } from '@kinema/core';
 import {
   MoveAnimation,
   RotateAnimation,
   FadeInAnimation,
-  FadeOutAnimation
-} from '@animaker/core/animation';
-import { smooth, easeInOut } from '@animaker/core/easing';
-import { renderToCanvas } from '@animaker/renderer';
+  FadeOutAnimation,
+} from '@kinema/core/animation';
+import { smooth, easeInOut } from '@kinema/core/easing';
+import { renderToCanvas } from '@kinema/renderer';
 
 // 创建场景
 const scene = createScene({
   width: 1280,
   height: 720,
   backgroundColor: '#0f0f1e',
-  fps: 60
+  fps: 60,
 });
 
 // 创建图形对象
@@ -354,21 +355,21 @@ const circle = new Circle({
   radius: 0.5,
   fillColor: '#e74c3c',
   strokeColor: '#c0392b',
-  strokeWidth: 0.05
+  strokeWidth: 0.05,
 }).withPosition(-3, 1, 0);
 
 const rectangle = new Rectangle({
   width: 1.5,
   height: 1,
   fillColor: '#3498db',
-  cornerRadius: 0.1
+  cornerRadius: 0.1,
 }).withPosition(-3, -1, 0);
 
 const square = new Square({
   sideLength: 1,
   fillColor: '#2ecc71',
   strokeColor: '#27ae60',
-  strokeWidth: 0.05
+  strokeWidth: 0.05,
 }).withPosition(3, 0, 0);
 
 // 添加对象到场景
@@ -376,28 +377,40 @@ let currentScene = scene.addObjects(circle, rectangle, square);
 
 // 创建动画
 const fadeInCircle = new FadeInAnimation(circle, { duration: 1, easing: smooth });
-const moveCircle = new MoveAnimation(circle, { x: 3, y: 1, z: 0 }, {
-  duration: 2,
-  easing: smooth
-});
+const moveCircle = new MoveAnimation(
+  circle,
+  { x: 3, y: 1, z: 0 },
+  {
+    duration: 2,
+    easing: smooth,
+  },
+);
 const rotateCircle = new RotateAnimation(circle, 'z', 360, {
   duration: 2,
-  easing: smooth
+  easing: smooth,
 });
 
-const moveRectangle = new MoveAnimation(rectangle, { x: 2, y: 2, z: 0 }, {
-  duration: 1.5,
-  easing: easeInOut
-});
+const moveRectangle = new MoveAnimation(
+  rectangle,
+  { x: 2, y: 2, z: 0 },
+  {
+    duration: 1.5,
+    easing: easeInOut,
+  },
+);
 const rotateRectangle = new RotateAnimation(rectangle, 'x', 180, {
   duration: 1.5,
-  easing: easeInOut
+  easing: easeInOut,
 });
 
-const moveSquare = new MoveAnimation(square, { x: -3, y: 0, z: 0 }, {
-  duration: 2.5,
-  easing: smooth
-});
+const moveSquare = new MoveAnimation(
+  square,
+  { x: -3, y: 0, z: 0 },
+  {
+    duration: 2.5,
+    easing: smooth,
+  },
+);
 const fadeOutSquare = new FadeOutAnimation(square, { duration: 1, easing: smooth });
 
 // 调度动画
@@ -410,10 +423,10 @@ currentScene = currentScene.schedule(moveSquare, 1);
 currentScene = currentScene.schedule(fadeOutSquare, 4);
 
 // 渲染到 Canvas
-const canvas = document.getElementById('animaker') as HTMLCanvasElement;
+const canvas = document.getElementById('kinema') as HTMLCanvasElement;
 renderToCanvas(canvas, currentScene, {
   autoplay: true,
-  loop: false
+  loop: false,
 });
 ```
 
@@ -421,21 +434,21 @@ renderToCanvas(canvas, currentScene, {
 
 ## 第三章：动画组合
 
-在实际应用中，我们经常需要组合多个动画来创建复杂的效果。AniMaker 提供了三种主要的组合方式：**并行**、**顺序** 和 **延迟**。
+在实际应用中，我们经常需要组合多个动画来创建复杂的效果。Kinema 提供了三种主要的组合方式：**并行**、**顺序** 和 **延迟**。
 
 ### 3.1 并行动画
 
 并行动画是指多个动画同时执行。例如，一个对象同时移动和旋转。
 
 ```typescript
-import { AnimationGroup, CompositionType } from '@animaker/core';
+import { AnimationGroup, CompositionType } from '@kinema/core';
 
 // 创建一个圆形
 const wheel = new Circle({
   radius: 0.5,
   fillColor: '#f39c12',
   strokeColor: '#e67e22',
-  strokeWidth: 0.1
+  strokeWidth: 0.1,
 }).withPosition(-4, 0, 0);
 
 // 创建并行动画组
@@ -445,10 +458,10 @@ const parallelGroup = new AnimationGroup(
     // 向右移动
     new MoveAnimation(wheel, { x: 4, y: 0, z: 0 }, { duration: 3, easing: smooth }),
     // 同时旋转（像车轮滚动）
-    new RotateAnimation(wheel, 'z', 720, { duration: 3, easing: smooth })
+    new RotateAnimation(wheel, 'z', 720, { duration: 3, easing: smooth }),
   ],
   CompositionType.Parallel, // 并行执行
-  { duration: 3, easing: smooth }
+  { duration: 3, easing: smooth },
 );
 
 // 调度并行动画
@@ -457,6 +470,7 @@ scene = scene.schedule(parallelGroup);
 ```
 
 **并行组合的特点：**
+
 - 所有动画同时开始
 - 总持续时间等于最长的动画
 - 适用于需要同时变化多个属性的场景
@@ -479,9 +493,9 @@ const sequenceGroup = new AnimationGroup(
     // 第四步：放大
     new ScaleAnimation(box, { x: 1.5, y: 1.5, z: 1 }, { duration: 0.5, easing: smooth }),
     // 第五步：淡出
-    new FadeOutAnimation(box, { duration: 0.5, easing: smooth })
+    new FadeOutAnimation(box, { duration: 0.5, easing: smooth }),
   ],
-  CompositionType.Sequence // 顺序执行
+  CompositionType.Sequence, // 顺序执行
 );
 
 // 调度顺序动画
@@ -490,6 +504,7 @@ scene = scene.schedule(sequenceGroup);
 ```
 
 **顺序组合的特点：**
+
 - 动画按顺序执行
 - 总持续时间等于所有动画之和
 - 适用于有明确步骤的复杂动画
@@ -503,16 +518,21 @@ scene = scene.schedule(sequenceGroup);
 const circles = Array.from({ length: 5 }, (_, i) =>
   new Circle({
     radius: 0.3,
-    fillColor: `hsl(${200 + i * 30}, 70%, 60%)`
-  }).withPosition(-4 + i * 2, 2, 0)
+    fillColor: `hsl(${200 + i * 30}, 70%, 60%)`,
+  }).withPosition(-4 + i * 2, 2, 0),
 );
 
 // 为每个圆形创建相同的动画
-const animations = circles.map(circle =>
-  new MoveAnimation(circle, { x: 0, y: -3, z: 0 }, {
-    duration: 2,
-    easing: smooth
-  })
+const animations = circles.map(
+  (circle) =>
+    new MoveAnimation(
+      circle,
+      { x: 0, y: -3, z: 0 },
+      {
+        duration: 2,
+        easing: smooth,
+      },
+    ),
 );
 
 // 创建延迟动画组（每个动画延迟 0.2 秒开始）
@@ -520,7 +540,7 @@ const laggedGroup = new AnimationGroup(
   circles[0], // 目标对象（这里不会被实际使用）
   animations,
   CompositionType.Lagged, // 延迟执行
-  { duration: 2 + 0.2 * (animations.length - 1), easing: smooth }
+  { duration: 2 + 0.2 * (animations.length - 1), easing: smooth },
 );
 
 // 添加所有圆形并调度动画
@@ -530,6 +550,7 @@ scene = scene.schedule(laggedGroup);
 ```
 
 **延迟组合的特点：**
+
 - 动画依次开始，但可能重叠
 - 可以创建波浪、级联效果
 - 总持续时间 = 最长动画 + 延迟时间
@@ -548,19 +569,27 @@ const complexAnimation = new AnimationGroup(
       hero,
       [
         new FadeInAnimation(hero, { duration: 0.5, easing: smooth }),
-        new ScaleAnimation(hero, { x: 1.2, y: 1.2, z: 1 }, {
-          duration: 0.5,
-          easing: smooth
-        })
+        new ScaleAnimation(
+          hero,
+          { x: 1.2, y: 1.2, z: 1 },
+          {
+            duration: 0.5,
+            easing: smooth,
+          },
+        ),
       ],
-      CompositionType.Parallel
+      CompositionType.Parallel,
     ),
 
     // 第二阶段：移动到中心
-    new MoveAnimation(hero, { x: 0, y: 0, z: 0 }, {
-      duration: 1,
-      easing: easeInOut
-    }),
+    new MoveAnimation(
+      hero,
+      { x: 0, y: 0, z: 0 },
+      {
+        duration: 1,
+        easing: easeInOut,
+      },
+    ),
 
     // 第三阶段：旋转效果（并行：旋转 + 弹跳缩放）
     new AnimationGroup(
@@ -571,15 +600,15 @@ const complexAnimation = new AnimationGroup(
           hero,
           [
             new ScaleAnimation(hero, { x: 1.1, y: 1.1, z: 1 }, { duration: 0.3 }),
-            new ScaleAnimation(hero, { x: 1, y: 1, z: 1 }, { duration: 0.3 })
+            new ScaleAnimation(hero, { x: 1, y: 1, z: 1 }, { duration: 0.3 }),
           ],
-          CompositionType.Sequence
-        )
+          CompositionType.Sequence,
+        ),
       ],
-      CompositionType.Parallel
-    )
+      CompositionType.Parallel,
+    ),
   ],
-  CompositionType.Sequence
+  CompositionType.Sequence,
 );
 ```
 
@@ -588,24 +617,17 @@ const complexAnimation = new AnimationGroup(
 让我们用一个弹跳球的例子来综合运用动画组合：
 
 ```typescript
-import {
-  createScene,
-  Circle
-} from '@animaker/core';
-import {
-  MoveAnimation,
-  ScaleAnimation,
-  FadeInAnimation
-} from '@animaker/core/animation';
-import { AnimationGroup, CompositionType } from '@animaker/core/animation';
-import { smooth, easeOut, bounce } from '@animaker/core/easing';
+import { createScene, Circle } from '@kinema/core';
+import { MoveAnimation, ScaleAnimation, FadeInAnimation } from '@kinema/core/animation';
+import { AnimationGroup, CompositionType } from '@kinema/core/animation';
+import { smooth, easeOut, bounce } from '@kinema/core/easing';
 
 // 创建场景
 const scene = createScene({
   width: 1280,
   height: 720,
   backgroundColor: '#1a1a2e',
-  fps: 60
+  fps: 60,
 });
 
 // 创建球
@@ -613,14 +635,14 @@ const ball = new Circle({
   radius: 0.4,
   fillColor: '#e74c3c',
   strokeColor: '#c0392b',
-  strokeWidth: 0.05
+  strokeWidth: 0.05,
 }).withPosition(0, 3, 0);
 
 // 创建地面
 const ground = new Rectangle({
   width: 10,
   height: 0.2,
-  fillColor: '#34495e'
+  fillColor: '#34495e',
 }).withPosition(0, -3, 0);
 
 let currentScene = scene.addObjects(ball, ground);
@@ -628,35 +650,59 @@ let currentScene = scene.addObjects(ball, ground);
 // 弹跳动画序列
 const bounceSequence = [
   // 第一次下落
-  new MoveAnimation(ball, { x: 0, y: -2.6, z: 0 }, {
-    duration: 0.5,
-    easing: easeOut
-  }),
+  new MoveAnimation(
+    ball,
+    { x: 0, y: -2.6, z: 0 },
+    {
+      duration: 0.5,
+      easing: easeOut,
+    },
+  ),
   // 第一次弹起（高度降低）
-  new MoveAnimation(ball, { x: 0, y: 0, z: 0 }, {
-    duration: 0.4,
-    easing: easeOut
-  }),
+  new MoveAnimation(
+    ball,
+    { x: 0, y: 0, z: 0 },
+    {
+      duration: 0.4,
+      easing: easeOut,
+    },
+  ),
   // 第二次下落
-  new MoveAnimation(ball, { x: 0, y: -2.6, z: 0 }, {
-    duration: 0.4,
-    easing: easeOut
-  }),
+  new MoveAnimation(
+    ball,
+    { x: 0, y: -2.6, z: 0 },
+    {
+      duration: 0.4,
+      easing: easeOut,
+    },
+  ),
   // 第二次弹起（更低）
-  new MoveAnimation(ball, { x: 0, y: -1, z: 0 }, {
-    duration: 0.3,
-    easing: easeOut
-  }),
+  new MoveAnimation(
+    ball,
+    { x: 0, y: -1, z: 0 },
+    {
+      duration: 0.3,
+      easing: easeOut,
+    },
+  ),
   // 第三次下落
-  new MoveAnimation(ball, { x: 0, y: -2.6, z: 0 }, {
-    duration: 0.3,
-    easing: easeOut
-  }),
+  new MoveAnimation(
+    ball,
+    { x: 0, y: -2.6, z: 0 },
+    {
+      duration: 0.3,
+      easing: easeOut,
+    },
+  ),
   // 停止
-  new MoveAnimation(ball, { x: 0, y: -2.6, z: 0 }, {
-    duration: 0.1,
-    easing: smooth
-  })
+  new MoveAnimation(
+    ball,
+    { x: 0, y: -2.6, z: 0 },
+    {
+      duration: 0.1,
+      easing: smooth,
+    },
+  ),
 ];
 
 // 添加挤压效果（落地时变扁）
@@ -668,9 +714,9 @@ const squashEffect = new AnimationGroup(
     // 落地时压扁
     new ScaleAnimation(ball, { x: 1.2, y: 0.8, z: 1 }, { duration: 0.1 }),
     // 恢复
-    new ScaleAnimation(ball, { x: 1, y: 1, z: 1 }, { duration: 0.2 })
+    new ScaleAnimation(ball, { x: 1, y: 1, z: 1 }, { duration: 0.2 }),
   ],
-  CompositionType.Sequence
+  CompositionType.Sequence,
 );
 
 // 组合弹跳和挤压效果
@@ -682,9 +728,9 @@ const fullBounceAnimation = new AnimationGroup(
     // 弹跳序列
     ...bounceSequence,
     // 挤压效果
-    squashEffect
+    squashEffect,
   ],
-  CompositionType.Sequence
+  CompositionType.Sequence,
 );
 
 currentScene = currentScene.schedule(fullBounceAnimation);
@@ -709,6 +755,7 @@ const smooth: EasingFunction = (alpha) => alpha * alpha * (3 - 2 * alpha);
 ```
 
 **可视化对比：**
+
 - `linear`: 等速运动，看起来机械
 - `smooth`: 平滑加速和减速，看起来自然
 - `easeIn`: 开始慢，越来越快
@@ -717,33 +764,29 @@ const smooth: EasingFunction = (alpha) => alpha * alpha * (3 - 2 * alpha);
 
 ### 4.2 内置缓动函数
 
-AniMaker 提供了丰富的内置缓动函数：
+Kinema 提供了丰富的内置缓动函数：
 
 #### 基础缓动
 
 ```typescript
-import {
-  linear,
-  smooth,
-  smoother
-} from '@animaker/core/easing';
+import { linear, smooth, smoother } from '@kinema/core/easing';
 
 // linear - 等速
 const anim1 = new MoveAnimation(obj, target, {
   duration: 2,
-  easing: linear
+  easing: linear,
 });
 
 // smooth - S 曲线（推荐默认值）
 const anim2 = new MoveAnimation(obj, target, {
   duration: 2,
-  easing: smooth
+  easing: smooth,
 });
 
 // smoother - 更平滑的 S 曲线
 const anim3 = new MoveAnimation(obj, target, {
   duration: 2,
-  easing: smoother
+  easing: smoother,
 });
 ```
 
@@ -757,19 +800,19 @@ import {
   easeInQuint,
   easeInSine,
   easeInExpo,
-  easeInCirc
-} from '@animaker/core/easing';
+  easeInCirc,
+} from '@kinema/core/easing';
 
 // easeIn - 二次加速
 const carStart = new MoveAnimation(car, target, {
   duration: 2,
-  easing: easeIn // 像汽车起步
+  easing: easeIn, // 像汽车起步
 });
 
 // easeInExpo - 指数加速（很慢开始，很快结束）
 const rocket = new MoveAnimation(rocketObj, target, {
   duration: 2,
-  easing: easeInExpo // 像火箭发射
+  easing: easeInExpo, // 像火箭发射
 });
 ```
 
@@ -783,19 +826,19 @@ import {
   easeOutQuint,
   easeOutSine,
   easeOutExpo,
-  easeOutCirc
-} from '@animaker/core/easing';
+  easeOutCirc,
+} from '@kinema/core/easing';
 
 // easeOut - 二次减速
 const carStop = new MoveAnimation(car, target, {
   duration: 2,
-  easing: easeOut // 像汽车刹车
+  easing: easeOut, // 像汽车刹车
 });
 
 // easeOutExpo - 指数减速（很快开始，很慢结束）
 const ballRoll = new MoveAnimation(ball, target, {
   duration: 2,
-  easing: easeOutExpo // 像球滚动停止
+  easing: easeOutExpo, // 像球滚动停止
 });
 ```
 
@@ -809,66 +852,60 @@ import {
   easeInOutQuint,
   easeInOutSine,
   easeInOutExpo,
-  easeInOutCirc
-} from '@animaker/core/easing';
+  easeInOutCirc,
+} from '@kinema/core/easing';
 
 // easeInOut - 先加速后减速
 const doorOpen = new RotateAnimation(door, 'y', 90, {
   duration: 1.5,
-  easing: easeInOut // 像门打开
+  easing: easeInOut, // 像门打开
 });
 ```
 
 #### 特殊效果缓动
 
 ```typescript
-import {
-  elastic,
-  back,
-  bounce,
-  thereAndBack,
-  thereAndBackWithPause
-} from '@animaker/core/easing';
+import { elastic, back, bounce, thereAndBack, thereAndBackWithPause } from '@kinema/core/easing';
 
 // elastic - 弹簧效果
 const spring = new MoveAnimation(obj, target, {
   duration: 2,
-  easing: elastic // 像弹簧一样振荡
+  easing: elastic, // 像弹簧一样振荡
 });
 
 // back - 回拉效果
 const pullBack = new MoveAnimation(obj, target, {
   duration: 1,
-  easing: back // 先往后拉，再向前冲
+  easing: back, // 先往后拉，再向前冲
 });
 
 // bounce - 弹跳效果
 const bouncingBall = new MoveAnimation(ball, target, {
   duration: 2,
-  easing: bounce // 像球落地弹跳
+  easing: bounce, // 像球落地弹跳
 });
 ```
 
 ### 4.3 缓动函数选择指南
 
-| 场景 | 推荐缓动 | 说明 |
-|------|----------|------|
-| 通用动画 | `smooth` | 最自然的选择 |
-| 淡入 | `easeOutSine` | 柔和出现 |
-| 淡出 | `easeInSine` | 柔和消失 |
-| 移入屏幕 | `easeOutQuart` | 快速进入，平滑停止 |
-| 移出屏幕 | `easeInQuart` | 快速离开 |
-| UI 元素出现 | `easeOutBack` | 略微过冲后回到位置 |
-| 强调效果 | `elastic` | 弹簧般吸引注意 |
-| 加载动画 | `linear` | 匀速旋转 |
-| 物理模拟 | `bounce` | 弹跳效果 |
+| 场景        | 推荐缓动       | 说明               |
+| ----------- | -------------- | ------------------ |
+| 通用动画    | `smooth`       | 最自然的选择       |
+| 淡入        | `easeOutSine`  | 柔和出现           |
+| 淡出        | `easeInSine`   | 柔和消失           |
+| 移入屏幕    | `easeOutQuart` | 快速进入，平滑停止 |
+| 移出屏幕    | `easeInQuart`  | 快速离开           |
+| UI 元素出现 | `easeOutBack`  | 略微过冲后回到位置 |
+| 强调效果    | `elastic`      | 弹簧般吸引注意     |
+| 加载动画    | `linear`       | 匀速旋转           |
+| 物理模拟    | `bounce`       | 弹跳效果           |
 
 ### 4.4 自定义缓动函数
 
 当内置缓动函数不能满足需求时，你可以创建自定义缓动函数。
 
 ```typescript
-import { custom } from '@animaker/core/easing';
+import { custom } from '@kinema/core/easing';
 
 // 创建一个"急停"缓动
 const sharpStop = custom((alpha) => {
@@ -882,7 +919,7 @@ const sharpStop = custom((alpha) => {
 // 使用自定义缓动
 const sharpMove = new MoveAnimation(obj, target, {
   duration: 2,
-  easing: sharpStop
+  easing: sharpStop,
 });
 ```
 
@@ -890,12 +927,7 @@ const sharpMove = new MoveAnimation(obj, target, {
 
 ```typescript
 // 创建三次贝塞尔曲线缓动
-function cubicBezierEasing(
-  p1x: number,
-  p1y: number,
-  p2x: number,
-  p2y: number
-): EasingFunction {
+function cubicBezierEasing(p1x: number, p1y: number, p2x: number, p2y: number): EasingFunction {
   return custom((t) => {
     // 简化的贝塞尔计算
     const cx = 3 * p1x;
@@ -941,19 +973,23 @@ const asymmetricMove = new AnimationGroup(
   hero,
   [
     // 位置用 easeOut（快速到达）
-    new MoveAnimation(hero, { x: 2, y: 0, z: 0 }, {
-      duration: 1,
-      easing: easeOut
-    }),
+    new MoveAnimation(
+      hero,
+      { x: 2, y: 0, z: 0 },
+      {
+        duration: 1,
+        easing: easeOut,
+      },
+    ),
     // 旋转用 smooth（平滑过渡）
     new RotateAnimation(hero, 'z', 180, {
       duration: 1,
-      easing: smooth
+      easing: smooth,
     }),
     // 透明度用 easeIn（慢慢显现）
-    new FadeInAnimation(hero, { duration: 1, easing: easeIn })
+    new FadeInAnimation(hero, { duration: 1, easing: easeIn }),
   ],
-  CompositionType.Parallel
+  CompositionType.Parallel,
 );
 ```
 
@@ -965,22 +1001,34 @@ const segmentedMove = new AnimationGroup(
   box,
   [
     // 第一阶段：快速启动
-    new MoveAnimation(box, { x: 1, y: 0, z: 0 }, {
-      duration: 0.3,
-      easing: easeIn
-    }),
+    new MoveAnimation(
+      box,
+      { x: 1, y: 0, z: 0 },
+      {
+        duration: 0.3,
+        easing: easeIn,
+      },
+    ),
     // 第二阶段：匀速移动
-    new MoveAnimation(box, { x: 2, y: 0, z: 0 }, {
-      duration: 0.4,
-      easing: linear
-    }),
+    new MoveAnimation(
+      box,
+      { x: 2, y: 0, z: 0 },
+      {
+        duration: 0.4,
+        easing: linear,
+      },
+    ),
     // 第三阶段：平滑停止
-    new MoveAnimation(box, { x: 3, y: 0, z: 0 }, {
-      duration: 0.3,
-      easing: easeOut
-    })
+    new MoveAnimation(
+      box,
+      { x: 3, y: 0, z: 0 },
+      {
+        duration: 0.3,
+        easing: easeOut,
+      },
+    ),
   ],
-  CompositionType.Sequence
+  CompositionType.Sequence,
 );
 ```
 
@@ -992,16 +1040,16 @@ function gravityEasing(height: number): EasingFunction {
   return custom((t) => {
     // h(t) = H - 0.5 * g * t²
     const g = 9.8;
-    const fallTime = Math.sqrt(2 * height / g);
+    const fallTime = Math.sqrt((2 * height) / g);
     const progress = t * fallTime;
-    return 1 - 0.5 * g * progress * progress / height;
+    return 1 - (0.5 * g * progress * progress) / height;
   });
 }
 
 const realisticFall = new MoveAnimation(
   apple,
   { x: 0, y: -5, z: 0 },
-  { duration: 1, easing: gravityEasing(5) }
+  { duration: 1, easing: gravityEasing(5) },
 );
 ```
 
@@ -1009,48 +1057,68 @@ const realisticFall = new MoveAnimation(
 
 ```typescript
 // 按钮：点击时轻微缩小
-const buttonPress = new ScaleAnimation(button, { x: 0.95, y: 0.95, z: 1 }, {
-  duration: 0.1,
-  easing: easeOutCubic
-});
+const buttonPress = new ScaleAnimation(
+  button,
+  { x: 0.95, y: 0.95, z: 1 },
+  {
+    duration: 0.1,
+    easing: easeOutCubic,
+  },
+);
 
 // 模态框：弹出效果
 const modalPopup = new AnimationGroup(
   modal,
   [
     new FadeInAnimation(modal, { duration: 0.3, easing: easeOutQuad }),
-    new ScaleAnimation(modal, { x: 1, y: 1, z: 1 }, {
-      duration: 0.3,
-      easing: easeOutBack // 轻微过冲效果
-    })
+    new ScaleAnimation(
+      modal,
+      { x: 1, y: 1, z: 1 },
+      {
+        duration: 0.3,
+        easing: easeOutBack, // 轻微过冲效果
+      },
+    ),
   ],
-  CompositionType.Parallel
+  CompositionType.Parallel,
 );
 
 // 侧边栏：滑入效果
-const sidebarSlide = new MoveAnimation(sidebar, { x: 0, y: 0, z: 0 }, {
-  duration: 0.4,
-  easing: easeOutCubic
-});
+const sidebarSlide = new MoveAnimation(
+  sidebar,
+  { x: 0, y: 0, z: 0 },
+  {
+    duration: 0.4,
+    easing: easeOutCubic,
+  },
+);
 
 // 通知：出现后自动消失
 const notificationShow = new AnimationGroup(
   notification,
   [
     new FadeInAnimation(notification, { duration: 0.3, easing: easeOutQuad }),
-    new MoveAnimation(notification, { x: 0, y: 20, z: 0 }, {
-      duration: 0.3,
-      easing: easeOutBack
-    }),
+    new MoveAnimation(
+      notification,
+      { x: 0, y: 20, z: 0 },
+      {
+        duration: 0.3,
+        easing: easeOutBack,
+      },
+    ),
     // 等待 2 秒
-    new MoveAnimation(notification, { x: 0, y: 20, z: 0 }, {
-      duration: 2,
-      easing: linear
-    }),
+    new MoveAnimation(
+      notification,
+      { x: 0, y: 20, z: 0 },
+      {
+        duration: 2,
+        easing: linear,
+      },
+    ),
     // 消失
-    new FadeOutAnimation(notification, { duration: 0.3, easing: easeInQuad })
+    new FadeOutAnimation(notification, { duration: 0.3, easing: easeInQuad }),
   ],
-  CompositionType.Sequence
+  CompositionType.Sequence,
 );
 ```
 
@@ -1058,7 +1126,7 @@ const notificationShow = new AnimationGroup(
 
 ## 总结
 
-恭喜你完成了 AniMaker 动画创建入门教程！你现在应该能够：
+恭喜你完成了 Kinema 动画创建入门教程！你现在应该能够：
 
 1. **理解核心概念**：Scene、RenderObject、Animation 的作用和关系
 2. **创建基本动画**：移动、旋转、缩放、淡入淡出
@@ -1081,8 +1149,8 @@ const notificationShow = new AnimationGroup(
 
 ### 获取帮助
 
-- 🐛 [报告问题](https://github.com/your-username/animaker/issues)
-- 💬 [参与讨论](https://github.com/your-username/animaker/discussions)
+- 🐛 [报告问题](https://github.com/your-username/kinema/issues)
+- 💬 [参与讨论](https://github.com/your-username/kinema/discussions)
 - 📚 [API 文档](../api/)
 
 祝你创作愉快！🎬

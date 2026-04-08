@@ -19,7 +19,7 @@ export enum MarkerType {
   /** Label marker */
   Label = 'label',
   /** Beat marker for rhythm */
-  Beat = 'beat'
+  Beat = 'beat',
 }
 
 /**
@@ -102,7 +102,7 @@ export class TimeMarker {
       type: updates.type ?? this.type,
       data: updates.data ?? this.data,
       color: updates.color ?? this.color,
-      visible: updates.visible ?? this.visible
+      visible: updates.visible ?? this.visible,
     });
   }
 
@@ -145,12 +145,7 @@ export class MarkerCollection {
    * @param data - Optional data
    * @returns The created marker
    */
-  add(
-    name: string,
-    time: number,
-    type: MarkerType = MarkerType.Label,
-    data?: unknown
-  ): TimeMarker {
+  add(name: string, time: number, type: MarkerType = MarkerType.Label, data?: unknown): TimeMarker {
     const marker = new TimeMarker({ name, time, type, data });
     this.markers.set(name, marker);
     return marker;
@@ -159,12 +154,14 @@ export class MarkerCollection {
   /**
    * Add multiple markers
    */
-  addAll(markers: Array<{
-    name: string;
-    time: number;
-    type?: MarkerType;
-    data?: unknown;
-  }>): MarkerCollection {
+  addAll(
+    markers: Array<{
+      name: string;
+      time: number;
+      type?: MarkerType;
+      data?: unknown;
+    }>,
+  ): MarkerCollection {
     for (const marker of markers) {
       this.add(marker.name, marker.time, marker.type, marker.data);
     }
@@ -196,24 +193,21 @@ export class MarkerCollection {
    * Get all markers
    */
   getAll(): TimeMarker[] {
-    return Array.from(this.markers.values())
-      .sort((a, b) => a.time - b.time);
+    return Array.from(this.markers.values()).sort((a, b) => a.time - b.time);
   }
 
   /**
    * Get markers in a time range
    */
   inRange(startTime: number, endTime: number): TimeMarker[] {
-    return this.getAll().filter(
-      m => m.time >= startTime && m.time <= endTime
-    );
+    return this.getAll().filter((m) => m.time >= startTime && m.time <= endTime);
   }
 
   /**
    * Get markers by type
    */
   byType(type: MarkerType): TimeMarker[] {
-    return this.getAll().filter(m => m.type === type);
+    return this.getAll().filter((m) => m.type === type);
   }
 
   /**
@@ -230,7 +224,7 @@ export class MarkerCollection {
     const markers = this.getAll();
     if (markers.length === 0) return undefined;
 
-    let nearest = markers[0];
+    let nearest = markers[0]!;
     let minDist = Math.abs(time - nearest.time);
 
     for (const marker of markers) {
@@ -265,10 +259,10 @@ export class MarkerCollection {
     const markers = this.getAll();
     if (markers.length === 0) return undefined;
 
-    const times = markers.map(m => m.time);
+    const times = markers.map((m) => m.time);
     return {
       min: Math.min(...times),
-      max: Math.max(...times)
+      max: Math.max(...times),
     };
   }
 
@@ -340,19 +334,12 @@ export class MarkerBuilder {
    * @param count - Number of beats
    * @param duration - Duration per beat in seconds
    */
-  beats(
-    startTime: number,
-    bpm: number,
-    count: number,
-    duration: number = 60 / bpm
-  ): MarkerBuilder {
+  beats(startTime: number, bpm: number, count: number, duration: number = 60 / bpm): MarkerBuilder {
     for (let i = 0; i < count; i++) {
-      this.collection.add(
-        `beat_${i}`,
-        startTime + (i * duration),
-        MarkerType.Beat,
-        { beatIndex: i, bpm }
-      );
+      this.collection.add(`beat_${i}`, startTime + i * duration, MarkerType.Beat, {
+        beatIndex: i,
+        bpm,
+      });
     }
     return this;
   }
@@ -380,10 +367,7 @@ export class MarkerBuilder {
  * @param collection - Marker collection to sync
  * @returns Listener cleanup function
  */
-export function syncWithTimeline(
-  timeline: Timeline,
-  collection: MarkerCollection
-  (): () => void {
+export function syncWithTimeline(timeline: Timeline, collection: MarkerCollection): () => void {
   const listener: TimelineEventListener = (event) => {
     if (event.type === 'seek') {
       // Reset and re-check markers
@@ -409,4 +393,3 @@ export function syncWithTimeline(
  * Default export
  */
 export default TimeMarker;
-export { MarkerCollection, MarkerBuilder, syncWithTimeline };

@@ -5,15 +5,24 @@
 
 import { describe, it, expect } from 'vitest';
 
+// Define functions at the top level so they can be used across describe blocks
+const lerp = (start: number, end: number, t: number): number => {
+  if (t < 0 || t > 1) {
+    throw new Error('t must be between 0 and 1');
+  }
+  return start + (end - start) * t;
+};
+
+const clamp = (value: number, min: number, max: number): number => {
+  return Math.min(Math.max(value, min), max);
+};
+
+const degToRad = (degrees: number): number => (degrees * Math.PI) / 180;
+
+const radToDeg = (radians: number): number => (radians * 180) / Math.PI;
+
 describe('MathUtils', () => {
   describe('lerp (linear interpolation)', () => {
-    const lerp = (start: number, end: number, t: number): number => {
-      if (t < 0 || t > 1) {
-        throw new Error('t must be between 0 and 1');
-      }
-      return start + (end - start) * t;
-    };
-
     it('should return start value when t is 0', () => {
       expect(lerp(0, 10, 0)).toBe(0);
       expect(lerp(5, 15, 0)).toBe(5);
@@ -46,10 +55,6 @@ describe('MathUtils', () => {
   });
 
   describe('clamp', () => {
-    const clamp = (value: number, min: number, max: number): number => {
-      return Math.min(Math.max(value, min), max);
-    };
-
     it('should return value when within range', () => {
       expect(clamp(5, 0, 10)).toBe(5);
       expect(clamp(0, 0, 10)).toBe(0);
@@ -74,8 +79,6 @@ describe('MathUtils', () => {
   });
 
   describe('degToRad', () => {
-    const degToRad = (degrees: number): number => (degrees * Math.PI) / 180;
-
     it('should convert 0 degrees to 0 radians', () => {
       expect(degToRad(0)).toBe(0);
     });
@@ -98,8 +101,6 @@ describe('MathUtils', () => {
   });
 
   describe('radToDeg', () => {
-    const radToDeg = (radians: number): number => (radians * 180) / Math.PI;
-
     it('should convert 0 radians to 0 degrees', () => {
       expect(radToDeg(0)).toBe(0);
     });
@@ -121,7 +122,6 @@ describe('MathUtils', () => {
     });
 
     it('should be inverse of degToRad', () => {
-      const degToRad = (degrees: number): number => (degrees * Math.PI) / 180;
       const degrees = 45;
       const converted = radToDeg(degToRad(degrees));
       expect(converted).toBeCloseTo(degrees, 10);

@@ -1,6 +1,6 @@
 # 核心概念
 
-深入理解 AniMaker 的核心概念是掌握框架的关键。
+深入理解 Kinema 的核心概念是掌握框架的关键。
 
 ## 架构概览
 
@@ -31,11 +31,11 @@
 
 ### 可用渲染器
 
-| 渲染器 | 用途 | 性能 | 兼容性 |
-|--------|------|------|--------|
-| CanvasRenderer | 2D 图形 | 中 | 优秀 |
-| WebGLRenderer | 2D/3D 图形 | 高 | 良好 |
-| SVGRenderer | 矢量图形 | 低 | 优秀 |
+| 渲染器         | 用途       | 性能 | 兼容性 |
+| -------------- | ---------- | ---- | ------ |
+| CanvasRenderer | 2D 图形    | 中   | 优秀   |
+| WebGLRenderer  | 2D/3D 图形 | 高   | 良好   |
+| SVGRenderer    | 矢量图形   | 低   | 优秀   |
 
 ### 渲染器接口
 
@@ -62,9 +62,9 @@ interface Renderer {
 ```typescript
 const animator = new Animator({
   renderer: new CanvasRenderer(canvas),
-  fps: 60,                    // 帧率
-  autoPlay: true,             // 自动播放
-  loop: false,                // 循环播放
+  fps: 60, // 帧率
+  autoPlay: true, // 自动播放
+  loop: false, // 循环播放
 });
 ```
 
@@ -97,7 +97,7 @@ const tween = new Tween({
 
 ### 缓动函数
 
-AniMaker 提供了丰富的内置缓动函数：
+Kinema 提供了丰富的内置缓动函数：
 
 - Linear: `linear`
 - Quad: `easeInQuad`, `easeOutQuad`, `easeInOutQuad`
@@ -114,24 +114,13 @@ AniMaker 提供了丰富的内置缓动函数：
 const timeline = new Timeline();
 
 // 序列执行
-timeline.sequence([
-  tween1,
-  tween2,
-  tween3,
-]);
+timeline.sequence([tween1, tween2, tween3]);
 
 // 并行执行
-timeline.parallel([
-  tweenA,
-  tweenB,
-]);
+timeline.parallel([tweenA, tweenB]);
 
 // 混合编排
-timeline.sequence([
-  tween1,
-  timeline.parallel([tween2, tween3]),
-  tween4,
-]);
+timeline.sequence([tween1, timeline.parallel([tween2, tween3]), tween4]);
 ```
 
 ## 场景图 (Scene Graph)

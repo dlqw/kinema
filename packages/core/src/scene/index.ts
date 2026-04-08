@@ -4,10 +4,5 @@
  * @module scene
  */
 
-export {
-  Scene,
-  SceneBuilder,
-  createScene,
-  sceneBuilder
-} from './Scene';
-export type { Scene, SceneBuilder, SceneState };
+export { Scene, SceneBuilder, createScene, sceneBuilder } from './Scene';
+export type { SceneState } from './Scene';

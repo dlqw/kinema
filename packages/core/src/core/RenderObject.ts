@@ -7,13 +7,7 @@
  * @module core/RenderObject
  */
 
-import type {
-  ObjectId,
-  Point3D,
-  BoundingBox,
-  Transform,
-  RenderObjectState
-} from '../types';
+import type { ObjectId, Point3D, BoundingBox, Transform, RenderObjectState } from '../types';
 import { generateObjectId, DEFAULT_TRANSFORM } from '../types';
 
 /**
@@ -154,7 +148,7 @@ export abstract class RenderObject {
    * @param z - Scale factor for Z axis (default: 1)
    * @returns A new instance with the updated scale
    */
-  withScale(x: number, y: number, z: number = 1): RenderObject {
+  withScale(x: number, y: number = x, z: number = 1): RenderObject {
     return this.withTransform({ scale: { x, y, z } });
   }
 
@@ -264,7 +258,7 @@ export abstract class RenderObject {
     const mergedState: RenderObjectState = {
       ...this.state,
       ...newState,
-      styles: newState.styles ?? this.state.styles
+      styles: newState.styles ?? this.state.styles,
     };
     return new (this.constructor as any)(mergedState);
   }
@@ -276,7 +270,7 @@ export abstract class RenderObject {
    * @returns A new render object state
    */
   protected static createDefaultState(
-    override: Partial<RenderObjectState> = {}
+    override: Partial<RenderObjectState> = {},
   ): RenderObjectState {
     return {
       id: generateObjectId(),
@@ -284,7 +278,10 @@ export abstract class RenderObject {
       visible: true,
       z_index: 0,
       styles: new Map(),
-      ...override
+      position: { x: 0, y: 0, z: 0 },
+      rotation: { x: 0, y: 0, z: 0 },
+      scale: { x: 1, y: 1, z: 1 },
+      ...override,
     };
   }
 
@@ -332,7 +329,7 @@ export abstract class RenderObject {
       transform: this.state.transform,
       visible: this.state.visible,
       zIndex: this.state.z_index,
-      parentId: this.state.parentId
+      parentId: this.state.parentId,
     };
   }
 }

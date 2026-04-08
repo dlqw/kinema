@@ -1,31 +1,31 @@
 /**
- * AniMaker 文档自定义样式
+ * Kinema 文档自定义样式
  */
 
 :root {
-  --animaker-primary: #3498db;
-  --animaker-secondary: #e74c3c;
-  --animaker-accent: #9b59b6;
-  --animaker-bg: #1e1e1e;
-  --animaker-text: #e0e0e0;
+  --kinema-primary: #3498db;
+  --kinema-secondary: #e74c3c;
+  --kinema-accent: #9b59b6;
+  --kinema-bg: #1e1e1e;
+  --kinema-text: #e0e0e0;
 }
 
 /* VPS（VitePress）变量覆盖 */
 :root {
-  --vp-c-brand: var(--animaker-primary);
+  --vp-c-brand: var(--kinema-primary);
   --vp-c-brand-light: #5dade2;
   --vp-c-brand-dark: #2874a6;
-  --vp-home-hero-name-color: var(--animaker-primary);
+  --vp-home-hero-name-color: var(--kinema-primary);
   --vp-home-hero-text-background: linear-gradient(
     120deg,
-    var(--animaker-primary),
-    var(--animaker-accent)
+    var(--kinema-primary),
+    var(--kinema-accent)
   );
 }
 
 /* 代码块样式 */
 .vp-code-group .tabs {
-  background-color: var(--animaker-bg);
+  background-color: var(--kinema-bg);
   border-radius: 8px;
 }
 
@@ -44,7 +44,7 @@
 }
 
 .api-table th {
-  background-color: var(--animaker-bg);
+  background-color: var(--kinema-bg);
   font-weight: 600;
 }
 
@@ -60,16 +60,18 @@
   border-radius: 4px;
   font-family: var(--vp-font-family-mono);
   font-size: 0.85em;
-  color: var(--animaker-primary);
+  color: var(--kinema-primary);
 }
 
 /* 特性卡片 */
 .feature-card {
   padding: 1.5rem;
   border-radius: 12px;
-  background-color: var(--animaker-bg);
+  background-color: var(--kinema-bg);
   border: 1px solid #333;
-  transition: transform 0.3s, box-shadow 0.3s;
+  transition:
+    transform 0.3s,
+    box-shadow 0.3s;
 }
 
 .feature-card:hover {
@@ -92,7 +94,7 @@
 
 .alert-info {
   background-color: rgba(52, 152, 219, 0.1);
-  border-color: var(--animaker-primary);
+  border-color: var(--kinema-primary);
 }
 
 .alert-warning {
@@ -102,14 +104,14 @@
 
 .alert-error {
   background-color: rgba(231, 76, 60, 0.1);
-  border-color: var(--animaker-secondary);
+  border-color: var(--kinema-secondary);
 }
 
 /* 版本标签 */
 .version-tag {
   display: inline-block;
   padding: 0.2rem 0.5rem;
-  background-color: var(--animaker-accent);
+  background-color: var(--kinema-accent);
   color: white;
   border-radius: 4px;
   font-size: 0.75rem;
@@ -131,7 +133,7 @@
 }
 
 .example-code {
-  background-color: var(--animaker-bg);
+  background-color: var(--kinema-bg);
   padding: 1rem;
 }
 

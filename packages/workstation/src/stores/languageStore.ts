@@ -1,32 +1,36 @@
 /**
- * Language Store
+ * Language State Management
  *
- * Manages application language preference and persistence.
+ * Manages language preference using Zustand with persistence
  */
 
-import { create } from 'zustand'
-import { persist } from 'zustand/middleware'
-import type { LanguageCode } from '../i18n'
+import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 
-interface LanguageState {
-  language: LanguageCode
-  setLanguage: (language: LanguageCode) => void
+export type LanguageCode = 'en' | 'zh';
+
+export interface LanguageState {
+  language: LanguageCode;
+  setLanguage: (language: LanguageCode) => void;
+  toggleLanguage: () => void;
 }
 
-/**
- * Language preference store with persistence
- */
 export const useLanguageStore = create<LanguageState>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       language: 'en',
 
-      setLanguage: (language: LanguageCode) => {
-        set({ language })
-      }
+      setLanguage: (language) => {
+        set({ language });
+      },
+
+      toggleLanguage: () => {
+        const { language } = get();
+        set({ language: language === 'en' ? 'zh' : 'en' });
+      },
     }),
     {
-      name: 'animaker-language'
-    }
-  )
-)
+      name: 'kinema-language',
+    },
+  ),
+);

@@ -4,22 +4,22 @@
  */
 
 import { describe, it, expect, beforeEach } from 'vitest';
+import { RenderObject } from '../../../packages/core/src/core/RenderObject';
 import {
-  RenderObject,
   generateObjectId,
   DEFAULT_TRANSFORM,
-  type RenderObjectState,
   type Transform,
   type Point3D,
   type BoundingBox,
 } from '../../../packages/core/src/types/core';
+import type { RenderObjectState } from '../../../packages/core/src/types/core';
 
 // Mock implementation of a concrete render object for testing
 class TestRectangle extends RenderObject {
   constructor(
     state: RenderObjectState,
     private readonly width: number,
-    private readonly height: number
+    private readonly height: number,
   ) {
     super(state);
   }
@@ -80,7 +80,10 @@ class TestRectangle extends RenderObject {
 
 // Mock circle implementation
 class TestCircle extends RenderObject {
-  constructor(state: RenderObjectState, private readonly radius: number) {
+  constructor(
+    state: RenderObjectState,
+    private readonly radius: number,
+  ) {
     super(state);
   }
 
@@ -163,11 +166,7 @@ describe('RenderObject', () => {
     });
 
     it('should have a unique ID', () => {
-      const rect2 = new TestRectangle(
-        { ...defaultState, id: generateObjectId('rect') },
-        100,
-        50
-      );
+      const rect2 = new TestRectangle({ ...defaultState, id: generateObjectId('rect') }, 100, 50);
 
       expect(rectangle.id).not.toBe(rect2.id);
     });
@@ -214,7 +213,7 @@ describe('RenderObject', () => {
     it('should support chaining transform updates', () => {
       const updated = rectangle
         .withPosition(10, 20)
-        .withRotation(45)
+        .withRotation(45, 0, 0) // withRotation takes (x, y, z) parameters
         .withScale(2)
         .withOpacity(0.7);
 

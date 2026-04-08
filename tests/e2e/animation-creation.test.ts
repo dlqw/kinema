@@ -44,7 +44,8 @@ test.describe('Animation Creation Workflow', () => {
     await page.waitForTimeout(1500);
 
     // Step 7: Verify animation result
-    const objectPosition = await page.locator('[data-testid="object-item-rectangle"]')
+    const objectPosition = await page
+      .locator('[data-testid="object-item-rectangle"]')
       .getAttribute('data-position');
 
     expect(objectPosition).toBeDefined();
@@ -63,7 +64,7 @@ test.describe('Animation Creation Workflow', () => {
     // Add second object (rectangle)
     await page.click('[data-testid="add-rectangle-button"]');
     await page.fill('[data-testid="object-x"]', '200');
-    await(page.fill('[data-testid="object-y"]', '200'));
+    await page.fill('[data-testid="object-y"]', '200');
     await page.click('[data-testid="object-apply"]');
 
     // Verify both objects are in the scene
@@ -118,7 +119,9 @@ test.describe('Animation Creation Workflow', () => {
     await page.click('[data-testid="animation-apply-button"]');
 
     // Verify easing is applied
-    await expect(page.locator('[data-testid="animation-details"] >> text=easeInOutCubic')).toBeVisible();
+    await expect(
+      page.locator('[data-testid="animation-details"] >> text=easeInOutCubic'),
+    ).toBeVisible();
 
     // Play and capture frames for verification
     await page.click('[data-testid="play-button"]');
@@ -154,7 +157,7 @@ test.describe('Animation Creation Workflow', () => {
     const download = await downloadPromise;
 
     // Verify project file
-    expect(download.suggestedFilename()).toMatch(/\.animaker$/);
+    expect(download.suggestedFilename()).toMatch(/\.kinema$/);
 
     // Clear scene
     await page.click('[data-testid="clear-scene-button"]');
@@ -211,7 +214,9 @@ test.describe('Animation Creation Workflow', () => {
     await page.click('[data-testid="animation-apply-button"]');
 
     // Should show validation error
-    await expect(page.locator('[data-testid="error-message"] >> text=Duration must be positive')).toBeVisible();
+    await expect(
+      page.locator('[data-testid="error-message"] >> text=Duration must be positive'),
+    ).toBeVisible();
 
     // Fix duration
     await page.fill('[data-testid="animation-duration"]', '1000');
@@ -342,8 +347,8 @@ test.describe('Animation Creation - Error Handling', () => {
     const errorMessage = page.locator('[data-testid="no-canvas-error"]');
     const fallbackMessage = page.locator('[data-testid="canvas-fallback"]');
 
-    const hasError = await errorMessage.count() > 0;
-    const hasFallback = await fallbackMessage.count() > 0;
+    const hasError = (await errorMessage.count()) > 0;
+    const hasFallback = (await fallbackMessage.count()) > 0;
 
     expect(hasError || hasFallback).toBeTruthy();
   });
@@ -364,7 +369,7 @@ test.describe('Animation Creation - Error Handling', () => {
 
     // Check for performance warnings
     const perfWarning = page.locator('[data-testid="performance-warning"]');
-    const hasWarning = await perfWarning.count() > 0;
+    const hasWarning = (await perfWarning.count()) > 0;
 
     // Performance warning is acceptable for 50+ objects
     expect(objectCount).toBeGreaterThan(0);
@@ -407,7 +412,8 @@ test.describe('Animation Creation - Error Handling', () => {
     await page.click('[data-testid="animation-apply-button"]');
 
     // Get initial object state
-    const initialState = await page.locator('[data-testid="object-item-rectangle"]')
+    const initialState = await page
+      .locator('[data-testid="object-item-rectangle"]')
       .getAttribute('data-state');
 
     // Resize scene
@@ -419,7 +425,8 @@ test.describe('Animation Creation - Error Handling', () => {
     await expect(page.locator('[data-testid="timeline"]')).toContainText('Scale');
 
     // Verify object state is preserved (possibly scaled)
-    const finalState = await page.locator('[data-testid="object-item-rectangle"]')
+    const finalState = await page
+      .locator('[data-testid="object-item-rectangle"]')
       .getAttribute('data-state');
     expect(finalState).toBeDefined();
   });

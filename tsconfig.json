@@ -7,7 +7,6 @@
 
     /* Modules */
     "module": "ESNext",
-    "rootDir": "./src",
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "allowSyntheticDefaultImports": true,
@@ -36,8 +35,8 @@
     "sourceMap": true,
     "removeComments": false,
     "importHelpers": true,
-    "outDir": "./dist",
     "emitDeclarationOnly": false,
+    "noEmit": true,
 
     /* Interop Constraints */
     "esModuleInterop": true,
@@ -48,8 +47,20 @@
     "skipLibCheck": true,
 
     /* Completeness */
-    "skipDefaultLibCheck": true
+    "skipDefaultLibCheck": true,
+
+    /* Types */
+    "types": ["@webgpu/types"]
   },
-  "include": ["src/**/*"],
-  "exclude": ["node_modules", "dist", "coverage", "**/*.test.ts", "**/*.spec.ts"]
+  "exclude": [
+    "node_modules",
+    "dist",
+    "coverage",
+    "**/node_modules/**",
+    "docs",
+    "video",
+    "**/*.test.ts",
+    "**/*.spec.ts",
+    "packages/workstation"
+  ]
 }

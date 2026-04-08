@@ -7,22 +7,23 @@
  * @module animation/Animation
  */
 
-import type {
-  Alpha,
-  EasingFunction,
-  AnimationConfig,
-  InterpolationResult
-} from '../types';
+import type { Alpha, EasingFunction, AnimationConfig, InterpolationResult } from '../types';
 import type { RenderObject } from '../core';
+import { smooth } from '../types/easing';
+
+/**
+ * Default duration in seconds
+ */
+const DEFAULT_DURATION = 1.0;
 
 /**
  * Default animation configuration
  */
 const DEFAULT_ANIMATION_CONFIG: AnimationConfig = {
-  duration: 1.0,
-  easing: (alpha: Alpha) => alpha, // linear
+  duration: DEFAULT_DURATION,
+  easing: smooth,
   delay: 0,
-  removeOnComplete: false
+  removeOnComplete: false,
 };
 
 /**
@@ -51,7 +52,7 @@ export abstract class Animation<T extends RenderObject = RenderObject> {
    */
   constructor(
     public readonly target: T,
-    protected readonly _config: AnimationConfig
+    protected readonly _config: AnimationConfig,
   ) {
     Object.freeze(_config);
   }
@@ -67,28 +68,28 @@ export abstract class Animation<T extends RenderObject = RenderObject> {
    * Get the animation duration in seconds
    */
   get duration(): number {
-    return this._config.duration;
+    return this.config.duration ?? DEFAULT_DURATION;
   }
 
   /**
    * Get the delay before animation starts
    */
   get delay(): number {
-    return this._config.delay ?? 0;
+    return this.config.delay ?? 0;
   }
 
   /**
    * Check if this animation removes the target on completion
    */
   get removeOnComplete(): boolean {
-    return this._config.removeOnComplete ?? false;
+    return this.config.removeOnComplete ?? false;
   }
 
   /**
    * Get the animation name for debugging
    */
   get name(): string {
-    return this._config.name ?? this.constructor.name;
+    return this.config.name ?? this.constructor.name;
   }
 
   /**
@@ -97,7 +98,7 @@ export abstract class Animation<T extends RenderObject = RenderObject> {
    * @returns Total duration in seconds
    */
   getTotalDuration(): number {
-    return (this._config.delay ?? 0) + this._config.duration;
+    return (this.config.delay ?? 0) + (this.config.duration ?? DEFAULT_DURATION);
   }
 
   /**
@@ -110,28 +111,33 @@ export abstract class Animation<T extends RenderObject = RenderObject> {
    * @returns Interpolation result with object state and completion flag
    */
   interpolate(elapsedTime: number): InterpolationResult<T> {
-    const delay = this._config.delay ?? 0;
+    const delay = this.config.delay ?? 0;
+    const duration = this.config.duration ?? DEFAULT_DURATION;
+    const easingFn = this.config.easing ?? smooth;
 
     // During delay, return original object
     if (elapsedTime < delay) {
       return { object: this.target, complete: false };
     }
 
+    // Handle zero duration - immediately complete
+    if (duration <= 0) {
+      const result = this.interpolateAt(1 as Alpha);
+      return { object: result, complete: true };
+    }
+
     // Calculate progress
-    const progress = Math.min(
-      (elapsedTime - delay) / this._config.duration,
-      1
-    ) as Alpha;
+    const progress = Math.min((elapsedTime - delay) / duration, 1) as Alpha;
 
     // Apply easing function
-    const easedAlpha = this._config.easing(progress);
+    const easedAlpha = easingFn(progress);
 
     // Perform interpolation
     const result = this.interpolateAt(easedAlpha);
 
     return {
       object: result,
-      complete: progress >= 1
+      complete: progress >= 1,
     };
   }
 
@@ -156,7 +162,7 @@ export abstract class Animation<T extends RenderObject = RenderObject> {
   static builder<T extends Animation>(
     this: new (...args: any[]) => T,
     target: RenderObject,
-    config: Partial<AnimationConfig> = {}
+    config: Partial<AnimationConfig> = {},
   ): AnimationBuilder<T> {
     return new AnimationBuilder(this, target, config);
   }
@@ -165,7 +171,7 @@ export abstract class Animation<T extends RenderObject = RenderObject> {
    * Get a string representation
    */
   toString(): string {
-    return `${this.name}(target="${this.target.id}", duration=${this._config.duration}s)`;
+    return `${this.name}(target="${this.target.id}", duration=${this.duration}s)`;
   }
 }
 
@@ -178,7 +184,7 @@ export class AnimationBuilder<T extends Animation> {
   constructor(
     private readonly AnimationClass: new (...args: any[]) => T,
     private readonly target: RenderObject,
-    private readonly config: Partial<AnimationConfig>
+    private readonly config: Partial<AnimationConfig>,
   ) {}
 
   /**
@@ -188,11 +194,10 @@ export class AnimationBuilder<T extends Animation> {
    * @returns A new builder with updated duration
    */
   withDuration(seconds: number): AnimationBuilder<T> {
-    return new AnimationBuilder(
-      this.AnimationClass,
-      this.target,
-      { ...this.config, duration: seconds }
-    );
+    return new AnimationBuilder(this.AnimationClass, this.target, {
+      ...this.config,
+      duration: seconds,
+    });
   }
 
   /**
@@ -202,11 +207,7 @@ export class AnimationBuilder<T extends Animation> {
    * @returns A new builder with updated easing
    */
   withEasing(easing: EasingFunction): AnimationBuilder<T> {
-    return new AnimationBuilder(
-      this.AnimationClass,
-      this.target,
-      { ...this.config, easing }
-    );
+    return new AnimationBuilder(this.AnimationClass, this.target, { ...this.config, easing });
   }
 
   /**
@@ -216,11 +217,10 @@ export class AnimationBuilder<T extends Animation> {
    * @returns A new builder with updated delay
    */
   withDelay(seconds: number): AnimationBuilder<T> {
-    return new AnimationBuilder(
-      this.AnimationClass,
-      this.target,
-      { ...this.config, delay: seconds }
-    );
+    return new AnimationBuilder(this.AnimationClass, this.target, {
+      ...this.config,
+      delay: seconds,
+    });
   }
 
   /**
@@ -230,11 +230,10 @@ export class AnimationBuilder<T extends Animation> {
    * @returns A new builder with updated remove flag
    */
   removeOnComplete(value: boolean = true): AnimationBuilder<T> {
-    return new AnimationBuilder(
-      this.AnimationClass,
-      this.target,
-      { ...this.config, removeOnComplete: value }
-    );
+    return new AnimationBuilder(this.AnimationClass, this.target, {
+      ...this.config,
+      removeOnComplete: value,
+    });
   }
 
   /**
@@ -244,11 +243,7 @@ export class AnimationBuilder<T extends Animation> {
    * @returns A new builder with updated name
    */
   withName(name: string): AnimationBuilder<T> {
-    return new AnimationBuilder(
-      this.AnimationClass,
-      this.target,
-      { ...this.config, name }
-    );
+    return new AnimationBuilder(this.AnimationClass, this.target, { ...this.config, name });
   }
 
   /**
@@ -259,7 +254,7 @@ export class AnimationBuilder<T extends Animation> {
   build(): T {
     const fullConfig: AnimationConfig = {
       ...DEFAULT_ANIMATION_CONFIG,
-      ...this.config
+      ...this.config,
     };
 
     return new this.AnimationClass(this.target as any, fullConfig);
@@ -272,12 +267,10 @@ export class AnimationBuilder<T extends Animation> {
  * @param config - Partial configuration
  * @returns Complete animation configuration
  */
-export function createAnimationConfig(
-  config: Partial<AnimationConfig> = {}
-): AnimationConfig {
+export function createAnimationConfig(config: Partial<AnimationConfig> = {}): AnimationConfig {
   return {
     ...DEFAULT_ANIMATION_CONFIG,
-    ...config
+    ...config,
   };
 }
 

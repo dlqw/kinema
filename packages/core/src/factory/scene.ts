@@ -8,8 +8,8 @@
 
 import type { SceneConfig } from '../types';
 import { Scene, SceneBuilder } from '../scene';
-import { VectorObject } from '../core';
-import type { RenderObject, Animation } from '../types';
+import type { RenderObject } from '../core';
+import type { Animation } from '../animation';
 
 // ============================================================================
 // Scene Creation
@@ -31,17 +31,19 @@ import type { RenderObject, Animation } from '../types';
  * });
  * ```
  */
-export function createScene(options: {
-  width?: number;
-  height?: number;
-  fps?: number;
-  backgroundColor?: string;
-} = {}): Scene {
+export function createScene(
+  options: {
+    width?: number;
+    height?: number;
+    fps?: number;
+    backgroundColor?: string;
+  } = {},
+): Scene {
   const config: SceneConfig = {
     width: options.width ?? 1920,
     height: options.height ?? 1080,
     fps: options.fps ?? 60,
-    backgroundColor: options.backgroundColor
+    ...(options.backgroundColor !== undefined ? { backgroundColor: options.backgroundColor } : {}),
   };
 
   return new Scene(config);
@@ -53,14 +55,16 @@ export function createScene(options: {
  * @param options - Optional scene configuration
  * @returns A new Scene instance
  */
-export function createHDScene(options: {
-  fps?: number;
-  backgroundColor?: string;
-} = {}): Scene {
+export function createHDScene(
+  options: {
+    fps?: number;
+    backgroundColor?: string;
+  } = {},
+): Scene {
   return createScene({
     width: 1920,
     height: 1080,
-    ...options
+    ...options,
   });
 }
 
@@ -70,10 +74,12 @@ export function createHDScene(options: {
  * @param options - Optional scene configuration
  * @returns A new Scene instance
  */
-export function createFullHDScene(options: {
-  fps?: number;
-  backgroundColor?: string;
-} = {}): Scene {
+export function createFullHDScene(
+  options: {
+    fps?: number;
+    backgroundColor?: string;
+  } = {},
+): Scene {
   return createHDScene(options);
 }
 
@@ -83,14 +89,16 @@ export function createFullHDScene(options: {
  * @param options - Optional scene configuration
  * @returns A new Scene instance
  */
-export function create4KScene(options: {
-  fps?: number;
-  backgroundColor?: string;
-} = {}): Scene {
+export function create4KScene(
+  options: {
+    fps?: number;
+    backgroundColor?: string;
+  } = {},
+): Scene {
   return createScene({
     width: 3840,
     height: 2160,
-    ...options
+    ...options,
   });
 }
 
@@ -106,12 +114,12 @@ export function createSquareScene(
   options: {
     fps?: number;
     backgroundColor?: string;
-  } = {}
+  } = {},
 ): Scene {
   return createScene({
     width: size,
     height: size,
-    ...options
+    ...options,
   });
 }
 
@@ -121,16 +129,18 @@ export function createSquareScene(
  * @param options - Optional scene configuration
  * @returns A new Scene instance
  */
-export function createVerticalScene(options: {
-  width?: number;
-  height?: number;
-  fps?: number;
-  backgroundColor?: string;
-} = {}): Scene {
+export function createVerticalScene(
+  options: {
+    width?: number;
+    height?: number;
+    fps?: number;
+    backgroundColor?: string;
+  } = {},
+): Scene {
   return createScene({
     width: options.width ?? 1080,
     height: options.height ?? 1920,
-    ...options
+    ...options,
   });
 }
 
@@ -173,7 +183,7 @@ export const ScenePresets = {
   /** 1280x720 - HD */
   HD: { width: 1280, height: 720 },
   /** 640x360 - SD */
-  SD: { width: 640, height: 360 }
+  SD: { width: 640, height: 360 },
 } as const;
 
 /**
@@ -191,7 +201,7 @@ export const FPSPresets = {
   /** High refresh rate */
   high: 120,
   /** Ultra high refresh rate */
-  ultra: 144
+  ultra: 144,
 } as const;
 
 /**
@@ -211,7 +221,7 @@ export const FPSPresets = {
 export function createSceneFromPreset(
   preset: keyof typeof ScenePresets | { width: number; height: number },
   fps: number = 60,
-  backgroundColor?: string
+  backgroundColor?: string,
 ): Scene {
   const size = typeof preset === 'string' ? ScenePresets[preset] : preset;
 
@@ -219,7 +229,7 @@ export function createSceneFromPreset(
     width: size.width,
     height: size.height,
     fps,
-    backgroundColor
+    ...(backgroundColor !== undefined ? { backgroundColor } : {}),
   });
 }
 
@@ -234,10 +244,7 @@ export function createSceneFromPreset(
  * @param objects - Objects to add
  * @returns A new scene with the objects added
  */
-export function addObjects(
-  scene: Scene,
-  ...objects: RenderObject[]
-): Scene {
+export function addObjects(scene: Scene, ...objects: RenderObject[]): Scene {
   return scene.addObjects(...objects);
 }
 
@@ -259,12 +266,9 @@ export function addObjects(
  */
 export function scheduleAnimations(
   scene: Scene,
-  animations: Array<{ animation: Animation; delay: number }>
+  animations: Array<{ animation: Animation; delay: number }>,
 ): Scene {
-  return animations.reduce(
-    (s, { animation, delay }) => s.schedule(animation, delay),
-    scene
-  );
+  return animations.reduce((s, { animation, delay }) => s.schedule(animation, delay), scene);
 }
 
 /**
@@ -287,7 +291,7 @@ export function renderAt(scene: Scene, time: number): ReadonlyArray<RenderObject
  */
 export function generateFrames(
   scene: Scene,
-  duration: number
+  duration: number,
 ): ReadonlyArray<ReadonlyArray<RenderObject>> {
   const fps = scene.fps;
   const frameCount = Math.floor(duration * fps);
@@ -339,7 +343,7 @@ export function animateSequentially(
   scene: Scene,
   objects: RenderObject[],
   animation: (obj: RenderObject, index: number) => Animation,
-  delay: number = 0.5
+  delay: number = 0.5,
 ): Scene {
   return objects.reduce((s, obj, index) => {
     const anim = animation(obj, index);
@@ -359,7 +363,7 @@ export function animateSequentially(
 export function animateSimultaneously(
   scene: Scene,
   objects: RenderObject[],
-  animation: (obj: RenderObject, index: number) => Animation
+  animation: (obj: RenderObject, index: number) => Animation,
 ): Scene {
   return objects.reduce((s, obj, index) => {
     const anim = animation(obj, index);
@@ -390,7 +394,7 @@ export function wave(
   scene: Scene,
   objects: RenderObject[],
   animation: (obj: RenderObject, index: number) => Animation,
-  delay: number = 0.3
+  delay: number = 0.3,
 ): Scene {
   return animateSequentially(scene, objects, animation, delay);
 }
@@ -424,5 +428,5 @@ export default {
   // Animation helpers
   animateSequentially,
   animateSimultaneously,
-  wave
+  wave,
 };

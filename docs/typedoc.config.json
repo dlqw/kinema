@@ -1,6 +1,6 @@
 {
   "$schema": "https://typedoc.org/schema.json",
-  "entryPoints": ["../src/index.ts"],
+  "entryPoints": ["../packages/core/src/index.ts"],
   "out": "./api/reference",
   "readme": "none",
   "excludePrivate": true,
@@ -33,23 +33,7 @@
     "TypeAlias",
     "Reference"
   ],
-  "groupOrder": [
-    "Core",
-    "Renderer",
-    "Scene",
-    "Animation",
-    "Graphics",
-    "Utils",
-    "*"
-  ],
+  "groupOrder": ["Core", "Renderer", "Scene", "Animation", "Graphics", "Utils", "*"],
   "defaultCategory": "Other",
-  "categoryOrder": [
-    "Core",
-    "Renderer",
-    "Scene",
-    "Animation",
-    "Graphics",
-    "Utils",
-    "*"
-  ]
+  "categoryOrder": ["Core", "Renderer", "Scene", "Animation", "Graphics", "Utils", "*"]
 }

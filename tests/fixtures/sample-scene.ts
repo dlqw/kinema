@@ -3,7 +3,36 @@
  * Provides pre-configured scene objects for testing
  */
 
-import type { SceneNode, Transform, Renderable } from '../../src/types/core';
+/**
+ * Transform component
+ */
+interface Transform {
+  position: { x: number; y: number };
+  rotation: number;
+  scale: { x: number; y: number };
+}
+
+/**
+ * Renderable component
+ */
+interface Renderable {
+  visible: boolean;
+  opacity: number;
+  width: number;
+  height: number;
+  color: string;
+}
+
+/**
+ * Scene node for testing
+ */
+interface SceneNode {
+  id: string;
+  type: string;
+  children: SceneNode[];
+  transform: Transform;
+  renderable?: Renderable;
+}
 
 /**
  * Creates a basic node with transform
@@ -34,7 +63,7 @@ export function createSpriteNode(
     height?: number;
     color?: string;
   } = {},
-): SceneNode & Renderable {
+): SceneNode {
   const {
     position = { x: 0, y: 0 },
     rotation = 0,

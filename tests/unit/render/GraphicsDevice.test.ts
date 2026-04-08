@@ -8,8 +8,8 @@ import {
   GraphicsDeviceFactory,
   GraphicsDevice,
   GraphicsDeviceConfig,
-} from '../../../src/render/graphics/GraphicsDevice';
-import { RenderAPI } from '../../../src/render/core/Capability';
+} from '../../packages/core/src/render/graphics/GraphicsDevice';
+import { RenderAPI } from '../../packages/core/src/render/core/Capability';
 
 // Mock canvas element
 class MockCanvas {
@@ -249,7 +249,7 @@ describe('GraphicsDeviceFactory', () => {
       };
 
       await expect(GraphicsDeviceFactory.create(config)).rejects.toThrow(
-        'No supported graphics API available'
+        'No supported graphics API available',
       );
     });
   });
@@ -371,7 +371,7 @@ describe('GraphicsDeviceFactory', () => {
 
       expect(device.api).toBe(RenderAPI.WebGL2); // Fallback
       expect(console.warn).toHaveBeenCalledWith(
-        '[GraphicsDeviceFactory] WebGPU not available, falling back to WebGL2'
+        '[GraphicsDeviceFactory] WebGPU not available, falling back to WebGL2',
       );
     });
 
@@ -391,7 +391,7 @@ describe('GraphicsDeviceFactory', () => {
       await GraphicsDeviceFactory.create(config);
 
       expect(console.warn).toHaveBeenCalledWith(
-        '[GraphicsDeviceFactory] WebGPU not available, falling back to WebGL2'
+        '[GraphicsDeviceFactory] WebGPU not available, falling back to WebGL2',
       );
     });
 
@@ -411,9 +411,7 @@ describe('GraphicsDeviceFactory', () => {
 
       await GraphicsDeviceFactory.create(config);
 
-      expect(logSpy).toHaveBeenCalledWith(
-        '[GraphicsDeviceFactory] Created WebGPU device'
-      );
+      expect(logSpy).toHaveBeenCalledWith('[GraphicsDeviceFactory] Created WebGPU device');
     });
   });
 

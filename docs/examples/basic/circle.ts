@@ -9,22 +9,10 @@
  * @module examples/basic/circle
  */
 
-import {
-  createScene,
-  Scene
-} from '../../../../packages/core/src/types/scene';
-import {
-  VectorObject
-} from '../../../../packages/core/src/types/objects';
-import {
-  RotateAnimation,
-  FadeInAnimation
-} from '../../../../packages/core/src/types/animation';
-import {
-  smooth,
-  easeInOutCubic,
-  linear
-} from '../../../../packages/core/src/types/easing';
+import { createScene, Scene } from '../../../../packages/core/src/types/scene';
+import { VectorObject } from '../../../../packages/core/src/types/objects';
+import { RotateAnimation, FadeInAnimation } from '../../../../packages/core/src/types/animation';
+import { smooth, easeInOutCubic, linear } from '../../../../packages/core/src/types/easing';
 
 /**
  * 创建旋转圆形示例
@@ -37,10 +25,10 @@ export function createRotatingCircleExample(): Scene {
   // ============================================
 
   const scene: Scene = createScene({
-    width: 1280,           // 场景宽度（像素）
-    height: 720,           // 场景高度（像素）
-    backgroundColor: '#1a1a2e',  // 深蓝色背景
-    fps: 60                // 每秒 60 帧
+    width: 1280, // 场景宽度（像素）
+    height: 720, // 场景高度（像素）
+    backgroundColor: '#1a1a2e', // 深蓝色背景
+    fps: 60, // 每秒 60 帧
   });
 
   // ============================================
@@ -49,22 +37,22 @@ export function createRotatingCircleExample(): Scene {
 
   // 定义圆形的样式
   const circleStroke = {
-    color: '#3498db',      // 蓝色描边
-    width: 0.05            // 描边宽度（相对于场景）
+    color: '#3498db', // 蓝色描边
+    width: 0.05, // 描边宽度（相对于场景）
   };
 
   const circleFill = {
-    color: '#2980b9',      // 深蓝色填充
-    opacity: 0.8           // 填充透明度
+    color: '#2980b9', // 深蓝色填充
+    opacity: 0.8, // 填充透明度
   };
 
   // 创建半径为 1 的圆形
-  // 注意：在 AniMaker 中，尺寸是相对于场景的归一化坐标
+  // 注意：在 Kinema 中，尺寸是相对于场景的归一化坐标
   const circle: VectorObject = VectorObject.circle(
-    1.0,                   // 半径
+    1.0, // 半径
     { x: 0, y: 0, z: 0 }, // 圆心位置（场景中心）
-    circleStroke,         // 描边样式
-    circleFill            // 填充样式
+    circleStroke, // 描边样式
+    circleFill, // 填充样式
   );
 
   // 将圆形添加到场景
@@ -76,45 +64,45 @@ export function createRotatingCircleExample(): Scene {
 
   // 动画 1：淡入效果（0 到 0.5 秒）
   const fadeIn: FadeInAnimation = new FadeInAnimation(circle, {
-    duration: 0.5,        // 持续时间：0.5 秒
-    easing: smooth,       // 使用平滑缓动
-    name: 'fade-in'       // 动画名称（用于调试）
+    duration: 0.5, // 持续时间：0.5 秒
+    easing: smooth, // 使用平滑缓动
+    name: 'fade-in', // 动画名称（用于调试）
   });
 
   // 动画 2：旋转 360 度（0.5 到 2.5 秒）
   const rotateFull: RotateAnimation = new RotateAnimation(
-    circle,               // 目标对象
-    'z',                  // 绕 Z 轴旋转（垂直于屏幕）
-    360,                  // 旋转角度（度）
+    circle, // 目标对象
+    'z', // 绕 Z 轴旋转（垂直于屏幕）
+    360, // 旋转角度（度）
     {
-      duration: 2.0,      // 持续时间：2 秒
-      easing: smooth,     // 平滑加速和减速
-      name: 'rotate-full'
-    }
+      duration: 2.0, // 持续时间：2 秒
+      easing: smooth, // 平滑加速和减速
+      name: 'rotate-full',
+    },
   );
 
   // 动画 3：反向旋转（2.5 到 4 秒）
   const rotateBack: RotateAnimation = new RotateAnimation(
     circle,
     'z',
-    -360,                 // 反向旋转
+    -360, // 反向旋转
     {
       duration: 1.5,
-      easing: easeInOutCubic,  // 使用不同的缓动效果
-      name: 'rotate-back'
-    }
+      easing: easeInOutCubic, // 使用不同的缓动效果
+      name: 'rotate-back',
+    },
   );
 
   // 动画 4：快速旋转（4 到 5 秒）
   const rotateFast: RotateAnimation = new RotateAnimation(
     circle,
     'z',
-    720,                  // 旋转两圈
+    720, // 旋转两圈
     {
       duration: 1.0,
-      easing: linear,     // 匀速旋转
-      name: 'rotate-fast'
-    }
+      easing: linear, // 匀速旋转
+      name: 'rotate-fast',
+    },
   );
 
   // ============================================
@@ -147,23 +135,23 @@ export function createMultipleCirclesExample(): Scene {
     width: 1280,
     height: 720,
     backgroundColor: '#0f0f1e',
-    fps: 60
+    fps: 60,
   });
 
   // 创建三个不同颜色的圆形
   const colors = [
-    { fill: '#e74c3c', stroke: '#c0392b' },  // 红色
-    { fill: '#3498db', stroke: '#2980b9' },  // 蓝色
-    { fill: '#2ecc71', stroke: '#27ae60' }   // 绿色
+    { fill: '#e74c3c', stroke: '#c0392b' }, // 红色
+    { fill: '#3498db', stroke: '#2980b9' }, // 蓝色
+    { fill: '#2ecc71', stroke: '#27ae60' }, // 绿色
   ];
 
   const circles: VectorObject[] = colors.map((color, index) => {
     return VectorObject.circle(
       0.5,
-      { x: -2 + index * 2, y: 0, z: 0 },  // 水平排列
+      { x: -2 + index * 2, y: 0, z: 0 }, // 水平排列
       { color: color.stroke, width: 0.05 },
-      { color: color.fill, opacity: 0.8 }
-    ).withPosition(-2 + index * 2, 0, 0);  // 设置初始位置
+      { color: color.fill, opacity: 0.8 },
+    ).withPosition(-2 + index * 2, 0, 0); // 设置初始位置
   });
 
   // 添加所有圆形到场景
@@ -171,26 +159,21 @@ export function createMultipleCirclesExample(): Scene {
 
   // 为每个圆形创建旋转动画
   circles.forEach((circle, index) => {
-    const rotate: RotateAnimation = new RotateAnimation(
-      circle,
-      'z',
-      360,
-      {
-        duration: 2 + index * 0.5,  // 每个圆形的旋转速度不同
-        easing: smooth,
-        name: `rotate-circle-${index}`
-      }
-    );
+    const rotate: RotateAnimation = new RotateAnimation(circle, 'z', 360, {
+      duration: 2 + index * 0.5, // 每个圆形的旋转速度不同
+      easing: smooth,
+      name: `rotate-circle-${index}`,
+    });
 
     // 淡入动画
     const fadeIn: FadeInAnimation = new FadeInAnimation(circle, {
       duration: 0.5,
       easing: smooth,
-      name: `fade-in-circle-${index}`
+      name: `fade-in-circle-${index}`,
     });
 
     // 调度动画
-    currentScene = currentScene.schedule(fadeIn, index * 0.2);  // 错开淡入时间
+    currentScene = currentScene.schedule(fadeIn, index * 0.2); // 错开淡入时间
     currentScene = currentScene.schedule(rotate, 0.5);
   });
 
