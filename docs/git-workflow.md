@@ -104,7 +104,7 @@ refactor: simplify render pipeline architecture
 ## 发布流程
 
 1. 更新版本号 (package.json)
-2. 更新 CHANGELOG.md
+2. 更新 `changelogs/CHANGELOG.md`
 3. 创建发布标签
 4. 构建和发布
 
