@@ -157,7 +157,7 @@ const animator = new Animator();
 
 - 内部链接：`[快速开始](./getting-started.md)`
 - 外部链接：`[VitePress](https://vitepress.dev/)`
-- API 链接：`[@kinema/core](../api/)
+- API 链接：`[@kinema/core](../api/)`
 
 ## 图片和媒体
 

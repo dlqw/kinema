@@ -271,7 +271,7 @@ export class WebGL2Device implements GraphicsDevice {
 
     // Determine shader type based on code content
     let type: GLenum;
-    let shaderSource = descriptor.code;
+    const shaderSource = descriptor.code;
 
     if (shaderSource.includes('vertex') || shaderSource.includes('gl_Position')) {
       type = gl.VERTEX_SHADER;

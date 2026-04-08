@@ -189,7 +189,8 @@ export function rgbToHsl(rgb: RGB): { h: number; s: number; l: number } {
  * @returns RGB object
  */
 export function hslToRgb(hsl: { h: number; s: number; l: number }): RGB {
-  let { h, s, l } = hsl;
+  let { h } = hsl;
+  const { s, l } = hsl;
   h /= 360;
 
   let r: number, g: number, b: number;

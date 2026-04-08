@@ -163,9 +163,7 @@ export class EventEmitter<TEvents extends EventMap = any> implements IDisposable
    * Set parent emitter for bubbling
    */
   setParent(parent: EventEmitter | undefined): this {
-    if (parent !== undefined) {
-      this._parent = parent;
-    }
+    this._parent = parent;
     return this;
   }
 
