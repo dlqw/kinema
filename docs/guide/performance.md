@@ -1,6 +1,6 @@
 # 性能优化指南
 
-本指南详细介绍 AniMaker 框架的性能优化策略，帮助你创建流畅、高效的动画。
+本指南详细介绍 Kinema 框架的性能优化策略，帮助你创建流畅、高效的动画。
 
 ## 目录
 
@@ -17,26 +17,26 @@
 
 ### 内置性能监控
 
-AniMaker 提供内置的性能分析工具：
+Kinema 提供内置的性能分析工具：
 
 ```typescript
-import { PerformanceMonitor, createScene } from '@animaker/core';
+import { PerformanceMonitor, createScene } from '@kinema/core';
 
 // 创建性能监控器
 const monitor = new PerformanceMonitor({
   // 监控选项
-  enableFPS: true,           // 监控帧率
-  enableMemory: true,        // 监控内存使用
-  enableRenderTime: true,    // 监控渲染时间
-  enableObjectCount: true,   // 监控对象数量
-  reportInterval: 1000       // 报告间隔（毫秒）
+  enableFPS: true, // 监控帧率
+  enableMemory: true, // 监控内存使用
+  enableRenderTime: true, // 监控渲染时间
+  enableObjectCount: true, // 监控对象数量
+  reportInterval: 1000, // 报告间隔（毫秒）
 });
 
 // 绑定到场景
 const scene = createScene({
   width: 1920,
   height: 1080,
-  fps: 60
+  fps: 60,
 });
 
 monitor.attach(scene);
@@ -63,7 +63,7 @@ monitor.addMetric('custom-metric', () => {
 使用性能分析器进行深入分析：
 
 ```typescript
-import { Profiler } from '@animaker/core';
+import { Profiler } from '@kinema/core';
 
 const profiler = new Profiler();
 
@@ -95,6 +95,7 @@ console.log(report);
 利用浏览器内置工具：
 
 **Chrome DevTools Performance:**
+
 ```typescript
 // 标记性能时间点
 performance.mark('animation-start');
@@ -107,12 +108,13 @@ performance.measure('animation', 'animation-start', 'animation-end');
 
 // 获取测量结果
 const measures = performance.getEntriesByName('animation');
-measures.forEach(measure => {
+measures.forEach((measure) => {
   console.log(`Duration: ${measure.duration}ms`);
 });
 ```
 
 **Memory Profiling:**
+
 ```typescript
 // 检查内存使用
 function checkMemory() {
@@ -122,7 +124,7 @@ function checkMemory() {
     const limit = performance.memory.jsHeapSizeLimit / 1024 / 1024;
 
     console.log(`Memory: ${used.toFixed(2)}MB / ${limit.toFixed(2)}MB`);
-    console.log(`Usage: ${(used / limit * 100).toFixed(1)}%`);
+    console.log(`Usage: ${((used / limit) * 100).toFixed(1)}%`);
   }
 }
 
@@ -140,14 +142,14 @@ setInterval(checkMemory, 5000);
 
 ```typescript
 // 不好的做法：每个对象单独渲染
-objects.forEach(obj => {
+objects.forEach((obj) => {
   renderer.setFillColor(obj.getColor());
   renderer.render(obj);
 });
 
 // 好的做法：按颜色分组批量渲染
 const groupedByColor = new Map<string, RenderObject[]>();
-objects.forEach(obj => {
+objects.forEach((obj) => {
   const color = obj.getColor();
   if (!groupedByColor.has(color)) {
     groupedByColor.set(color, []);
@@ -158,7 +160,7 @@ objects.forEach(obj => {
 // 批量渲染
 groupedByColor.forEach((objs, color) => {
   renderer.setFillColor(color);
-  objs.forEach(obj => renderer.render(obj));
+  objs.forEach((obj) => renderer.render(obj));
 });
 ```
 
@@ -174,7 +176,7 @@ class FrustumCuller {
     this.bounds = {
       min: { x: -sceneWidth / 2, y: -sceneHeight / 2, z: 0 },
       max: { x: sceneWidth / 2, y: sceneHeight / 2, z: 0 },
-      center: { x: 0, y: 0, z: 0 }
+      center: { x: 0, y: 0, z: 0 },
     };
   }
 
@@ -185,9 +187,12 @@ class FrustumCuller {
 
   private intersects(a: BoundingBox, b: BoundingBox): boolean {
     return !(
-      a.max.x < b.min.x || a.min.x > b.max.x ||
-      a.max.y < b.min.y || a.min.y > b.max.y ||
-      a.max.z < b.min.z || a.min.z > b.max.z
+      a.max.x < b.min.x ||
+      a.min.x > b.max.x ||
+      a.max.y < b.min.y ||
+      a.min.y > b.max.y ||
+      a.max.z < b.min.z ||
+      a.min.z > b.max.z
     );
   }
 }
@@ -195,7 +200,7 @@ class FrustumCuller {
 // 使用视锥剔除
 const culler = new FrustumCuller(1920, 1080);
 
-const visibleObjects = allObjects.filter(obj => culler.isVisible(obj));
+const visibleObjects = allObjects.filter((obj) => culler.isVisible(obj));
 renderer.render(visibleObjects);
 ```
 
@@ -205,8 +210,8 @@ renderer.render(visibleObjects);
 
 ```typescript
 interface LODConfig {
-  distances: number[];      // 距离阈值
-  qualities: number[];      // 对应的质量级别
+  distances: number[]; // 距离阈值
+  qualities: number[]; // 对应的质量级别
 }
 
 class LODObject implements RenderObject {
@@ -214,11 +219,7 @@ class LODObject implements RenderObject {
   private config: LODConfig;
   private baseState: RenderObjectState;
 
-  constructor(
-    variants: RenderObject[],
-    config: LODConfig,
-    position: Point3D
-  ) {
+  constructor(variants: RenderObject[], config: LODConfig, position: Point3D) {
     this.variants = new Map();
     config.qualities.forEach((quality, index) => {
       this.variants.set(quality, variants[index]);
@@ -253,15 +254,15 @@ class LODObject implements RenderObject {
 // 使用 LOD
 const lodObject = new LODObject(
   [
-    createHighDetailModel(),    // 高质量模型
-    createMediumDetailModel(),  // 中等质量模型
-    createLowDetailModel()      // 低质量模型
+    createHighDetailModel(), // 高质量模型
+    createMediumDetailModel(), // 中等质量模型
+    createLowDetailModel(), // 低质量模型
   ],
   {
     distances: [5, 15],
-    qualities: [1.0, 0.5, 0.25]
+    qualities: [1.0, 0.5, 0.25],
   },
-  { x: 0, y: 0, z: 0 }
+  { x: 0, y: 0, z: 0 },
 );
 ```
 
@@ -273,10 +274,10 @@ const lodObject = new LODObject(
 // 使用实例化渲染
 class InstancedRenderer {
   renderInstances(objects: RenderObject[], prototype: RenderObject) {
-    const instances = objects.map(obj => ({
+    const instances = objects.map((obj) => ({
       position: obj.getState().transform.position,
       rotation: obj.getState().transform.rotation,
-      scale: obj.getState().transform.scale
+      scale: obj.getState().transform.scale,
     }));
 
     // 一次性渲染所有实例
@@ -314,7 +315,7 @@ class TextureAtlas {
 // 不好的做法：每次都重新计算
 class BadAnimation extends Animation {
   interpolate(elapsedTime: number): InterpolationResult {
-    const path = this.calculateComplexPath();  // 每次都计算
+    const path = this.calculateComplexPath(); // 每次都计算
     // ...
   }
 }
@@ -331,7 +332,7 @@ class GoodAnimation extends Animation {
   }
 
   interpolate(elapsedTime: number): InterpolationResult {
-    const path = this.getPath();  // 使用缓存
+    const path = this.getPath(); // 使用缓存
     // ...
   }
 }
@@ -344,7 +345,7 @@ class GoodAnimation extends Animation {
 ```typescript
 class IncrementalAnimator {
   private lastUpdateTime: number = 0;
-  private updateInterval: number = 1 / 60;  // 60 FPS
+  private updateInterval: number = 1 / 60; // 60 FPS
 
   shouldUpdate(currentTime: number): boolean {
     return currentTime - this.lastUpdateTime >= this.updateInterval;
@@ -352,7 +353,7 @@ class IncrementalAnimator {
 
   update(currentTime: number, scene: Scene): Scene {
     if (!this.shouldUpdate(currentTime)) {
-      return scene;  // 跳过更新
+      return scene; // 跳过更新
     }
 
     this.lastUpdateTime = currentTime;
@@ -376,11 +377,7 @@ scene.schedule(anim2, 0);
 scene.schedule(anim3, 0);
 
 // 好的做法：合并为单个动画
-const combined = new AnimationGroup(
-  obj,
-  [anim1, anim2, anim3],
-  CompositionType.Parallel
-);
+const combined = new AnimationGroup(obj, [anim1, anim2, anim3], CompositionType.Parallel);
 
 scene.schedule(combined, 0);
 ```
@@ -414,7 +411,7 @@ class LazyAnimationLoader {
   }
 
   preload(keys: string[]): void {
-    keys.forEach(key => this.load(key));
+    keys.forEach((key) => this.load(key));
   }
 
   clear(): void {
@@ -450,7 +447,7 @@ class ObjectPool<T> {
     factory: () => T,
     reset: (obj: T) => void,
     initialSize: number = 10,
-    maxSize: number = 100
+    maxSize: number = 100,
   ) {
     this.factory = factory;
     this.reset = reset;
@@ -488,8 +485,8 @@ class ObjectPool<T> {
 const particlePool = new ObjectPool(
   () => new Particle(),
   (p) => p.reset(),
-  100,  // 初始大小
-  500   // 最大大小
+  100, // 初始大小
+  500, // 最大大小
 );
 
 // 获取粒子
@@ -529,7 +526,8 @@ class MemoryLeakDetector {
 
     for (let i = 1; i < keys.length; i++) {
       const diff = this.compare(keys[i - 1], keys[i]);
-      if (diff > 1024 * 1024) {  // 超过 1MB
+      if (diff > 1024 * 1024) {
+        // 超过 1MB
         leaks.push(`${keys[i - 1]} -> ${keys[i]}: +${(diff / 1024 / 1024).toFixed(2)}MB`);
       }
     }
@@ -567,7 +565,7 @@ class ResourceManager {
     if (!this.resources.has(key)) {
       this.resources.set(key, {
         resource: factory(),
-        refCount: 0
+        refCount: 0,
       });
     }
 
@@ -615,7 +613,7 @@ class WebGPUMemoryManager {
     const buffer = device.createBuffer({
       size,
       usage,
-      mappedAtCreation: false
+      mappedAtCreation: false,
     });
 
     this.buffers.set(buffer, size);
@@ -643,8 +641,8 @@ class WebGPUMemoryManager {
 
   getMemoryUsage(): number {
     let total = 0;
-    this.buffers.forEach(size => total += size);
-    this.textures.forEach(size => total += size);
+    this.buffers.forEach((size) => (total += size));
+    this.textures.forEach((size) => (total += size));
     return total;
   }
 
@@ -714,12 +712,14 @@ class WebGPUCommandOptimizer {
   // 批量编码
   encodePass(encoder: GPUCommandEncoder, callback: (pass: GPURenderPassEncoder) => void): void {
     const passEncoder = encoder.beginRenderPass({
-      colorAttachments: [{
-        view: getCurrentTextureView(),
-        clearValue: { r: 0, g: 0, b: 0, a: 1 },
-        loadOp: 'clear',
-        storeOp: 'store'
-      }]
+      colorAttachments: [
+        {
+          view: getCurrentTextureView(),
+          clearValue: { r: 0, g: 0, b: 0, a: 1 },
+          loadOp: 'clear',
+          storeOp: 'store',
+        },
+      ],
     });
 
     callback(passEncoder);
@@ -749,11 +749,11 @@ class WebGPUCommandOptimizer {
 
 不同平台的性能目标：
 
-| 平台 | 目标帧率 | 最大对象数 | 最大内存 |
-|------|----------|------------|----------|
-| 桌面浏览器 | 60 FPS | 1000+ | 500MB |
-| 移动浏览器 | 30-60 FPS | 500+ | 200MB |
-| 低端设备 | 30 FPS | 200+ | 100MB |
+| 平台       | 目标帧率  | 最大对象数 | 最大内存 |
+| ---------- | --------- | ---------- | -------- |
+| 桌面浏览器 | 60 FPS    | 1000+      | 500MB    |
+| 移动浏览器 | 30-60 FPS | 500+       | 200MB    |
+| 低端设备   | 30 FPS    | 200+       | 100MB    |
 
 ### 3. 优化优先级
 
@@ -827,7 +827,7 @@ class PerformanceMonitor {
       frameTime: this.getAverage('frameTime'),
       memory: this.getAverage('memory'),
       objectCount: this.getAverage('objectCount'),
-      trends: {}
+      trends: {},
     };
 
     this.metrics.forEach((_, name) => {

@@ -33,7 +33,7 @@ export class MoveAnimation extends Animation {
   constructor(
     target: RenderObject,
     private readonly delta: Point3D,
-    config: AnimationConfig = {}
+    config: AnimationConfig = {},
   ) {
     super(target, config);
   }
@@ -44,12 +44,12 @@ export class MoveAnimation extends Animation {
    * @param alpha - Progress value [0, 1]
    * @returns Object with interpolated position
    */
-  protected interpolateAt(alpha: Alpha): RenderObject {
+  protected override interpolateAt(alpha: Alpha): RenderObject {
     const current = this.target.getState().position;
     return this.target.withPosition(
       current.x + this.delta.x * alpha,
       current.y + this.delta.y * alpha,
-      current.z + this.delta.z * alpha
+      current.z + this.delta.z * alpha,
     );
   }
 
@@ -61,11 +61,7 @@ export class MoveAnimation extends Animation {
    * @param duration - Animation duration in seconds
    * @returns A new MoveAnimation
    */
-  static create(
-    target: RenderObject,
-    delta: Point3D,
-    duration: number = 1
-  ): MoveAnimation {
+  static create(target: RenderObject, delta: Point3D, duration: number = 1): MoveAnimation {
     return new MoveAnimation(target, delta, { duration });
   }
 
@@ -77,11 +73,7 @@ export class MoveAnimation extends Animation {
    * @param duration - Animation duration in seconds
    * @returns A new MoveAnimation
    */
-  static horizontal(
-    target: RenderObject,
-    deltaX: number,
-    duration: number = 1
-  ): MoveAnimation {
+  static horizontal(target: RenderObject, deltaX: number, duration: number = 1): MoveAnimation {
     return new MoveAnimation(target, { x: deltaX, y: 0, z: 0 }, { duration });
   }
 
@@ -93,11 +85,7 @@ export class MoveAnimation extends Animation {
    * @param duration - Animation duration in seconds
    * @returns A new MoveAnimation
    */
-  static vertical(
-    target: RenderObject,
-    deltaY: number,
-    duration: number = 1
-  ): MoveAnimation {
+  static vertical(target: RenderObject, deltaY: number, duration: number = 1): MoveAnimation {
     return new MoveAnimation(target, { x: 0, y: deltaY, z: 0 }, { duration });
   }
 }
@@ -127,7 +115,7 @@ export class MoveToAnimation extends Animation {
   constructor(
     target: RenderObject,
     private readonly targetPosition: Point3D,
-    config: AnimationConfig = {}
+    config: AnimationConfig = {},
   ) {
     super(target, config);
     this.startPosition = target.getState().position;
@@ -139,14 +127,13 @@ export class MoveToAnimation extends Animation {
    * @param alpha - Progress value [0, 1]
    * @returns Object with interpolated position
    */
-  protected interpolateAt(alpha: Alpha): RenderObject {
-    const lerp = (start: number, end: number): number =>
-      start + (end - start) * alpha;
+  protected override interpolateAt(alpha: Alpha): RenderObject {
+    const lerp = (start: number, end: number): number => start + (end - start) * alpha;
 
     return this.target.withPosition(
       lerp(this.startPosition.x, this.targetPosition.x),
       lerp(this.startPosition.y, this.targetPosition.y),
-      lerp(this.startPosition.z, this.targetPosition.z)
+      lerp(this.startPosition.z, this.targetPosition.z),
     );
   }
 
@@ -161,7 +148,7 @@ export class MoveToAnimation extends Animation {
   static create(
     target: RenderObject,
     targetPosition: Point3D,
-    duration: number = 1
+    duration: number = 1,
   ): MoveToAnimation {
     return new MoveToAnimation(target, targetPosition, { duration });
   }
@@ -173,10 +160,7 @@ export class MoveToAnimation extends Animation {
    * @param duration - Animation duration in seconds
    * @returns A new MoveToAnimation to origin
    */
-  static toCenter(
-    target: RenderObject,
-    duration: number = 1
-  ): MoveToAnimation {
+  static toCenter(target: RenderObject, duration: number = 1): MoveToAnimation {
     return MoveToAnimation.create(target, { x: 0, y: 0, z: 0 }, duration);
   }
 }
@@ -208,7 +192,7 @@ export class PathAnimation extends Animation {
   constructor(
     target: RenderObject,
     private readonly path: ReadonlyArray<Point3D>,
-    config: AnimationConfig = {}
+    config: AnimationConfig = {},
   ) {
     super(target, config);
     this.startPosition = target.getState().position;
@@ -224,22 +208,20 @@ export class PathAnimation extends Animation {
    * @param alpha - Progress value [0, 1]
    * @returns Object with interpolated position
    */
-  protected interpolateAt(alpha: Alpha): RenderObject {
+  protected override interpolateAt(alpha: Alpha): RenderObject {
     if (this.path.length === 1) {
-      const point = this.path[0];
+      const point = this.path[0]!;
       return this.target.withPosition(point.x, point.y, point.z);
     }
 
     // Calculate which segment we're in
     const segmentProgress = alpha * (this.path.length - 1);
-    const segmentIndex = Math.floor(segmentProgress);
-    const segmentAlpha = segmentProgress - segmentIndex;
+    const segmentIndex = Math.min(Math.floor(segmentProgress), this.path.length - 1);
+    const segmentAlpha = segmentProgress - Math.floor(segmentProgress);
 
     // Get segment endpoints
-    const start = segmentIndex === 0
-      ? this.startPosition
-      : this.path[segmentIndex - 1];
-    const end = this.path[segmentIndex];
+    const start = segmentIndex === 0 ? this.startPosition : this.path[segmentIndex - 1]!;
+    const end = this.path[segmentIndex]!;
 
     // Interpolate within segment
     const lerp = (s: number, e: number): number => s + (e - s) * segmentAlpha;
@@ -247,7 +229,7 @@ export class PathAnimation extends Animation {
     return this.target.withPosition(
       lerp(start.x, end.x),
       lerp(start.y, end.y),
-      lerp(start.z, end.z)
+      lerp(start.z, end.z),
     );
   }
 
@@ -262,7 +244,7 @@ export class PathAnimation extends Animation {
   static create(
     target: RenderObject,
     path: ReadonlyArray<Point3D>,
-    duration: number = 1
+    duration: number = 1,
   ): PathAnimation {
     return new PathAnimation(target, path, { duration });
   }
@@ -282,7 +264,7 @@ export class PathAnimation extends Animation {
     radius: number,
     center: Point3D = { x: 0, y: 0, z: 0 },
     segments: number = 16,
-    duration: number = 2
+    duration: number = 2,
   ): PathAnimation {
     const path: Point3D[] = [];
 
@@ -291,7 +273,7 @@ export class PathAnimation extends Animation {
       path.push({
         x: center.x + radius * Math.cos(angle),
         y: center.y + radius * Math.sin(angle),
-        z: center.z
+        z: center.z,
       });
     }
 
@@ -299,5 +281,7 @@ export class PathAnimation extends Animation {
   }
 }
 
-// Default export
+/**
+ * Default export
+ */
 export default MoveAnimation;

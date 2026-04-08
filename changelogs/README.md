@@ -1,6 +1,6 @@
 # Changelogs
 
-This directory contains detailed release notes for each version of AniMaker.
+This directory contains detailed release notes for each version of Kinema.
 
 ## Format
 

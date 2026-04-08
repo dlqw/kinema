@@ -14,26 +14,28 @@
  *   - 性能对比
  */
 
-import { Scene, Circle, Rectangle, Text, Group, Line } from '../../src'
-import type { RenderObject } from '../../src'
-import { colors, videoConfig } from '../main'
-import { Easing } from '../../src/easing'
+import { Scene, Circle, Rectangle, Text, Group, Line } from '../../src';
+import type { RenderObject } from '../../src';
+import { colors, videoConfig } from '../main';
+import { Easing } from '../../src/easing';
 
 // Type aliases to avoid DOM type conflicts
-type AnimText = ReturnType<typeof Text>
-type AnimRectangle = ReturnType<typeof Rectangle>
+type AnimText = ReturnType<typeof Text>;
+type AnimRectangle = ReturnType<typeof Rectangle>;
 
 // === 工具函数 ===
 
 function createPanel(x: number, y: number, width: number, height: number, title: string) {
   const background = Rectangle({
-    x, y,
-    width, height,
+    x,
+    y,
+    width,
+    height,
     color: '#161B22',
     cornerRadius: 12,
     border: { color: '#30363D', width: 1 },
     opacity: 0,
-  })
+  });
 
   const titleText = Text({
     x: x + 20,
@@ -42,48 +44,64 @@ function createPanel(x: number, y: number, width: number, height: number, title:
     fontSize: 18,
     color: colors.text.primary,
     opacity: 0,
-  })
+  });
 
-  return { background, titleText }
+  return { background, titleText };
 }
 
 function createCodeBlock(x: number, y: number, lines: { code: string; color?: string }[]) {
-  const elements: any[] = []
+  const elements: any[] = [];
 
   lines.forEach((line, index) => {
-    elements.push(Text({
-      x: x + 15,
-      y: y + 15 + index * 24,
-      content: line.code,
-      fontSize: 14,
-      fontFamily: 'JetBrains Mono, monospace',
-      color: line.color || colors.code.text,
-      opacity: 0,
-    }))
-  })
+    elements.push(
+      Text({
+        x: x + 15,
+        y: y + 15 + index * 24,
+        content: line.code,
+        fontSize: 14,
+        fontFamily: 'JetBrains Mono, monospace',
+        color: line.color || colors.code.text,
+        opacity: 0,
+      }),
+    );
+  });
 
-  return elements
+  return elements;
 }
 
 function createAnimatedShape(type: string, x: number, y: number, size: number, color: string) {
   switch (type) {
     case 'circle':
-      return Circle({ x, y, radius: size, color, opacity: 0 })
+      return Circle({ x, y, radius: size, color, opacity: 0 });
     case 'square':
-      return Rectangle({ x: x - size, y: y - size, width: size * 2, height: size * 2, color, opacity: 0 })
+      return Rectangle({
+        x: x - size,
+        y: y - size,
+        width: size * 2,
+        height: size * 2,
+        color,
+        opacity: 0,
+      });
     case 'triangle':
       // 用文本近似三角形
-      return Text({ x: x - size, y: y - size, content: '▲', fontSize: size * 2, color, opacity: 0 })
+      return Text({
+        x: x - size,
+        y: y - size,
+        content: '▲',
+        fontSize: size * 2,
+        color,
+        opacity: 0,
+      });
     default:
-      return Circle({ x, y, radius: size, color, opacity: 0 })
+      return Circle({ x, y, radius: size, color, opacity: 0 });
   }
 }
 
 // === 3.1 易用性展示 ===
 
 function createEaseOfUseSection(scene: Scene, startTime: number) {
-  const centerX = videoConfig.width / 2
-  const centerY = videoConfig.height / 2
+  const centerX = videoConfig.width / 2;
+  const centerY = videoConfig.height / 2;
 
   // 标题
   const sectionTitle = Text({
@@ -93,7 +111,7 @@ function createEaseOfUseSection(scene: Scene, startTime: number) {
     fontSize: 42,
     color: colors.brand,
     opacity: 0,
-  })
+  });
 
   scene.timeline.add({
     target: sectionTitle,
@@ -103,10 +121,10 @@ function createEaseOfUseSection(scene: Scene, startTime: number) {
     from: 0,
     to: 1,
     easing: Easing.easeOut,
-  })
+  });
 
   // 左侧：代码编辑器
-  const codePanel = createPanel(80, 140, 600, 400, 'animation.ts')
+  const codePanel = createPanel(80, 140, 600, 400, 'animation.ts');
 
   const codeLines = createCodeBlock(80, 140, [
     { code: '// 创建各种图形，一行搞定', color: colors.code.comment },
@@ -122,10 +140,10 @@ function createEaseOfUseSection(scene: Scene, startTime: number) {
     { code: '  .moveTo(100, 100)', color: colors.code.text },
     { code: '  .rotate(360)', color: colors.code.text },
     { code: '  .fadeIn()', color: colors.code.text },
-  ])
+  ]);
 
   // 右侧：效果预览
-  const previewPanel = createPanel(720, 140, 700, 400, '预览')
+  const previewPanel = createPanel(720, 140, 700, 400, '预览');
 
   // 创建演示图形
   const demoCircle = Circle({
@@ -134,7 +152,7 @@ function createEaseOfUseSection(scene: Scene, startTime: number) {
     radius: 30,
     color: '#FF6B6B',
     opacity: 0,
-  })
+  });
 
   const demoRect = Rectangle({
     x: centerX + 250,
@@ -143,7 +161,7 @@ function createEaseOfUseSection(scene: Scene, startTime: number) {
     height: 60,
     color: '#4ECDC4',
     opacity: 0,
-  })
+  });
 
   const demoText = Text({
     x: centerX + 450,
@@ -152,7 +170,7 @@ function createEaseOfUseSection(scene: Scene, startTime: number) {
     fontSize: 28,
     color: '#FFE66D',
     opacity: 0,
-  })
+  });
 
   // 字幕
   const subtitle1 = Text({
@@ -162,7 +180,7 @@ function createEaseOfUseSection(scene: Scene, startTime: number) {
     fontSize: 28,
     color: colors.text.accent,
     opacity: 0,
-  })
+  });
 
   const subtitle2 = Text({
     x: centerX,
@@ -171,7 +189,7 @@ function createEaseOfUseSection(scene: Scene, startTime: number) {
     fontSize: 28,
     color: colors.text.accent,
     opacity: 0,
-  })
+  });
 
   // 动画时间线
   // 面板出现
@@ -183,7 +201,7 @@ function createEaseOfUseSection(scene: Scene, startTime: number) {
     from: 0,
     to: 1,
     easing: Easing.easeOut,
-  })
+  });
 
   scene.timeline.add({
     target: codePanel.titleText,
@@ -193,7 +211,7 @@ function createEaseOfUseSection(scene: Scene, startTime: number) {
     from: 0,
     to: 1,
     easing: Easing.easeOut,
-  })
+  });
 
   scene.timeline.add({
     target: previewPanel.background,
@@ -203,7 +221,7 @@ function createEaseOfUseSection(scene: Scene, startTime: number) {
     from: 0,
     to: 1,
     easing: Easing.easeOut,
-  })
+  });
 
   scene.timeline.add({
     target: previewPanel.titleText,
@@ -213,7 +231,7 @@ function createEaseOfUseSection(scene: Scene, startTime: number) {
     from: 0,
     to: 1,
     easing: Easing.easeOut,
-  })
+  });
 
   // 代码逐行出现
   codeLines.forEach((line, i) => {
@@ -225,8 +243,8 @@ function createEaseOfUseSection(scene: Scene, startTime: number) {
       from: 0,
       to: 1,
       easing: Easing.easeOut,
-    })
-  })
+    });
+  });
 
   // 图形同步出现
   scene.timeline.add({
@@ -237,7 +255,7 @@ function createEaseOfUseSection(scene: Scene, startTime: number) {
     from: 0,
     to: 1,
     easing: Easing.easeOut,
-  })
+  });
 
   scene.timeline.add({
     target: demoCircle,
@@ -247,7 +265,7 @@ function createEaseOfUseSection(scene: Scene, startTime: number) {
     from: 0,
     to: 1,
     easing: Easing.easeOutBack,
-  })
+  });
 
   scene.timeline.add({
     target: demoRect,
@@ -257,7 +275,7 @@ function createEaseOfUseSection(scene: Scene, startTime: number) {
     from: 0,
     to: 1,
     easing: Easing.easeOut,
-  })
+  });
 
   scene.timeline.add({
     target: demoText,
@@ -267,7 +285,7 @@ function createEaseOfUseSection(scene: Scene, startTime: number) {
     from: 0,
     to: 1,
     easing: Easing.easeOut,
-  })
+  });
 
   // 字幕
   scene.timeline.add({
@@ -278,7 +296,7 @@ function createEaseOfUseSection(scene: Scene, startTime: number) {
     from: 0,
     to: 1,
     easing: Easing.easeOut,
-  })
+  });
 
   scene.timeline.add({
     target: subtitle1,
@@ -288,7 +306,7 @@ function createEaseOfUseSection(scene: Scene, startTime: number) {
     from: 1,
     to: 0,
     easing: Easing.easeIn,
-  })
+  });
 
   scene.timeline.add({
     target: subtitle2,
@@ -298,7 +316,7 @@ function createEaseOfUseSection(scene: Scene, startTime: number) {
     from: 0,
     to: 1,
     easing: Easing.easeOut,
-  })
+  });
 
   // 动画演示
   scene.timeline.add({
@@ -309,7 +327,7 @@ function createEaseOfUseSection(scene: Scene, startTime: number) {
     from: centerX + 350,
     to: centerX + 250,
     easing: Easing.easeInOut,
-  })
+  });
 
   scene.timeline.add({
     target: demoCircle,
@@ -319,7 +337,7 @@ function createEaseOfUseSection(scene: Scene, startTime: number) {
     from: 0,
     to: 360,
     easing: Easing.easeInOut,
-  })
+  });
 
   scene.timeline.add({
     target: demoCircle,
@@ -329,7 +347,7 @@ function createEaseOfUseSection(scene: Scene, startTime: number) {
     from: 0.5,
     to: 1,
     easing: Easing.easeOut,
-  })
+  });
 
   // 清理
   scene.timeline.add({
@@ -340,10 +358,19 @@ function createEaseOfUseSection(scene: Scene, startTime: number) {
     from: 1,
     to: 0,
     easing: Easing.easeIn,
-  })
-
-  ;[codePanel.background, codePanel.titleText, previewPanel.background, previewPanel.titleText,
-    ...codeLines, demoCircle, demoRect, demoText, subtitle1, subtitle2].forEach((el) => {
+  });
+  [
+    codePanel.background,
+    codePanel.titleText,
+    previewPanel.background,
+    previewPanel.titleText,
+    ...codeLines,
+    demoCircle,
+    demoRect,
+    demoText,
+    subtitle1,
+    subtitle2,
+  ].forEach((el) => {
     scene.timeline.add({
       target: el,
       startTime: startTime + 20,
@@ -352,23 +379,23 @@ function createEaseOfUseSection(scene: Scene, startTime: number) {
       from: 1,
       to: 0,
       easing: Easing.easeIn,
-    })
-  })
+    });
+  });
 
   // 添加元素
-  scene.add(sectionTitle)
-  scene.add(codePanel.background, codePanel.titleText)
-  scene.add(previewPanel.background, previewPanel.titleText)
-  codeLines.forEach((line) => scene.add(line))
-  scene.add(demoCircle, demoRect, demoText)
-  scene.add(subtitle1, subtitle2)
+  scene.add(sectionTitle);
+  scene.add(codePanel.background, codePanel.titleText);
+  scene.add(previewPanel.background, previewPanel.titleText);
+  codeLines.forEach((line) => scene.add(line));
+  scene.add(demoCircle, demoRect, demoText);
+  scene.add(subtitle1, subtitle2);
 }
 
 // === 3.2 功能丰富展示 ===
 
 function createFeaturesSection(scene: Scene, startTime: number) {
-  const centerX = videoConfig.width / 2
-  const centerY = videoConfig.height / 2
+  const centerX = videoConfig.width / 2;
+  const centerY = videoConfig.height / 2;
 
   // 标题
   const sectionTitle = Text({
@@ -378,7 +405,7 @@ function createFeaturesSection(scene: Scene, startTime: number) {
     fontSize: 42,
     color: colors.brand,
     opacity: 0,
-  })
+  });
 
   scene.timeline.add({
     target: sectionTitle,
@@ -388,27 +415,27 @@ function createFeaturesSection(scene: Scene, startTime: number) {
     from: 0,
     to: 1,
     easing: Easing.easeOut,
-  })
+  });
 
   // 动画效果网格 (3x3)
   const effectNames = [
     ['移动', '旋转', '缩放'],
     ['路径', '变形', '弹跳'],
     ['粒子', '波浪', '爆炸'],
-  ]
+  ];
 
-  const gridSize = 160
-  const startX = centerX - gridSize * 1.5
-  const startY = centerY - gridSize * 1
+  const gridSize = 160;
+  const startX = centerX - gridSize * 1.5;
+  const startY = centerY - gridSize * 1;
 
-  const gridCells: any[] = []
-  const gridLabels: any[] = []
-  const gridDemos: any[] = []
+  const gridCells: any[] = [];
+  const gridLabels: any[] = [];
+  const gridDemos: any[] = [];
 
   effectNames.forEach((row, rowIndex) => {
     row.forEach((name, colIndex) => {
-      const x = startX + colIndex * gridSize + gridSize / 2
-      const y = startY + rowIndex * gridSize + gridSize / 2
+      const x = startX + colIndex * gridSize + gridSize / 2;
+      const y = startY + rowIndex * gridSize + gridSize / 2;
 
       // 单元格背景
       const cell = Rectangle({
@@ -420,8 +447,8 @@ function createFeaturesSection(scene: Scene, startTime: number) {
         cornerRadius: 12,
         border: { color: '#30363D', width: 1 },
         opacity: 0,
-      })
-      gridCells.push(cell)
+      });
+      gridCells.push(cell);
 
       // 标签
       const label = Text({
@@ -431,8 +458,8 @@ function createFeaturesSection(scene: Scene, startTime: number) {
         fontSize: 16,
         color: colors.text.secondary,
         opacity: 0,
-      })
-      gridLabels.push(label)
+      });
+      gridLabels.push(label);
 
       // 演示图形
       const demo = createAnimatedShape(
@@ -440,11 +467,11 @@ function createFeaturesSection(scene: Scene, startTime: number) {
         x,
         y - 10,
         20,
-        colors.brand
-      )
-      gridDemos.push(demo)
-    })
-  })
+        colors.brand,
+      );
+      gridDemos.push(demo);
+    });
+  });
 
   // 网格出现动画
   gridCells.forEach((cell, i) => {
@@ -456,8 +483,8 @@ function createFeaturesSection(scene: Scene, startTime: number) {
       from: 0,
       to: 1,
       easing: Easing.easeOut,
-    })
-  })
+    });
+  });
 
   gridLabels.forEach((label, i) => {
     scene.timeline.add({
@@ -468,8 +495,8 @@ function createFeaturesSection(scene: Scene, startTime: number) {
       from: 0,
       to: 1,
       easing: Easing.easeOut,
-    })
-  })
+    });
+  });
 
   gridDemos.forEach((demo, i) => {
     scene.timeline.add({
@@ -480,8 +507,8 @@ function createFeaturesSection(scene: Scene, startTime: number) {
       from: 0,
       to: 1,
       easing: Easing.easeOut,
-    })
-  })
+    });
+  });
 
   // 高亮效果：依次突出每个格子
   gridCells.forEach((cell, i) => {
@@ -494,7 +521,7 @@ function createFeaturesSection(scene: Scene, startTime: number) {
       from: 1,
       to: 1.1,
       easing: Easing.easeOut,
-    })
+    });
     scene.timeline.add({
       target: cell,
       startTime: startTime + 3.3 + i * 0.8,
@@ -503,12 +530,12 @@ function createFeaturesSection(scene: Scene, startTime: number) {
       from: 1.1,
       to: 1,
       easing: Easing.easeIn,
-    })
+    });
 
     // 对应演示动画
-    const demo = gridDemos[i]
-    const row = Math.floor(i / 3)
-    const col = i % 3
+    const demo = gridDemos[i];
+    const row = Math.floor(i / 3);
+    const col = i % 3;
 
     // 根据位置执行不同动画
     if (row === 0 && col === 0) {
@@ -521,7 +548,7 @@ function createFeaturesSection(scene: Scene, startTime: number) {
         from: demo.x,
         to: demo.x + 30,
         easing: Easing.easeInOut,
-      })
+      });
     } else if (row === 0 && col === 1) {
       // 旋转
       scene.timeline.add({
@@ -532,7 +559,7 @@ function createFeaturesSection(scene: Scene, startTime: number) {
         from: 0,
         to: 360,
         easing: Easing.easeInOut,
-      })
+      });
     } else if (row === 0 && col === 2) {
       // 缩放
       scene.timeline.add({
@@ -543,7 +570,7 @@ function createFeaturesSection(scene: Scene, startTime: number) {
         from: 1,
         to: 1.5,
         easing: Easing.easeOut,
-      })
+      });
       scene.timeline.add({
         target: demo,
         startTime: startTime + 3.3 + i * 0.8,
@@ -552,9 +579,9 @@ function createFeaturesSection(scene: Scene, startTime: number) {
         from: 1.5,
         to: 1,
         easing: Easing.easeIn,
-      })
+      });
     }
-  })
+  });
 
   // 字幕
   const subtitle = Text({
@@ -564,7 +591,7 @@ function createFeaturesSection(scene: Scene, startTime: number) {
     fontSize: 28,
     color: colors.text.accent,
     opacity: 0,
-  })
+  });
 
   scene.timeline.add({
     target: subtitle,
@@ -574,7 +601,7 @@ function createFeaturesSection(scene: Scene, startTime: number) {
     from: 0,
     to: 1,
     easing: Easing.easeOut,
-  })
+  });
 
   // 清理
   scene.timeline.add({
@@ -585,9 +612,8 @@ function createFeaturesSection(scene: Scene, startTime: number) {
     from: 1,
     to: 0,
     easing: Easing.easeIn,
-  })
-
-  ;[...gridCells, ...gridLabels, ...gridDemos, subtitle].forEach((el) => {
+  });
+  [...gridCells, ...gridLabels, ...gridDemos, subtitle].forEach((el) => {
     scene.timeline.add({
       target: el,
       startTime: startTime + 22,
@@ -596,22 +622,22 @@ function createFeaturesSection(scene: Scene, startTime: number) {
       from: 1,
       to: 0,
       easing: Easing.easeIn,
-    })
-  })
+    });
+  });
 
   // 添加元素
-  scene.add(sectionTitle)
-  gridCells.forEach((cell) => scene.add(cell))
-  gridLabels.forEach((label) => scene.add(label))
-  gridDemos.forEach((demo) => scene.add(demo))
-  scene.add(subtitle)
+  scene.add(sectionTitle);
+  gridCells.forEach((cell) => scene.add(cell));
+  gridLabels.forEach((label) => scene.add(label));
+  gridDemos.forEach((demo) => scene.add(demo));
+  scene.add(subtitle);
 }
 
 // === 3.3 性能展示 ===
 
 function createPerformanceSection(scene: Scene, startTime: number) {
-  const centerX = videoConfig.width / 2
-  const centerY = videoConfig.height / 2
+  const centerX = videoConfig.width / 2;
+  const centerY = videoConfig.height / 2;
 
   // 标题
   const sectionTitle = Text({
@@ -621,7 +647,7 @@ function createPerformanceSection(scene: Scene, startTime: number) {
     fontSize: 42,
     color: colors.brand,
     opacity: 0,
-  })
+  });
 
   scene.timeline.add({
     target: sectionTitle,
@@ -631,10 +657,10 @@ function createPerformanceSection(scene: Scene, startTime: number) {
     from: 0,
     to: 1,
     easing: Easing.easeOut,
-  })
+  });
 
   // 性能监控面板
-  const monitorPanel = createPanel(100, 150, 800, 450, '性能监控')
+  const monitorPanel = createPanel(100, 150, 800, 450, '性能监控');
 
   // GPU 使用率
   const gpuLabel = Text({
@@ -644,7 +670,7 @@ function createPerformanceSection(scene: Scene, startTime: number) {
     fontSize: 20,
     color: colors.text.primary,
     opacity: 0,
-  })
+  });
 
   const gpuBar = Rectangle({
     x: 140,
@@ -654,7 +680,7 @@ function createPerformanceSection(scene: Scene, startTime: number) {
     color: colors.success,
     cornerRadius: 4,
     opacity: 0,
-  })
+  });
 
   const gpuBarBg = Rectangle({
     x: 140,
@@ -664,7 +690,7 @@ function createPerformanceSection(scene: Scene, startTime: number) {
     color: '#21262D',
     cornerRadius: 4,
     opacity: 0,
-  })
+  });
 
   const gpuValue = Text({
     x: 650,
@@ -673,7 +699,7 @@ function createPerformanceSection(scene: Scene, startTime: number) {
     fontSize: 16,
     color: colors.success,
     opacity: 0,
-  })
+  });
 
   // FPS
   const fpsLabel = Text({
@@ -683,10 +709,10 @@ function createPerformanceSection(scene: Scene, startTime: number) {
     fontSize: 20,
     color: colors.text.primary,
     opacity: 0,
-  })
+  });
 
   // FPS 波形图 (简化)
-  const fpsBars: AnimRectangle[] = []
+  const fpsBars: AnimRectangle[] = [];
   for (let i = 0; i < 20; i++) {
     const bar = Rectangle({
       x: 140 + i * 25,
@@ -696,8 +722,8 @@ function createPerformanceSection(scene: Scene, startTime: number) {
       color: colors.brand,
       cornerRadius: 2,
       opacity: 0,
-    })
-    fpsBars.push(bar)
+    });
+    fpsBars.push(bar);
   }
 
   // 内存
@@ -708,7 +734,7 @@ function createPerformanceSection(scene: Scene, startTime: number) {
     fontSize: 20,
     color: colors.text.primary,
     opacity: 0,
-  })
+  });
 
   const memBar = Rectangle({
     x: 140,
@@ -718,7 +744,7 @@ function createPerformanceSection(scene: Scene, startTime: number) {
     color: colors.brand,
     cornerRadius: 4,
     opacity: 0,
-  })
+  });
 
   const memBarBg = Rectangle({
     x: 140,
@@ -728,7 +754,7 @@ function createPerformanceSection(scene: Scene, startTime: number) {
     color: '#21262D',
     cornerRadius: 4,
     opacity: 0,
-  })
+  });
 
   const memValue = Text({
     x: 650,
@@ -737,19 +763,19 @@ function createPerformanceSection(scene: Scene, startTime: number) {
     fontSize: 16,
     color: colors.brand,
     opacity: 0,
-  })
+  });
 
   // 性能对比面板
-  const comparePanel = createPanel(950, 150, 800, 450, '性能对比')
+  const comparePanel = createPanel(950, 150, 800, 450, '性能对比');
 
   // 对比数据
-  const frameworks = ['AniMaker', 'Canvas', 'SVG', 'DOM']
-  const scores = [98, 72, 55, 35]
-  const barColors = [colors.success, colors.warning, '#8B949E', colors.error]
+  const frameworks = ['Kinema', 'Canvas', 'SVG', 'DOM'];
+  const scores = [98, 72, 55, 35];
+  const barColors = [colors.success, colors.warning, '#8B949E', colors.error];
 
-  const compareBars: AnimRectangle[] = []
-  const compareLabels: AnimText[] = []
-  const compareScores: AnimText[] = []
+  const compareBars: AnimRectangle[] = [];
+  const compareLabels: AnimText[] = [];
+  const compareScores: AnimText[] = [];
 
   frameworks.forEach((name, i) => {
     const label = Text({
@@ -759,8 +785,8 @@ function createPerformanceSection(scene: Scene, startTime: number) {
       fontSize: 18,
       color: colors.text.primary,
       opacity: 0,
-    })
-    compareLabels.push(label)
+    });
+    compareLabels.push(label);
 
     const bar = Rectangle({
       x: 1150,
@@ -770,8 +796,8 @@ function createPerformanceSection(scene: Scene, startTime: number) {
       color: barColors[i],
       cornerRadius: 4,
       opacity: 0,
-    })
-    compareBars.push(bar)
+    });
+    compareBars.push(bar);
 
     const score = Text({
       x: 1160,
@@ -780,9 +806,9 @@ function createPerformanceSection(scene: Scene, startTime: number) {
       fontSize: 16,
       color: barColors[i],
       opacity: 0,
-    })
-    compareScores.push(score)
-  })
+    });
+    compareScores.push(score);
+  });
 
   // 动画时间线
 
@@ -795,7 +821,7 @@ function createPerformanceSection(scene: Scene, startTime: number) {
     from: 0,
     to: 1,
     easing: Easing.easeOut,
-  })
+  });
   scene.timeline.add({
     target: monitorPanel.titleText,
     startTime: startTime + 0.5,
@@ -804,7 +830,7 @@ function createPerformanceSection(scene: Scene, startTime: number) {
     from: 0,
     to: 1,
     easing: Easing.easeOut,
-  })
+  });
 
   scene.timeline.add({
     target: comparePanel.background,
@@ -814,7 +840,7 @@ function createPerformanceSection(scene: Scene, startTime: number) {
     from: 0,
     to: 1,
     easing: Easing.easeOut,
-  })
+  });
   scene.timeline.add({
     target: comparePanel.titleText,
     startTime: startTime + 0.7,
@@ -823,7 +849,7 @@ function createPerformanceSection(scene: Scene, startTime: number) {
     from: 0,
     to: 1,
     easing: Easing.easeOut,
-  })
+  });
 
   // GPU 指标
   scene.timeline.add({
@@ -834,7 +860,7 @@ function createPerformanceSection(scene: Scene, startTime: number) {
     from: 0,
     to: 1,
     easing: Easing.easeOut,
-  })
+  });
   scene.timeline.add({
     target: gpuBarBg,
     startTime: startTime + 1.2,
@@ -843,7 +869,7 @@ function createPerformanceSection(scene: Scene, startTime: number) {
     from: 0,
     to: 1,
     easing: Easing.easeOut,
-  })
+  });
   scene.timeline.add({
     target: gpuBar,
     startTime: startTime + 1.5,
@@ -852,7 +878,7 @@ function createPerformanceSection(scene: Scene, startTime: number) {
     from: 0,
     to: 1,
     easing: Easing.easeOut,
-  })
+  });
   scene.timeline.add({
     target: gpuBar,
     startTime: startTime + 1.5,
@@ -861,7 +887,7 @@ function createPerformanceSection(scene: Scene, startTime: number) {
     from: 0,
     to: 490,
     easing: Easing.easeOut,
-  })
+  });
   scene.timeline.add({
     target: gpuValue,
     startTime: startTime + 2,
@@ -870,7 +896,7 @@ function createPerformanceSection(scene: Scene, startTime: number) {
     from: 0,
     to: 1,
     easing: Easing.easeOut,
-  })
+  });
 
   // FPS 指标
   scene.timeline.add({
@@ -881,7 +907,7 @@ function createPerformanceSection(scene: Scene, startTime: number) {
     from: 0,
     to: 1,
     easing: Easing.easeOut,
-  })
+  });
 
   fpsBars.forEach((bar, i) => {
     scene.timeline.add({
@@ -892,7 +918,7 @@ function createPerformanceSection(scene: Scene, startTime: number) {
       from: 0,
       to: 1,
       easing: Easing.easeOut,
-    })
+    });
     // 波动动画
     scene.timeline.add({
       target: bar,
@@ -904,8 +930,8 @@ function createPerformanceSection(scene: Scene, startTime: number) {
       easing: Easing.easeInOut,
       repeat: -1,
       yoyo: true,
-    })
-  })
+    });
+  });
 
   // 内存指标
   scene.timeline.add({
@@ -916,7 +942,7 @@ function createPerformanceSection(scene: Scene, startTime: number) {
     from: 0,
     to: 1,
     easing: Easing.easeOut,
-  })
+  });
   scene.timeline.add({
     target: memBarBg,
     startTime: startTime + 3.7,
@@ -925,7 +951,7 @@ function createPerformanceSection(scene: Scene, startTime: number) {
     from: 0,
     to: 1,
     easing: Easing.easeOut,
-  })
+  });
   scene.timeline.add({
     target: memBar,
     startTime: startTime + 4,
@@ -934,7 +960,7 @@ function createPerformanceSection(scene: Scene, startTime: number) {
     from: 0,
     to: 1,
     easing: Easing.easeOut,
-  })
+  });
   scene.timeline.add({
     target: memBar,
     startTime: startTime + 4,
@@ -943,7 +969,7 @@ function createPerformanceSection(scene: Scene, startTime: number) {
     from: 0,
     to: 200,
     easing: Easing.easeOut,
-  })
+  });
   scene.timeline.add({
     target: memValue,
     startTime: startTime + 4.5,
@@ -952,7 +978,7 @@ function createPerformanceSection(scene: Scene, startTime: number) {
     from: 0,
     to: 1,
     easing: Easing.easeOut,
-  })
+  });
 
   // 对比数据
   compareLabels.forEach((label, i) => {
@@ -964,8 +990,8 @@ function createPerformanceSection(scene: Scene, startTime: number) {
       from: 0,
       to: 1,
       easing: Easing.easeOut,
-    })
-  })
+    });
+  });
 
   compareBars.forEach((bar, i) => {
     scene.timeline.add({
@@ -976,7 +1002,7 @@ function createPerformanceSection(scene: Scene, startTime: number) {
       from: 0,
       to: 1,
       easing: Easing.easeOut,
-    })
+    });
     scene.timeline.add({
       target: bar,
       startTime: startTime + 2 + i * 0.3,
@@ -985,8 +1011,8 @@ function createPerformanceSection(scene: Scene, startTime: number) {
       from: 0,
       to: scores[i] * 5,
       easing: Easing.easeOut,
-    })
-  })
+    });
+  });
 
   compareScores.forEach((score, i) => {
     scene.timeline.add({
@@ -997,7 +1023,7 @@ function createPerformanceSection(scene: Scene, startTime: number) {
       from: 0,
       to: 1,
       easing: Easing.easeOut,
-    })
+    });
     // 分数跟随条形图移动
     scene.timeline.add({
       target: score,
@@ -1007,8 +1033,8 @@ function createPerformanceSection(scene: Scene, startTime: number) {
       from: 1160,
       to: 1160 + scores[i] * 5 + 10,
       easing: Easing.easeOut,
-    })
-  })
+    });
+  });
 
   // 字幕
   const subtitle = Text({
@@ -1018,7 +1044,7 @@ function createPerformanceSection(scene: Scene, startTime: number) {
     fontSize: 28,
     color: colors.text.accent,
     opacity: 0,
-  })
+  });
 
   scene.timeline.add({
     target: subtitle,
@@ -1028,7 +1054,7 @@ function createPerformanceSection(scene: Scene, startTime: number) {
     from: 0,
     to: 1,
     easing: Easing.easeOut,
-  })
+  });
 
   // 清理
   scene.timeline.add({
@@ -1039,16 +1065,28 @@ function createPerformanceSection(scene: Scene, startTime: number) {
     from: 1,
     to: 0,
     easing: Easing.easeIn,
-  })
+  });
 
   const allElements = [
-    monitorPanel.background, monitorPanel.titleText,
-    comparePanel.background, comparePanel.titleText,
-    gpuLabel, gpuBar, gpuBarBg, gpuValue,
-    fpsLabel, memLabel, memBar, memBarBg, memValue,
-    ...fpsBars, ...compareLabels, ...compareBars, ...compareScores,
+    monitorPanel.background,
+    monitorPanel.titleText,
+    comparePanel.background,
+    comparePanel.titleText,
+    gpuLabel,
+    gpuBar,
+    gpuBarBg,
+    gpuValue,
+    fpsLabel,
+    memLabel,
+    memBar,
+    memBarBg,
+    memValue,
+    ...fpsBars,
+    ...compareLabels,
+    ...compareBars,
+    ...compareScores,
     subtitle,
-  ]
+  ];
 
   allElements.forEach((el) => {
     scene.timeline.add({
@@ -1059,21 +1097,21 @@ function createPerformanceSection(scene: Scene, startTime: number) {
       from: 1,
       to: 0,
       easing: Easing.easeIn,
-    })
-  })
+    });
+  });
 
   // 添加元素
-  scene.add(sectionTitle)
-  scene.add(monitorPanel.background, monitorPanel.titleText)
-  scene.add(comparePanel.background, comparePanel.titleText)
-  scene.add(gpuLabel, gpuBar, gpuBarBg, gpuValue)
-  scene.add(fpsLabel)
-  fpsBars.forEach((bar) => scene.add(bar))
-  scene.add(memLabel, memBar, memBarBg, memValue)
-  compareLabels.forEach((label) => scene.add(label))
-  compareBars.forEach((bar) => scene.add(bar))
-  compareScores.forEach((score) => scene.add(score))
-  scene.add(subtitle)
+  scene.add(sectionTitle);
+  scene.add(monitorPanel.background, monitorPanel.titleText);
+  scene.add(comparePanel.background, comparePanel.titleText);
+  scene.add(gpuLabel, gpuBar, gpuBarBg, gpuValue);
+  scene.add(fpsLabel);
+  fpsBars.forEach((bar) => scene.add(bar));
+  scene.add(memLabel, memBar, memBarBg, memValue);
+  compareLabels.forEach((label) => scene.add(label));
+  compareBars.forEach((bar) => scene.add(bar));
+  compareScores.forEach((score) => scene.add(score));
+  scene.add(subtitle);
 }
 
 // === 创建完整场景 ===
@@ -1085,16 +1123,16 @@ export function createCoreDemoScene(): Scene {
     backgroundColor: videoConfig.backgroundColor,
     fps: videoConfig.fps,
     duration: 120, // 2分钟
-  })
+  });
 
   // 3.1 易用性 (0-25秒)
-  createEaseOfUseSection(scene, 0)
+  createEaseOfUseSection(scene, 0);
 
   // 3.2 功能丰富 (25-50秒)
-  createFeaturesSection(scene, 25)
+  createFeaturesSection(scene, 25);
 
   // 3.3 性能 (50-80秒)
-  createPerformanceSection(scene, 50)
+  createPerformanceSection(scene, 50);
 
-  return scene
+  return scene;
 }

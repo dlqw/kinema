@@ -1,6 +1,6 @@
 # 示例集合
 
-通过实战示例学习 AniMaker 的各种功能。
+通过实战示例学习 Kinema 的各种功能。
 
 ## 基础示例
 
@@ -9,7 +9,7 @@
 让一个矩形从左边移动到右边：
 
 ```typescript
-import { Animator, CanvasRenderer, Rectangle, Tween } from '@animaker/core';
+import { Animator, CanvasRenderer, Rectangle, Tween } from '@kinema/core';
 
 const canvas = document.getElementById('canvas') as HTMLCanvasElement;
 const renderer = new CanvasRenderer(canvas);
@@ -164,11 +164,13 @@ timeline.parallel([
 ]);
 
 // 第三阶段：淡出
-timeline.add(new Tween({
-  target: obj,
-  to: { opacity: 0 },
-  duration: 300,
-}));
+timeline.add(
+  new Tween({
+    target: obj,
+    to: { opacity: 0 },
+    duration: 300,
+  }),
+);
 ```
 
 ## 交互示例

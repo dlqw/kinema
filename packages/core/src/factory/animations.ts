@@ -6,30 +6,13 @@
  * @module factory/animations
  */
 
-import type {
-  AnimationConfig,
-  EasingFunction,
-  Point3D
-} from '../types';
+import type { AnimationConfig, EasingFunction, Point3D } from '../types';
 import type { RenderObject } from '../core';
-import {
-  FadeInAnimation,
-  FadeOutAnimation,
-  FadeToAnimation
-} from '../animation/FadeAnimation';
-import {
-  RotateAnimation,
-  RotateToAnimation,
-  MultiRotateAnimation
-} from '../animation/RotateAnimation';
-import {
-  MoveAnimation,
-  MoveToAnimation,
-  PathAnimation
-} from '../animation/MoveAnimation';
+import { FadeInAnimation, FadeOutAnimation, FadeToAnimation } from '../animation/FadeAnimation';
+import { RotateAnimation, RotateToAnimation } from '../animation/RotateAnimation';
+import { MoveAnimation, MoveToAnimation } from '../animation/MoveAnimation';
 import { TransformAnimation } from '../animation/TransformAnimation';
 import { AnimationGroup } from '../animation/AnimationGroup';
-import { smooth } from '../easing';
 
 // ============================================================================
 // Fade Animations
@@ -55,13 +38,13 @@ export function fade(
     duration?: number;
     delay?: number;
     easing?: EasingFunction;
-  } = {}
+  } = {},
 ): FadeInAnimation {
-  return FadeInAnimation.create(
-    target,
-    options.duration ?? 1
-  ).withDelay(options.delay ?? 0)
-   .withEasing(options.easing ?? smooth);
+  return new FadeInAnimation(target, {
+    duration: options.duration ?? 1,
+    ...(options.delay !== undefined && { delay: options.delay }),
+    ...(options.easing !== undefined && { easing: options.easing }),
+  });
 }
 
 /**
@@ -84,16 +67,14 @@ export function fadeOut(
     delay?: number;
     easing?: EasingFunction;
     remove?: boolean;
-  } = {}
+  } = {},
 ): FadeOutAnimation {
-  const anim = FadeOutAnimation.create(
-    target,
-    options.duration ?? 1,
-    options.remove ?? true
-  );
-
-  return anim.withDelay(options.delay ?? 0)
-           .withEasing(options.easing ?? smooth);
+  return new FadeOutAnimation(target, {
+    duration: options.duration ?? 1,
+    removeOnComplete: options.remove ?? true,
+    ...(options.delay !== undefined && { delay: options.delay }),
+    ...(options.easing !== undefined && { easing: options.easing }),
+  });
 }
 
 /**
@@ -117,14 +98,13 @@ export function fadeTo(
     duration?: number;
     delay?: number;
     easing?: EasingFunction;
-  } = {}
+  } = {},
 ): FadeToAnimation {
-  return FadeToAnimation.create(
-    target,
-    opacity,
-    options.duration ?? 1
-  ).withDelay(options.delay ?? 0)
-   .withEasing(options.easing ?? smooth);
+  return new FadeToAnimation(target, opacity, {
+    duration: options.duration ?? 1,
+    ...(options.delay !== undefined && { delay: options.delay }),
+    ...(options.easing !== undefined && { easing: options.easing }),
+  });
 }
 
 // ============================================================================
@@ -152,14 +132,13 @@ export function move(
     duration?: number;
     delay?: number;
     easing?: EasingFunction;
-  } = {}
+  } = {},
 ): MoveAnimation {
-  return MoveAnimation.create(
-    target,
-    delta,
-    options.duration ?? 1
-  ).withDelay(options.delay ?? 0)
-   .withEasing(options.easing ?? smooth);
+  return new MoveAnimation(target, delta, {
+    duration: options.duration ?? 1,
+    ...(options.delay !== undefined && { delay: options.delay }),
+    ...(options.easing !== undefined && { easing: options.easing }),
+  });
 }
 
 /**
@@ -183,14 +162,13 @@ export function moveTo(
     duration?: number;
     delay?: number;
     easing?: EasingFunction;
-  } = {}
+  } = {},
 ): MoveToAnimation {
-  return MoveToAnimation.create(
-    target,
-    position,
-    options.duration ?? 1
-  ).withDelay(options.delay ?? 0)
-   .withEasing(options.easing ?? smooth);
+  return new MoveToAnimation(target, position, {
+    duration: options.duration ?? 1,
+    ...(options.delay !== undefined && { delay: options.delay }),
+    ...(options.easing !== undefined && { easing: options.easing }),
+  });
 }
 
 /**
@@ -208,14 +186,17 @@ export function moveX(
     duration?: number;
     delay?: number;
     easing?: EasingFunction;
-  } = {}
+  } = {},
 ): MoveAnimation {
-  return MoveAnimation.horizontal(
+  return new MoveAnimation(
     target,
-    deltaX,
-    options.duration ?? 1
-  ).withDelay(options.delay ?? 0)
-   .withEasing(options.easing ?? smooth);
+    { x: deltaX, y: 0, z: 0 },
+    {
+      duration: options.duration ?? 1,
+      ...(options.delay !== undefined && { delay: options.delay }),
+      ...(options.easing !== undefined && { easing: options.easing }),
+    },
+  );
 }
 
 /**
@@ -233,14 +214,17 @@ export function moveY(
     duration?: number;
     delay?: number;
     easing?: EasingFunction;
-  } = {}
+  } = {},
 ): MoveAnimation {
-  return MoveAnimation.vertical(
+  return new MoveAnimation(
     target,
-    deltaY,
-    options.duration ?? 1
-  ).withDelay(options.delay ?? 0)
-   .withEasing(options.easing ?? smooth);
+    { x: 0, y: deltaY, z: 0 },
+    {
+      duration: options.duration ?? 1,
+      ...(options.delay !== undefined && { delay: options.delay }),
+      ...(options.easing !== undefined && { easing: options.easing }),
+    },
+  );
 }
 
 // ============================================================================
@@ -270,15 +254,13 @@ export function rotate(
     duration?: number;
     delay?: number;
     easing?: EasingFunction;
-  } = {}
+  } = {},
 ): RotateAnimation {
-  return RotateAnimation.create(
-    target,
-    axis,
-    degrees,
-    options.duration ?? 1
-  ).withDelay(options.delay ?? 0)
-   .withEasing(options.easing ?? smooth);
+  return new RotateAnimation(target, axis, degrees, {
+    duration: options.duration ?? 1,
+    ...(options.delay !== undefined && { delay: options.delay }),
+    ...(options.easing !== undefined && { easing: options.easing }),
+  });
 }
 
 /**
@@ -298,15 +280,13 @@ export function rotateTo(
     duration?: number;
     delay?: number;
     easing?: EasingFunction;
-  } = {}
+  } = {},
 ): RotateToAnimation {
-  return RotateToAnimation.create(
-    target,
-    axis,
-    targetDegrees,
-    options.duration ?? 1
-  ).withDelay(options.delay ?? 0)
-   .withEasing(options.easing ?? smooth);
+  return new RotateToAnimation(target, axis, targetDegrees, {
+    duration: options.duration ?? 1,
+    ...(options.delay !== undefined && { delay: options.delay }),
+    ...(options.easing !== undefined && { easing: options.easing }),
+  });
 }
 
 /**
@@ -324,7 +304,7 @@ export function spin(
     duration?: number;
     delay?: number;
     easing?: EasingFunction;
-  } = {}
+  } = {},
 ): RotateAnimation {
   return rotate(target, 'z', degrees, options);
 }
@@ -354,20 +334,20 @@ export function scale(
     duration?: number;
     delay?: number;
     easing?: EasingFunction;
-  } = {}
+  } = {},
 ): TransformAnimation {
   const endState = {
     ...target.getState(),
     transform: {
       ...target.getState().transform,
-      scale
-    }
+      scale,
+    },
   };
 
   return new TransformAnimation(target, endState, {
     duration: options.duration ?? 1,
-    delay: options.delay ?? 0,
-    easing: options.easing ?? smooth
+    ...(options.delay !== undefined && { delay: options.delay }),
+    ...(options.easing !== undefined && { easing: options.easing }),
   });
 }
 
@@ -386,7 +366,7 @@ export function scaleBy(
     duration?: number;
     delay?: number;
     easing?: EasingFunction;
-  } = {}
+  } = {},
 ): TransformAnimation {
   return scale(target, { x: factor, y: factor, z: factor }, options);
 }
@@ -413,7 +393,7 @@ export function transformTo(
     rotation?: Point3D;
     scale?: Point3D;
     opacity?: number;
-  } = {}
+  } = {},
 ): TransformAnimation {
   const endState = {
     ...target.getState(),
@@ -421,14 +401,14 @@ export function transformTo(
       position,
       rotation: options.rotation ?? target.getState().transform.rotation,
       scale: options.scale ?? target.getState().transform.scale,
-      opacity: options.opacity ?? target.getState().transform.opacity
-    }
+      opacity: options.opacity ?? target.getState().transform.opacity,
+    },
   };
 
   return new TransformAnimation(target, endState, {
     duration: options.duration ?? 1,
-    delay: options.delay ?? 0,
-    easing: options.easing ?? smooth
+    ...(options.delay !== undefined && { delay: options.delay }),
+    ...(options.easing !== undefined && { easing: options.easing }),
   });
 }
 
@@ -458,12 +438,13 @@ export function parallel(
   options: {
     duration?: number;
     delay?: number;
-  } = {}
+  } = {},
 ): AnimationGroup {
-  return AnimationGroup.parallel(target, animations, {
-    duration: options.duration,
-    delay: options.delay ?? 0
-  });
+  const config: AnimationConfig = {
+    ...(options.duration !== undefined && { duration: options.duration }),
+    ...(options.delay !== undefined && { delay: options.delay }),
+  };
+  return AnimationGroup.parallel(target, animations, config);
 }
 
 /**
@@ -488,11 +469,12 @@ export function sequence(
   animations: ReadonlyArray<any>,
   options: {
     delay?: number;
-  } = {}
+  } = {},
 ): AnimationGroup {
-  return AnimationGroup.sequence(target, animations, {
-    delay: options.delay ?? 0
-  });
+  const config: AnimationConfig = {
+    ...(options.delay !== undefined && { delay: options.delay }),
+  };
+  return AnimationGroup.sequence(target, animations, config);
 }
 
 /**
@@ -519,11 +501,12 @@ export function stagger(
   lag: number = 0.1,
   options: {
     delay?: number;
-  } = {}
+  } = {},
 ): AnimationGroup {
-  return AnimationGroup.lagged(target, animations, lag, {
-    delay: options.delay ?? 0
-  });
+  const config: AnimationConfig = {
+    ...(options.delay !== undefined && { delay: options.delay }),
+  };
+  return AnimationGroup.lagged(target, animations, lag, config);
 }
 
 // ============================================================================
@@ -557,5 +540,5 @@ export default {
   // Composition
   parallel,
   sequence,
-  stagger
+  stagger,
 };

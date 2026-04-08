@@ -2,7 +2,7 @@
 
 ## 分支策略
 
-AniMaker 使用简化的 Git Flow 工作流程：
+Kinema 使用简化的 Git Flow 工作流程：
 
 ### 主要分支
 
@@ -26,6 +26,7 @@ git checkout -b feature/feature-name
 ```
 
 功能分支命名规范：
+
 - `feature/project-management` - 项目管理功能
 - `feature/video-export` - 视频导出功能
 - `fix/rendering-bug` - 渲染修复
@@ -34,18 +35,21 @@ git checkout -b feature/feature-name
 ### 工作流程
 
 1. **开始新功能**
+
    ```bash
    git checkout develop
    git checkout -b feature/your-feature
    ```
 
 2. **开发和提交**
+
    ```bash
    git add .
    git commit -m "feat: add feature description"
    ```
 
 3. **合并到 develop**
+
    ```bash
    git checkout develop
    git merge feature/your-feature

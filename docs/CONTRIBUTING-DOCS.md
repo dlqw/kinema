@@ -35,6 +35,7 @@ npm run docs:preview
 ### 4. 提交更改
 
 遵循项目的 Commit 规范：
+
 - `docs:` 文档更新
 - `docs:api` API 文档更新
 
@@ -45,6 +46,7 @@ npm run docs:preview
 教学性质的文档，帮助用户理解和使用框架。
 
 **目录结构：**
+
 ```
 guide/
 ├── getting-started.md   # 快速开始
@@ -54,6 +56,7 @@ guide/
 ```
 
 **编写规范：**
+
 - 使用渐进式的讲解方式
 - 提供可运行的代码示例
 - 添加图表和截图辅助说明
@@ -64,12 +67,14 @@ guide/
 API 参考文档，由 TypeDoc 自动生成。
 
 **更新流程：**
+
 1. 在源代码中添加/更新 JSDoc 注释
 2. 运行 `npm run docs:api` 生成文档
 3. 检查生成的文档是否正确
 
 **JSDoc 规范：**
-```typescript
+
+````typescript
 /**
  * 动画器类，负责管理和控制动画播放
  *
@@ -99,13 +104,14 @@ class Animator {
     // ...
   }
 }
-```
+````
 
 ### 示例文档 (examples/)
 
 实战示例，展示框架的各种用法。
 
 **示例规范：**
+
 - 完整可运行的代码
 - 包含详细注释
 - 说明实现原理
@@ -117,8 +123,11 @@ class Animator {
 
 ```markdown
 # H1 - 页面标题（每个文件只有一个）
+
 ## H2 - 主要章节
+
 ### H3 - 子章节
+
 #### H4 - 小节
 ```
 
@@ -148,7 +157,7 @@ const animator = new Animator();
 
 - 内部链接：`[快速开始](./getting-started.md)`
 - 外部链接：`[VitePress](https://vitepress.dev/)`
-- API 链接：`[@animaker/core](../api/)
+- API 链接：`[@kinema/core](../api/)
 
 ## 图片和媒体
 

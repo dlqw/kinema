@@ -7,18 +7,17 @@
  * @module types/animation
  */
 
-import type { RenderObject, ObjectId } from './core';
+import type { RenderObject, Alpha } from './core';
+import { smooth } from './easing';
+
+// Re-export Alpha for convenience
+export type { Alpha };
 
 /**
  * ============================================================================
  * Animation Types
  * ============================================================================
  */
-
-/**
- * Animation progress value [0, 1]
- */
-export type Alpha = number & { readonly __brand: 'alpha' };
 
 /**
  * Easing function type - maps linear progress to eased progress
@@ -29,16 +28,18 @@ export type EasingFunction = (alpha: Alpha) => Alpha;
  * Animation configuration options
  */
 export interface AnimationConfig {
-  /** Duration in seconds */
-  readonly duration: number;
-  /** Easing function to use */
-  readonly easing: EasingFunction;
+  /** Duration in seconds (defaults to 1) */
+  readonly duration?: number;
+  /** Easing function to use (defaults to smooth) */
+  readonly easing?: EasingFunction;
   /** Delay before animation starts (seconds) */
   readonly delay?: number;
   /** Remove target object from scene on completion */
   readonly removeOnComplete?: boolean;
   /** Animation name for debugging */
   readonly name?: string;
+  /** Lag between animations (for Lagged composition) */
+  readonly lag?: number;
 }
 
 /**
@@ -60,7 +61,7 @@ export enum CompositionType {
   /** Execute animations sequentially */
   Sequence = 'sequence',
   /** Execute animations with staggered start times */
-  Lagged = 'lagged'
+  Lagged = 'lagged',
 }
 
 /**
@@ -96,7 +97,7 @@ export abstract class Animation<T extends RenderObject = RenderObject> {
     /** Target object to animate */
     public readonly target: T,
     /** Animation configuration */
-    protected readonly _config: AnimationConfig
+    protected readonly _config: AnimationConfig,
   ) {}
 
   /**
@@ -110,7 +111,7 @@ export abstract class Animation<T extends RenderObject = RenderObject> {
    * Get the total duration including delay
    */
   getTotalDuration(): number {
-    return (this._config.delay ?? 0) + this._config.duration;
+    return (this._config.delay ?? 0) + (this._config.duration ?? 1);
   }
 
   /**
@@ -121,27 +122,32 @@ export abstract class Animation<T extends RenderObject = RenderObject> {
    */
   interpolate(elapsedTime: number): InterpolationResult<T> {
     const delay = this._config.delay ?? 0;
+    const duration = this._config.duration ?? 1;
 
     // Return original object during delay
     if (elapsedTime < delay) {
       return { object: this.target, complete: false };
     }
 
-    // Calculate progress
-    const progress = Math.min(
-      (elapsedTime - delay) / this._config.duration,
-      1
-    ) as Alpha;
+    // Handle zero or negative duration - immediately complete
+    if (duration <= 0) {
+      const result = this.interpolateAt(1 as Alpha);
+      return { object: result, complete: true };
+    }
 
-    // Apply easing function
-    const easedAlpha = this._config.easing(progress);
+    // Calculate progress
+    const progress = Math.min((elapsedTime - delay) / duration, 1) as Alpha;
+
+    // Apply easing function (use smooth as default)
+    const easingFn = this._config.easing ?? smooth;
+    const easedAlpha = easingFn(progress);
 
     // Perform interpolation
     const result = this.interpolateAt(easedAlpha);
 
     return {
       object: result,
-      complete: progress >= 1
+      complete: progress >= 1,
     };
   }
 
@@ -184,7 +190,7 @@ export class AnimationBuilder<T extends Animation> {
   constructor(
     private readonly AnimationClass: new (...args: any[]) => T,
     private readonly target: RenderObject,
-    private readonly config: Partial<AnimationConfig>
+    private readonly _config: Partial<AnimationConfig>,
   ) {}
 
   /**
@@ -193,11 +199,10 @@ export class AnimationBuilder<T extends Animation> {
    * @param seconds Duration in seconds
    */
   withDuration(seconds: number): AnimationBuilder<T> {
-    return new AnimationBuilder(
-      this.AnimationClass,
-      this.target,
-      { ...this._config, duration: seconds }
-    );
+    return new AnimationBuilder(this.AnimationClass, this.target, {
+      ...this._config,
+      duration: seconds,
+    });
   }
 
   /**
@@ -206,11 +211,7 @@ export class AnimationBuilder<T extends Animation> {
    * @param easing Easing function to use
    */
   withEasing(easing: EasingFunction): AnimationBuilder<T> {
-    return new AnimationBuilder(
-      this.AnimationClass,
-      this.target,
-      { ...this._config, easing }
-    );
+    return new AnimationBuilder(this.AnimationClass, this.target, { ...this._config, easing });
   }
 
   /**
@@ -219,11 +220,10 @@ export class AnimationBuilder<T extends Animation> {
    * @param seconds Delay in seconds
    */
   withDelay(seconds: number): AnimationBuilder<T> {
-    return new AnimationBuilder(
-      this.AnimationClass,
-      this.target,
-      { ...this._config, delay: seconds }
-    );
+    return new AnimationBuilder(this.AnimationClass, this.target, {
+      ...this._config,
+      delay: seconds,
+    });
   }
 
   /**
@@ -232,11 +232,10 @@ export class AnimationBuilder<T extends Animation> {
    * @param value Whether to remove on complete (default: true)
    */
   removeOnComplete(value: boolean = true): AnimationBuilder<T> {
-    return new AnimationBuilder(
-      this.AnimationClass,
-      this.target,
-      { ...this._config, removeOnComplete: value }
-    );
+    return new AnimationBuilder(this.AnimationClass, this.target, {
+      ...this._config,
+      removeOnComplete: value,
+    });
   }
 
   /**
@@ -245,11 +244,7 @@ export class AnimationBuilder<T extends Animation> {
    * @param name Animation name for debugging
    */
   withName(name: string): AnimationBuilder<T> {
-    return new AnimationBuilder(
-      this.AnimationClass,
-      this.target,
-      { ...this._config, name }
-    );
+    return new AnimationBuilder(this.AnimationClass, this.target, { ...this._config, name });
   }
 
   /**
@@ -258,13 +253,13 @@ export class AnimationBuilder<T extends Animation> {
   build(): T {
     const defaults: AnimationConfig = {
       duration: 1,
-      easing: smooth
+      easing: smooth,
     };
 
-    return new this.AnimationClass(
-      this.target,
-      { ...defaults, ...this._config } as AnimationConfig
-    );
+    return new this.AnimationClass(this.target, {
+      ...defaults,
+      ...this._config,
+    } as AnimationConfig);
   }
 }
 
@@ -281,7 +276,7 @@ export class TransformAnimation extends Animation {
   constructor(
     target: RenderObject,
     private readonly endState: RenderObjectState,
-    config: AnimationConfig
+    config: AnimationConfig,
   ) {
     super(target, config);
   }
@@ -290,26 +285,25 @@ export class TransformAnimation extends Animation {
     const startTransform = this.target.getState().transform;
     const endTransform = this.endState.transform;
 
-    const lerp = (start: number, end: number): number =>
-      start + (end - start) * alpha;
+    const lerp = (start: number, end: number): number => start + (end - start) * alpha;
 
     return this.target.withTransform({
       position: {
         x: lerp(startTransform.position.x, endTransform.position.x),
         y: lerp(startTransform.position.y, endTransform.position.y),
-        z: lerp(startTransform.position.z, endTransform.position.z)
+        z: lerp(startTransform.position.z, endTransform.position.z),
       },
       rotation: {
         x: lerp(startTransform.rotation.x, endTransform.rotation.x),
         y: lerp(startTransform.rotation.y, endTransform.rotation.y),
-        z: lerp(startTransform.rotation.z, endTransform.rotation.z)
+        z: lerp(startTransform.rotation.z, endTransform.rotation.z),
       },
       scale: {
         x: lerp(startTransform.scale.x, endTransform.scale.x),
         y: lerp(startTransform.scale.y, endTransform.scale.y),
-        z: lerp(startTransform.scale.z, endTransform.scale.z)
+        z: lerp(startTransform.scale.z, endTransform.scale.z),
       },
-      opacity: lerp(startTransform.opacity, endTransform.opacity)
+      opacity: lerp(startTransform.opacity, endTransform.opacity),
     });
   }
 }
@@ -319,7 +313,7 @@ export class TransformAnimation extends Animation {
  */
 export class FadeInAnimation extends Animation {
   protected interpolateAt(alpha: Alpha): RenderObject {
-    return this.target.withOpacity(alpha);
+    return this.target.withTransform({ opacity: alpha });
   }
 }
 
@@ -328,7 +322,7 @@ export class FadeInAnimation extends Animation {
  */
 export class FadeOutAnimation extends Animation {
   protected interpolateAt(alpha: Alpha): RenderObject {
-    return this.target.withOpacity(1 - alpha);
+    return this.target.withTransform({ opacity: 1 - alpha });
   }
 }
 
@@ -340,13 +334,13 @@ export class RotateAnimation extends Animation {
     target: RenderObject,
     private readonly axis: 'x' | 'y' | 'z',
     private readonly degrees: number,
-    config: AnimationConfig
+    config: AnimationConfig,
   ) {
     super(target, config);
   }
 
   protected interpolateAt(alpha: Alpha): RenderObject {
-    const currentRotation = this.target.getState().rotation;
+    const currentRotation = this.target.getState().transform.rotation;
     const newRotation = { ...currentRotation };
     newRotation[this.axis] += this.degrees * alpha;
     return this.target.withTransform({ rotation: newRotation });
@@ -360,18 +354,20 @@ export class MoveAnimation extends Animation {
   constructor(
     target: RenderObject,
     private readonly delta: Point3D,
-    config: AnimationConfig
+    config: AnimationConfig,
   ) {
     super(target, config);
   }
 
   protected interpolateAt(alpha: Alpha): RenderObject {
-    const current = this.target.getState().position;
-    return this.target.withPosition(
-      current.x + this.delta.x * alpha,
-      current.y + this.delta.y * alpha,
-      current.z + this.delta.z * alpha
-    );
+    const current = this.target.getState().transform.position;
+    return this.target.withTransform({
+      position: {
+        x: current.x + this.delta.x * alpha,
+        y: current.y + this.delta.y * alpha,
+        z: current.z + this.delta.z * alpha,
+      },
+    });
   }
 }
 
@@ -379,21 +375,26 @@ export class MoveAnimation extends Animation {
  * Scale animation - scales object
  */
 export class ScaleAnimation extends Animation {
-  constructor(
-    target: RenderObject,
-    private readonly scaleFactor: Point3D,
-    config: AnimationConfig
-  ) {
+  private readonly resolvedScaleFactor: Point3D;
+
+  constructor(target: RenderObject, scaleFactor: number | Point3D, config: AnimationConfig) {
     super(target, config);
+    // Convert number to uniform Point3D scale
+    this.resolvedScaleFactor =
+      typeof scaleFactor === 'number'
+        ? { x: scaleFactor, y: scaleFactor, z: scaleFactor }
+        : scaleFactor;
   }
 
   protected interpolateAt(alpha: Alpha): RenderObject {
-    const current = this.target.getState().scale;
-    return this.target.withScale(
-      current.x + (this.scaleFactor.x - current.x) * alpha,
-      current.y + (this.scaleFactor.y - current.y) * alpha,
-      current.z + (this.scaleFactor.z - current.z) * alpha
-    );
+    const current = this.target.getState().transform.scale;
+    return this.target.withTransform({
+      scale: {
+        x: current.x + (this.resolvedScaleFactor.x - current.x) * alpha,
+        y: current.y + (this.resolvedScaleFactor.y - current.y) * alpha,
+        z: current.z + (this.resolvedScaleFactor.z - current.z) * alpha,
+      },
+    });
   }
 }
 
@@ -411,7 +412,7 @@ export class AnimationGroup extends Animation {
     target: RenderObject,
     private readonly animations: ReadonlyArray<Animation>,
     private readonly compositionType: CompositionType = CompositionType.Parallel,
-    config: AnimationConfig = {}
+    config: AnimationConfig = {},
   ) {
     const totalDuration = calculateTotalDuration(animations, compositionType);
     super(target, { ...config, duration: totalDuration });
@@ -431,16 +432,14 @@ export class AnimationGroup extends Animation {
   private interpolateParallel(alpha: Alpha): RenderObject {
     let result = this.target;
     for (const animation of this.animations) {
-      const { object } = animation.interpolate(
-        alpha * animation.getTotalDuration()
-      );
+      const { object } = animation.interpolate(alpha * animation.getTotalDuration());
       result = object;
     }
     return result;
   }
 
   private interpolateSequence(alpha: Alpha): RenderObject {
-    const totalDuration = this._config.duration;
+    const totalDuration = this._config.duration ?? 1;
     const currentTime = alpha * totalDuration;
 
     let accumulatedTime = 0;
@@ -465,7 +464,7 @@ export class AnimationGroup extends Animation {
 
   private interpolateLagged(alpha: Alpha): RenderObject {
     const lag = 0.1; // Default lag between animations
-    const totalDuration = this._config.duration;
+    const totalDuration = this._config.duration ?? 1;
     const currentTime = alpha * totalDuration;
 
     let result = this.target;
@@ -480,6 +479,28 @@ export class AnimationGroup extends Animation {
 
     return result;
   }
+
+  /**
+   * Create a parallel animation group
+   */
+  static parallel(
+    target: RenderObject,
+    animations: ReadonlyArray<Animation>,
+    config: AnimationConfig = {},
+  ): AnimationGroup {
+    return new AnimationGroup(target, animations, CompositionType.Parallel, config);
+  }
+
+  /**
+   * Create a sequential animation group
+   */
+  static sequence(
+    target: RenderObject,
+    animations: ReadonlyArray<Animation>,
+    config: AnimationConfig = {},
+  ): AnimationGroup {
+    return new AnimationGroup(target, animations, CompositionType.Sequence, config);
+  }
 }
 
 /**
@@ -487,12 +508,12 @@ export class AnimationGroup extends Animation {
  */
 function calculateTotalDuration(
   animations: ReadonlyArray<Animation>,
-  type: CompositionType
+  type: CompositionType,
 ): number {
   switch (type) {
     case CompositionType.Parallel:
     case CompositionType.Lagged:
-      return Math.max(...animations.map(a => a.getTotalDuration()));
+      return Math.max(...animations.map((a) => a.getTotalDuration()));
     case CompositionType.Sequence:
       return animations.reduce((sum, a) => sum + a.getTotalDuration(), 0);
   }
@@ -536,7 +557,7 @@ export class Timeline {
     newTimeline.events = [
       ...this.events,
       { time: startTime, type: 'animation_start', data: animation },
-      { time: endTime, type: 'animation_end', data: animation }
+      { time: endTime, type: 'animation_end', data: animation },
     ];
     newTimeline.duration = Math.max(this.duration, endTime);
     return newTimeline;
@@ -549,7 +570,7 @@ export class Timeline {
    * @param end End time in seconds
    */
   getEventsInRange(start: number, end: number): ReadonlyArray<TimelineEvent> {
-    return this.events.filter(e => e.time >= start && e.time <= end);
+    return this.events.filter((e) => e.time >= start && e.time <= end);
   }
 
   /**
@@ -574,47 +595,9 @@ export class Timeline {
  */
 
 // Re-export necessary types from core
-import type {
-  Point3D,
-  RenderObjectState,
-  Transform
-} from './core';
+import type { Point3D, RenderObjectState, Transform } from './core';
 
 export type { Point3D, RenderObjectState, Transform };
 
 // Re-export easing functions
-export {
-  linear,
-  smooth,
-  smoother,
-  easeInQuad,
-  easeOutQuad,
-  easeInOutQuad,
-  easeInCubic,
-  easeOutCubic,
-  easeInOutCubic,
-  easeInQuart,
-  easeOutQuart,
-  easeInOutQuart,
-  easeInQuint,
-  easeOutQuint,
-  easeInOutQuint,
-  easeInSine,
-  easeOutSine,
-  easeInOutSine,
-  easeInExpo,
-  easeOutExpo,
-  easeInOutExpo,
-  easeInCirc,
-  easeOutCirc,
-  easeInOutCirc,
-  easeInElastic,
-  easeOutElastic,
-  easeInOutElastic,
-  easeInBack,
-  easeOutBack,
-  easeInOutBack,
-  easeInBounce,
-  easeOutBounce,
-  easeInOutBounce,
-} from './easing';
+export { smooth, linear } from './easing';

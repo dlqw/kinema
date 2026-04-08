@@ -4,9 +4,9 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { RenderEngine } from '../../../src/render/core/RenderEngine';
-import type { GraphicsDevice, RenderContext } from '../../../src/render/core/types';
-import { RenderAPI } from '../../../src/render/core/Capability';
+import { RenderEngine } from '../../packages/core/src/render/core/RenderEngine';
+import type { GraphicsDevice, RenderContext } from '../../packages/core/src/render/core/types';
+import { RenderAPI } from '../../packages/core/src/render/core/Capability';
 
 // Mock GPU APIs
 const mockRequestAnimationFrame = vi.fn();
@@ -205,9 +205,9 @@ class MockGraphicsDevice implements GraphicsDevice {
 
   destroy() {
     this.destroyed = true;
-    this.buffers.forEach(b => b.destroy());
-    this.textures.forEach(t => t.destroy());
-    this.samplers.forEach(s => s.destroy());
+    this.buffers.forEach((b) => b.destroy());
+    this.textures.forEach((t) => t.destroy());
+    this.samplers.forEach((s) => s.destroy());
   }
 
   getResourceCount() {
@@ -526,7 +526,7 @@ describe('Rendering Pipeline Integration Tests', () => {
       await expect(
         RenderEngine.init({
           canvas: mockCanvas as any,
-        })
+        }),
       ).rejects.toThrow();
     });
 
@@ -544,7 +544,7 @@ describe('Rendering Pipeline Integration Tests', () => {
 
       expect(console.error).toHaveBeenCalledWith(
         '[RenderEngine] Frame render error:',
-        expect.any(Error)
+        expect.any(Error),
       );
     });
 

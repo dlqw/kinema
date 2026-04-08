@@ -1,6 +1,6 @@
 # 示例代码集合
 
-本目录包含 AniMaker 框架的可运行示例代码，每个示例都经过精心设计，展示了框架的各种功能。
+本目录包含 Kinema 框架的可运行示例代码，每个示例都经过精心设计，展示了框架的各种功能。
 
 ## 目录结构
 
@@ -27,7 +27,7 @@ import { createRotatingCircleExample } from './basic/circle';
 const scene = createRotatingCircleExample();
 
 // 使用渲染器渲染
-import { renderToCanvas } from '@animaker/renderer';
+import { renderToCanvas } from '@kinema/renderer';
 const canvas = document.getElementById('canvas') as HTMLCanvasElement;
 renderToCanvas(canvas, scene, { autoplay: true });
 ```
@@ -51,18 +51,21 @@ examples.runIntermediateExamples();
 #### circle.ts - 旋转的圆形
 
 展示内容：
+
 - 创建带有填充和描边的圆形
 - 应用旋转动画
 - 使用不同缓动函数控制旋转速度
 - 调度多个动画到时间线
 
 可导出函数：
+
 - `createRotatingCircleExample()` - 单个旋转圆形
 - `createMultipleCirclesExample()` - 多个旋转圆形
 
 #### fade.ts - 淡入淡出效果
 
 展示内容：
+
 - 创建淡入动画（透明度 0 → 1）
 - 创建淡出动画（透明度 1 → 0）
 - 组合淡入淡出效果
@@ -70,6 +73,7 @@ examples.runIntermediateExamples();
 - 交叉淡入淡出
 
 可导出函数：
+
 - `createFadeExample()` - 基础淡入淡出
 - `createBlinkExample()` - 闪烁效果
 - `createPulseExample()` - 脉冲效果
@@ -81,6 +85,7 @@ examples.runIntermediateExamples();
 #### transform.ts - 变换动画
 
 展示内容：
+
 - 移动动画（MoveAnimation）
 - 旋转动画（RotateAnimation）
 - 缩放动画（ScaleAnimation）
@@ -88,6 +93,7 @@ examples.runIntermediateExamples();
 - 路径移动
 
 可导出函数：
+
 - `createMoveAnimationExample()` - 移动动画展示
 - `createRotateAnimationExample()` - 旋转动画展示
 - `createScaleAnimationExample()` - 缩放动画展示
@@ -97,6 +103,7 @@ examples.runIntermediateExamples();
 #### composition.ts - 动画组合
 
 展示内容：
+
 - 并行动画（Parallel）
 - 顺序动画（Sequence）
 - 延迟动画（Lagged）
@@ -104,6 +111,7 @@ examples.runIntermediateExamples();
 - 复杂编排
 
 可导出函数：
+
 - `createParallelExample()` - 并行动画（车轮滚动）
 - `createSequenceExample()` - 顺序动画（英雄入场）
 - `createLaggedExample()` - 延迟动画（波浪效果）
@@ -148,7 +156,7 @@ export function createExampleName(): Scene {
     width: 1280,
     height: 720,
     backgroundColor: '#1a1a2e',
-    fps: 60
+    fps: 60,
   });
 
   // 第二步：创建对象

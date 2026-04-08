@@ -2,4 +2,6 @@
  * Components Index
  */
 
-export { NewProjectDialog } from './NewProjectDialog'
+export { NewProjectDialog } from './ProjectDialog';
+export { OpenProjectDialog } from './OpenProjectDialog';
+export { SaveProjectDialog } from './SaveProjectDialog';

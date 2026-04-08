@@ -1,13 +1,13 @@
 /**
- * AniMaker 产品介绍视频
+ * Kinema 产品介绍视频
  *
  * 时长: 5分30秒 (330秒)
  * 分辨率: 1920x1080
  * 帧率: 60fps
  */
 
-import { Scene } from '../src'
-import { VideoRenderer } from './render'
+import { Scene } from '../src';
+import { VideoRenderer } from './render';
 
 // 视频配置
 export const videoConfig = {
@@ -16,7 +16,7 @@ export const videoConfig = {
   fps: 60,
   duration: 330, // 5分30秒
   backgroundColor: '#0D1117',
-}
+};
 
 // 颜色方案
 export const colors = {
@@ -40,16 +40,16 @@ export const colors = {
     primary: '#E6EDF3',
     secondary: '#8B949E',
     accent: '#58A6FF',
-  }
-}
+  },
+};
 
 // 导入各场景
-import { createIntroScene } from './scenes/01-intro'
-import { createIntroductionScene } from './scenes/02-introduction'
-import { createCoreDemoScene } from './scenes/03-core-demo'
-import { createTypeSafetyScene } from './scenes/04-type-safety'
-import { createUseCasesScene } from './scenes/05-use-cases'
-import { createComparisonScene } from './scenes/06-comparison'
+import { createIntroScene } from './scenes/01-intro';
+import { createIntroductionScene } from './scenes/02-introduction';
+import { createCoreDemoScene } from './scenes/03-core-demo';
+import { createTypeSafetyScene } from './scenes/04-type-safety';
+import { createUseCasesScene } from './scenes/05-use-cases';
+import { createComparisonScene } from './scenes/06-comparison';
 
 // 获取所有场景
 export function getScenes() {
@@ -60,21 +60,21 @@ export function getScenes() {
     createTypeSafetyScene(),
     createUseCasesScene(),
     createComparisonScene(),
-  ]
+  ];
 }
 
 // 渲染视频
-export async function renderVideo(outputPath: string = 'output/animaker-intro.mp4') {
-  const scenes = getScenes()
+export async function renderVideo(outputPath: string = 'output/kinema-intro.mp4') {
+  const scenes = getScenes();
   const renderer = new VideoRenderer(scenes, {
     width: videoConfig.width,
     height: videoConfig.height,
     fps: videoConfig.fps,
-  })
+  });
 
   return renderer.render({
     output: outputPath,
     format: 'mp4',
     quality: 'high',
-  })
+  });
 }

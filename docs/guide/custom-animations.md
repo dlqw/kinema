@@ -19,12 +19,18 @@
 所有自定义动画都继承自 `Animation` 抽象基类：
 
 ```typescript
-import type { Animation, AnimationConfig, InterpolationResult, RenderObject, Alpha } from '@animaker/core';
+import type {
+  Animation,
+  AnimationConfig,
+  InterpolationResult,
+  RenderObject,
+  Alpha,
+} from '@kinema/core';
 
 abstract class CustomAnimation<T extends RenderObject = RenderObject> implements Animation<T> {
   constructor(
     public readonly target: T,
-    protected readonly config: AnimationConfig
+    protected readonly config: AnimationConfig,
   ) {}
 
   // 获取动画总时长（包括延迟）
@@ -52,6 +58,7 @@ abstract class CustomAnimation<T extends RenderObject = RenderObject> implements
 **缓动（Easing）**: 控制动画速度曲线的函数。
 
 **时间管理**:
+
 - `elapsedTime`: 从动画开始经过的时间
 - `duration`: 动画持续时间
 - `delay`: 开始前的延迟时间
@@ -70,22 +77,19 @@ import {
   AnimationConfig,
   InterpolationResult,
   RenderObject,
-  generateObjectId
-} from '@animaker/core';
+  generateObjectId,
+} from '@kinema/core';
 
 interface ShakeConfig extends AnimationConfig {
-  intensity?: number;    // 抖动强度
-  frequency?: number;    // 抖动频率
+  intensity?: number; // 抖动强度
+  frequency?: number; // 抖动频率
 }
 
 class ShakeAnimation extends Animation {
   private readonly intensity: number;
   private readonly frequency: number;
 
-  constructor(
-    target: RenderObject,
-    config: ShakeConfig
-  ) {
+  constructor(target: RenderObject, config: ShakeConfig) {
     super(target, config);
     this.intensity = config.intensity ?? 0.1;
     this.frequency = config.frequency ?? 10;
@@ -107,9 +111,8 @@ class ShakeAnimation extends Animation {
     const easedAlpha = this.config.easing(alpha as Alpha);
 
     // 计算抖动偏移
-    const shake = Math.sin(easedAlpha * Math.PI * 2 * this.frequency) *
-                  this.intensity *
-                  (1 - easedAlpha); // 逐渐减弱
+    const shake =
+      Math.sin(easedAlpha * Math.PI * 2 * this.frequency) * this.intensity * (1 - easedAlpha); // 逐渐减弱
 
     // 应用抖动到 X 轴
     const currentTransform = this.target.getState().transform;
@@ -117,8 +120,8 @@ class ShakeAnimation extends Animation {
       ...currentTransform,
       position: {
         ...currentTransform.position,
-        x: currentTransform.position.x + shake
-      }
+        x: currentTransform.position.x + shake,
+      },
     };
 
     // 返回插值结果
@@ -126,20 +129,20 @@ class ShakeAnimation extends Animation {
 
     return {
       object: updatedObject,
-      complete: easedAlpha >= 1
+      complete: easedAlpha >= 1,
     };
   }
 }
 
 // 使用示例
-import { smooth } from '@animaker/core/easing';
+import { smooth } from '@kinema/core/easing';
 
 const shake = new ShakeAnimation(myObject, {
   duration: 1,
   easing: smooth,
   intensity: 0.2,
   frequency: 15,
-  name: 'shake-effect'
+  name: 'shake-effect',
 });
 
 scene.schedule(shake, 0);
@@ -151,9 +154,9 @@ scene.schedule(shake, 0);
 
 ```typescript
 interface PulseConfig extends AnimationConfig {
-  minScale?: number;    // 最小缩放比例
-  maxScale?: number;    // 最大缩放比例
-  cycles?: number;      // 脉冲周期数
+  minScale?: number; // 最小缩放比例
+  maxScale?: number; // 最大缩放比例
+  cycles?: number; // 脉冲周期数
 }
 
 class PulseAnimation extends Animation {
@@ -161,10 +164,7 @@ class PulseAnimation extends Animation {
   private readonly maxScale: number;
   private readonly cycles: number;
 
-  constructor(
-    target: RenderObject,
-    config: PulseConfig
-  ) {
+  constructor(target: RenderObject, config: PulseConfig) {
     super(target, config);
     this.minScale = config.minScale ?? 0.8;
     this.maxScale = config.maxScale ?? 1.2;
@@ -194,15 +194,15 @@ class PulseAnimation extends Animation {
       scale: {
         x: scale,
         y: scale,
-        z: scale
-      }
+        z: scale,
+      },
     };
 
     const updatedObject = this.target.withTransform(newTransform);
 
     return {
       object: updatedObject,
-      complete: alpha >= 1
+      complete: alpha >= 1,
     };
   }
 }
@@ -214,7 +214,7 @@ const pulse = new PulseAnimation(heartObject, {
   minScale: 0.9,
   maxScale: 1.3,
   cycles: 3,
-  name: 'heartbeat'
+  name: 'heartbeat',
 });
 ```
 
@@ -223,21 +223,18 @@ const pulse = new PulseAnimation(heartObject, {
 让对象沿着指定路径移动：
 
 ```typescript
-import { Point3D, lerpPoint } from '@animaker/core';
+import { Point3D, lerpPoint } from '@kinema/core';
 
 interface PathFollowConfig extends AnimationConfig {
-  path: Point3D[];      // 路径点数组
-  loop?: boolean;       // 是否循环
+  path: Point3D[]; // 路径点数组
+  loop?: boolean; // 是否循环
 }
 
 class PathFollowAnimation extends Animation {
   private readonly path: ReadonlyArray<Point3D>;
   private readonly loop: boolean;
 
-  constructor(
-    target: RenderObject,
-    config: PathFollowConfig
-  ) {
+  constructor(target: RenderObject, config: PathFollowConfig) {
     super(target, config);
     this.path = config.path;
     this.loop = config.loop ?? false;
@@ -271,12 +268,12 @@ class PathFollowAnimation extends Animation {
       const lastPoint = this.path[this.path.length - 1];
       const newTransform = {
         ...this.target.getState().transform,
-        position: lastPoint
+        position: lastPoint,
       };
       const updatedObject = this.target.withTransform(newTransform);
       return {
         object: updatedObject,
-        complete: true
+        complete: true,
       };
     }
 
@@ -289,14 +286,14 @@ class PathFollowAnimation extends Animation {
     const currentTransform = this.target.getState().transform;
     const newTransform = {
       ...currentTransform,
-      position: currentPosition
+      position: currentPosition,
     };
 
     const updatedObject = this.target.withTransform(newTransform);
 
     return {
       object: updatedObject,
-      complete: easedAlpha >= 1 && !this.loop
+      complete: easedAlpha >= 1 && !this.loop,
     };
   }
 }
@@ -307,7 +304,7 @@ const path: Point3D[] = [
   { x: 1, y: 1, z: 0 },
   { x: 2, y: 0, z: 0 },
   { x: 3, y: 1, z: 0 },
-  { x: 4, y: 0, z: 0 }
+  { x: 4, y: 0, z: 0 },
 ];
 
 const pathFollow = new PathFollowAnimation(birdObject, {
@@ -315,7 +312,7 @@ const pathFollow = new PathFollowAnimation(birdObject, {
   easing: smooth,
   path: path,
   loop: false,
-  name: 'bird-flight'
+  name: 'bird-flight',
 });
 ```
 
@@ -329,9 +326,9 @@ const pathFollow = new PathFollowAnimation(birdObject, {
 
 ```typescript
 interface ElasticDeformConfig extends AnimationConfig {
-  axis: 'x' | 'y' | 'z';     // 形变轴
-  stretchFactor?: number;     // 拉伸系数
-  compressFactor?: number;    // 压缩系数
+  axis: 'x' | 'y' | 'z'; // 形变轴
+  stretchFactor?: number; // 拉伸系数
+  compressFactor?: number; // 压缩系数
 }
 
 class ElasticDeformAnimation extends Animation {
@@ -339,10 +336,7 @@ class ElasticDeformAnimation extends Animation {
   private readonly stretchFactor: number;
   private readonly compressFactor: number;
 
-  constructor(
-    target: RenderObject,
-    config: ElasticDeformConfig
-  ) {
+  constructor(target: RenderObject, config: ElasticDeformConfig) {
     super(target, config);
     this.axis = config.axis;
     this.stretchFactor = config.stretchFactor ?? 1.3;
@@ -366,7 +360,7 @@ class ElasticDeformAnimation extends Animation {
     if (easedAlpha < 0.3) {
       // 拉伸阶段
       const stretchProgress = easedAlpha / 0.3;
-      scale = 1 + (this.stretchFactor - 1) * Math.sin(stretchProgress * Math.PI / 2);
+      scale = 1 + (this.stretchFactor - 1) * Math.sin((stretchProgress * Math.PI) / 2);
     } else if (easedAlpha < 0.7) {
       // 压缩阶段
       const compressProgress = (easedAlpha - 0.3) / 0.4;
@@ -381,7 +375,7 @@ class ElasticDeformAnimation extends Animation {
     const currentTransform = this.target.getState().transform;
     const newScale = {
       ...currentTransform.scale,
-      [this.axis]: currentTransform.scale[this.axis] * scale
+      [this.axis]: currentTransform.scale[this.axis] * scale,
     };
 
     // 保持体积不变（在其他轴上反向缩放）
@@ -399,14 +393,14 @@ class ElasticDeformAnimation extends Animation {
 
     const newTransform = {
       ...currentTransform,
-      scale: newScale
+      scale: newScale,
     };
 
     const updatedObject = this.target.withTransform(newTransform);
 
     return {
       object: updatedObject,
-      complete: easedAlpha >= 1
+      complete: easedAlpha >= 1,
     };
   }
 }
@@ -418,7 +412,7 @@ const elasticDeform = new ElasticDeformAnimation(ballObject, {
   axis: 'y',
   stretchFactor: 1.4,
   compressFactor: 0.6,
-  name: 'bounce-deform'
+  name: 'bounce-deform',
 });
 ```
 
@@ -428,9 +422,9 @@ const elasticDeform = new ElasticDeformAnimation(ballObject, {
 
 ```typescript
 interface TypewriterConfig extends AnimationConfig {
-  text: string;              // 目标文本
-  cursor?: string;           // 光标字符
-  blinkRate?: number;        // 光标闪烁速率
+  text: string; // 目标文本
+  cursor?: string; // 光标字符
+  blinkRate?: number; // 光标闪烁速率
 }
 
 class TypewriterAnimation extends Animation {
@@ -438,10 +432,7 @@ class TypewriterAnimation extends Animation {
   private readonly cursor: string;
   private readonly blinkRate: number;
 
-  constructor(
-    target: RenderObject,
-    config: TypewriterConfig
-  ) {
+  constructor(target: RenderObject, config: TypewriterConfig) {
     super(target, config);
     this.targetText = config.text;
     this.cursor = config.cursor ?? '|';
@@ -483,7 +474,7 @@ class TypewriterAnimation extends Animation {
 
     return {
       object: updatedObject,
-      complete: easedAlpha >= 1
+      complete: easedAlpha >= 1,
     };
   }
 }
@@ -492,10 +483,10 @@ class TypewriterAnimation extends Animation {
 const typewriter = new TypewriterAnimation(textObject, {
   duration: 3,
   easing: linear,
-  text: 'Hello, AniMaker!',
+  text: 'Hello, Kinema!',
   cursor: '_',
   blinkRate: 4,
-  name: 'typing-effect'
+  name: 'typing-effect',
 });
 ```
 
@@ -508,7 +499,7 @@ const typewriter = new TypewriterAnimation(textObject, {
 创建复杂的嵌套动画组合：
 
 ```typescript
-import { AnimationGroup, CompositionType } from '@animaker/core/animation';
+import { AnimationGroup, CompositionType } from '@kinema/core/animation';
 
 // 创建多层嵌套动画
 const complexAnimation = new AnimationGroup(
@@ -519,9 +510,9 @@ const complexAnimation = new AnimationGroup(
       mainObject,
       [
         new MoveAnimation(mainObject, { x: 2, y: 0, z: 0 }, { duration: 1 }),
-        new RotateAnimation(mainObject, 'z', 360, { duration: 1 })
+        new RotateAnimation(mainObject, 'z', 360, { duration: 1 }),
       ],
-      CompositionType.Parallel
+      CompositionType.Parallel,
     ),
 
     // 第二层：顺序动画
@@ -529,15 +520,15 @@ const complexAnimation = new AnimationGroup(
       mainObject,
       [
         new ScaleAnimation(mainObject, { x: 1.5, y: 1.5, z: 1 }, { duration: 0.5 }),
-        new ScaleAnimation(mainObject, { x: 1, y: 1, z: 1 }, { duration: 0.5 })
+        new ScaleAnimation(mainObject, { x: 1, y: 1, z: 1 }, { duration: 0.5 }),
       ],
-      CompositionType.Sequence
+      CompositionType.Sequence,
     ),
 
     // 第三层：自定义动画
-    new ShakeAnimation(mainObject, { duration: 0.5, intensity: 0.1 })
+    new ShakeAnimation(mainObject, { duration: 0.5, intensity: 0.1 }),
   ],
-  CompositionType.Sequence
+  CompositionType.Sequence,
 );
 
 scene.schedule(complexAnimation, 0);
@@ -558,7 +549,7 @@ class ConditionalAnimation extends Animation {
     condition: () => boolean,
     trueAnimation: Animation,
     falseAnimation: Animation,
-    config: AnimationConfig
+    config: AnimationConfig,
   ) {
     super(target, config);
     this.condition = condition;
@@ -579,10 +570,10 @@ class ConditionalAnimation extends Animation {
 // 使用示例
 const conditionalMove = new ConditionalAnimation(
   playerObject,
-  () => playerHasPowerUp,  // 条件函数
-  new MoveAnimation(playerObject, { x: 5, y: 0, z: 0 }, { duration: 1 }),  // 有能量时
-  new MoveAnimation(playerObject, { x: 2, y: 0, z: 0 }, { duration: 1 }),  // 无能量时
-  { duration: 1, easing: smooth }
+  () => playerHasPowerUp, // 条件函数
+  new MoveAnimation(playerObject, { x: 5, y: 0, z: 0 }, { duration: 1 }), // 有能量时
+  new MoveAnimation(playerObject, { x: 2, y: 0, z: 0 }, { duration: 1 }), // 无能量时
+  { duration: 1, easing: smooth },
 );
 ```
 
@@ -648,12 +639,14 @@ class TransformPool {
   private pool: Transform[] = [];
 
   acquire(): Transform {
-    return this.pool.pop() || {
-      position: { x: 0, y: 0, z: 0 },
-      rotation: { x: 0, y: 0, z: 0 },
-      scale: { x: 1, y: 1, z: 1 },
-      opacity: 1
-    };
+    return (
+      this.pool.pop() || {
+        position: { x: 0, y: 0, z: 0 },
+        rotation: { x: 0, y: 0, z: 0 },
+        scale: { x: 1, y: 1, z: 1 },
+        opacity: 1,
+      }
+    );
   }
 
   release(transform: Transform): void {
@@ -677,7 +670,7 @@ class DebuggableAnimation extends Animation {
     if (this.config.name) {
       console.log(`[${this.config.name}] t=${elapsedTime.toFixed(2)}:`, {
         position: result.object.getState().transform.position,
-        complete: result.complete
+        complete: result.complete,
       });
     }
 
@@ -726,10 +719,7 @@ class BouncingBallAnimation extends Animation {
   private readonly bounceFactor: number = 0.7;
   private readonly floorY: number = -2;
 
-  constructor(
-    target: RenderObject,
-    config: AnimationConfig
-  ) {
+  constructor(target: RenderObject, config: AnimationConfig) {
     super(target, config);
   }
 
@@ -743,7 +733,7 @@ class BouncingBallAnimation extends Animation {
     // 物理模拟
     const t = adjustedTime;
     const startY = 0;
-    const velocity = -5;  // 初始向上速度
+    const velocity = -5; // 初始向上速度
 
     // 计算位置（考虑重力）
     let y = startY + velocity * t + 0.5 * this.gravity * t * t;
@@ -751,12 +741,15 @@ class BouncingBallAnimation extends Animation {
 
     // 地面碰撞检测
     if (y < this.floorY) {
-      const impactTime = Math.sqrt(2 * (startY - this.floorY) / this.gravity);
+      const impactTime = Math.sqrt((2 * (startY - this.floorY)) / this.gravity);
       const bounceVelocity = -velocity - this.gravity * impactTime;
       const remainingTime = t - impactTime;
 
       if (remainingTime > 0) {
-        y = this.floorY + bounceVelocity * remainingTime - 0.5 * this.gravity * remainingTime * remainingTime;
+        y =
+          this.floorY +
+          bounceVelocity * remainingTime -
+          0.5 * this.gravity * remainingTime * remainingTime;
 
         // 落地时压缩形变
         const impactForce = Math.abs(bounceVelocity) / 10;
@@ -770,20 +763,20 @@ class BouncingBallAnimation extends Animation {
       ...currentTransform,
       position: {
         ...currentTransform.position,
-        y: Math.max(this.floorY, y)
+        y: Math.max(this.floorY, y),
       },
       scale: {
-        x: currentTransform.scale.x * (2 - scaleY),  // 保持体积
+        x: currentTransform.scale.x * (2 - scaleY), // 保持体积
         y: currentTransform.scale.y * scaleY,
-        z: currentTransform.scale.z * (2 - scaleY)
-      }
+        z: currentTransform.scale.z * (2 - scaleY),
+      },
     };
 
     const updatedObject = this.target.withTransform(newTransform);
 
     return {
       object: updatedObject,
-      complete: adjustedTime >= this.config.duration
+      complete: adjustedTime >= this.config.duration,
     };
   }
 }
@@ -791,8 +784,8 @@ class BouncingBallAnimation extends Animation {
 // 使用示例
 const bouncingBall = new BouncingBallAnimation(ballObject, {
   duration: 3,
-  easing: linear,  // 物理模拟不需要缓动
-  name: 'bouncing-ball'
+  easing: linear, // 物理模拟不需要缓动
+  name: 'bouncing-ball',
 });
 
 scene.schedule(bouncingBall, 0);

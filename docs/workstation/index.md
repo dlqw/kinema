@@ -1,6 +1,6 @@
 # 视频工作站文档
 
-欢迎使用 AniMaker 视频工作站！这是一款基于 Electron 的桌面应用，专为视频编辑和动画制作设计。
+欢迎使用 Kinema 视频工作站！这是一款基于 Electron 的桌面应用，专为视频编辑和动画制作设计。
 
 ## 快速开始
 
@@ -29,11 +29,13 @@
 ## 文档目录
 
 ### 入门
+
 - **[安装指南](./installation.md)** - 系统要求和安装步骤
 - **[用户手册](./user-guide.md)** - 界面介绍和基本操作
 - **[快捷键](./user-guide.md#快捷键)** - 提高效率的快捷键参考
 
 ### 功能详解
+
 - **[项目管理](./projects.md)** - 创建、保存、备份项目
 - **[编辑器功能](./editor.md)** - 逐帧编辑、图层管理、关键帧
 - **[设置配置](./settings.md)** - 自定义应用行为和偏好
@@ -43,24 +45,28 @@
 ### 系统架构
 
 视频工作站基于以下技术构建：
+
 - **Electron**: 跨平台桌面应用框架
 - **React**: 用户界面框架
 - **Vite**: 快速的开发构建工具
-- **AniMaker Framework**: 底层动画渲染引擎
+- **Kinema Framework**: 底层动画渲染引擎
 
 ### 开发路线图
 
 #### v0.1.0（当前版本）
+
 - 基础项目管理和编辑功能
 - 逐帧预览和编辑
 - 基本导出功能
 
 #### v0.2.0（计划中）
+
 - 插件系统
 - 更多导出格式
 - 性能优化
 
 #### v1.0.0（未来）
+
 - 完整的视频编辑功能
 - 特效和滤镜
 - 音频编辑
@@ -73,8 +79,8 @@
 
 ### 反馈和支持
 
-- **GitHub Issues**: [报告问题](https://github.com/your-username/animaker/issues)
-- **Discussions**: [参与讨论](https://github.com/your-username/animaker/discussions)
+- **GitHub Issues**: [报告问题](https://github.com/your-username/kinema/issues)
+- **Discussions**: [参与讨论](https://github.com/your-username/kinema/discussions)
 - **文档**: [框架文档](../guide/getting-started.md)
 
 ### 贡献

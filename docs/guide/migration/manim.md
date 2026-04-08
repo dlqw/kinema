@@ -1,6 +1,6 @@
-# 从 Manim 迁移到 AniMaker
+# 从 Manim 迁移到 Kinema
 
-本指南帮助你从 Python 的 Manim 迁移到 TypeScript 的 AniMaker。
+本指南帮助你从 Python 的 Manim 迁移到 TypeScript 的 Kinema。
 
 ## 目录
 
@@ -16,17 +16,17 @@
 
 ### 主要差异
 
-| 方面 | Manim | AniMaker |
-|------|-------|----------|
-| **语言** | Python | TypeScript |
-| **运行环境** | 本地渲染 | 浏览器/本地 |
-| **渲染后端** | Cairo/OpenGL | WebGPU/Canvas2D |
-| **类型系统** | 动态类型 | 静态类型 |
-| **数据模型** | 可变 | 不可变 |
+| 方面         | Manim        | Kinema            |
+| ------------ | ------------ | ----------------- |
+| **语言**     | Python       | TypeScript        |
+| **运行环境** | 本地渲染     | 浏览器/本地       |
+| **渲染后端** | Cairo/OpenGL | WebGPU/Canvas2D   |
+| **类型系统** | 动态类型     | 静态类型          |
+| **数据模型** | 可变         | 不可变            |
 | **动画定义** | 继承 Mobject | 实现 RenderObject |
-| **组合方式** | 函数式 | 面向对象 |
+| **组合方式** | 函数式       | 面向对象          |
 
-### AniMaker 的优势
+### Kinema 的优势
 
 1. **类型安全** - 编译时捕获错误
 2. **更好性能** - WebGPU 加速
@@ -48,14 +48,14 @@ class MyScene(Scene):
 ```
 
 ```typescript
-// AniMaker
-import { createScene, VectorObject } from '@animaker/core';
-import { FadeInAnimation } from '@animaker/core/animation';
+// Kinema
+import { createScene, VectorObject } from '@kinema/core';
+import { FadeInAnimation } from '@kinema/core/animation';
 
 const scene = createScene({
   width: 1920,
   height: 1080,
-  fps: 60
+  fps: 60,
 });
 
 const circle = VectorObject.circle(1);
@@ -73,14 +73,16 @@ square = Square(side_length=3, color=RED)
 ```
 
 ```typescript
-// AniMaker
-import { VectorObject } from '@animaker/core';
+// Kinema
+import { VectorObject } from '@kinema/core';
 
-const circle = VectorObject.circle(2, { x: 0, y: 0, z: 0 })
-  .withStyles(new Map([['fillColor', '#3498db']]));
+const circle = VectorObject.circle(2, { x: 0, y: 0, z: 0 }).withStyles(
+  new Map([['fillColor', '#3498db']]),
+);
 
-const square = VectorObject.rectangle(3, 3, { x: 0, y: 0, z: 0 })
-  .withStyles(new Map([['fillColor', '#e74c3c']]));
+const square = VectorObject.rectangle(3, 3, { x: 0, y: 0, z: 0 }).withStyles(
+  new Map([['fillColor', '#e74c3c']]),
+);
 ```
 
 ### Animation 对应
@@ -93,17 +95,13 @@ self.play(Transform(circle, square))
 ```
 
 ```typescript
-// AniMaker
-import {
-  FadeInAnimation,
-  FadeOutAnimation,
-  TransformAnimation
-} from '@animaker/core/animation';
+// Kinema
+import { FadeInAnimation, FadeOutAnimation, TransformAnimation } from '@kinema/core/animation';
 
 const create = new FadeInAnimation(circle, { duration: 1 });
 const fadeOut = new FadeOutAnimation(circle, { duration: 1 });
 const transform = new TransformAnimation(circle, square.getState(), {
-  duration: 1
+  duration: 1,
 });
 
 scene.schedule(create, 0);
@@ -117,26 +115,26 @@ scene.schedule(transform, 2);
 
 ### 创建对象
 
-| Manim | AniMaker | 说明 |
-|-------|----------|------|
-| `Circle()` | `VectorObject.circle()` | 圆形 |
-| `Square()` | `VectorObject.rectangle()` | 正方形 |
-| `Rectangle()` | `VectorObject.rectangle()` | 矩形 |
-| `Line()` | `VectorObject.line()` | 线段 |
-| `Triangle()` | `PolygonObject.triangle()` | 三角形 |
-| `Polygon()` | `PolygonObject` | 多边形 |
-| `Text()` | `TextObject` | 文本 |
-| `Dot()` | `VectorObject.circle()` | 点（小圆） |
+| Manim         | Kinema                     | 说明       |
+| ------------- | -------------------------- | ---------- |
+| `Circle()`    | `VectorObject.circle()`    | 圆形       |
+| `Square()`    | `VectorObject.rectangle()` | 正方形     |
+| `Rectangle()` | `VectorObject.rectangle()` | 矩形       |
+| `Line()`      | `VectorObject.line()`      | 线段       |
+| `Triangle()`  | `PolygonObject.triangle()` | 三角形     |
+| `Polygon()`   | `PolygonObject`            | 多边形     |
+| `Text()`      | `TextObject`               | 文本       |
+| `Dot()`       | `VectorObject.circle()`    | 点（小圆） |
 
 ### 颜色
 
-| Manim | AniMaker |
-|-------|----------|
-| `WHITE` | `#FFFFFF` |
-| `BLACK` | `#000000` |
-| `BLUE` | `#3498db` |
-| `RED` | `#e74c3c` |
-| `GREEN` | `#2ecc71` |
+| Manim    | Kinema    |
+| -------- | --------- |
+| `WHITE`  | `#FFFFFF` |
+| `BLACK`  | `#000000` |
+| `BLUE`   | `#3498db` |
+| `RED`    | `#e74c3c` |
+| `GREEN`  | `#2ecc71` |
 | `YELLOW` | `#f1c40f` |
 | `ORANGE` | `#e67e22` |
 | `PURPLE` | `#9b59b6` |
@@ -144,39 +142,39 @@ scene.schedule(transform, 2);
 
 ### 动画
 
-| Manim | AniMaker | 说明 |
-|-------|----------|------|
-| `Create()` | `FadeInAnimation` | 创建对象 |
-| `FadeIn()` | `FadeInAnimation` | 淡入 |
-| `FadeOut()` | `FadeOutAnimation` | 淡出 |
-| `Transform()` | `TransformAnimation` | 变换 |
+| Manim                    | Kinema               | 说明     |
+| ------------------------ | -------------------- | -------- |
+| `Create()`               | `FadeInAnimation`    | 创建对象 |
+| `FadeIn()`               | `FadeInAnimation`    | 淡入     |
+| `FadeOut()`              | `FadeOutAnimation`   | 淡出     |
+| `Transform()`            | `TransformAnimation` | 变换     |
 | `ReplacementTransform()` | `TransformAnimation` | 替换变换 |
-| `Rotate()` | `RotateAnimation` | 旋转 |
-| `Shift()` | `MoveAnimation` | 移动 |
-| `Scale()` | `ScaleAnimation` | 缩放 |
+| `Rotate()`               | `RotateAnimation`    | 旋转     |
+| `Shift()`                | `MoveAnimation`      | 移动     |
+| `Scale()`                | `ScaleAnimation`     | 缩放     |
 
 ### 组合
 
-| Manim | AniMaker | 说明 |
-|-------|----------|------|
+| Manim              | Kinema                     | 说明 |
+| ------------------ | -------------------------- | ---- |
 | `AnimationGroup()` | `AnimationGroup(Parallel)` | 并行 |
-| `Succession()` | `AnimationGroup(Sequence)` | 顺序 |
-| `LaggedStart()` | `AnimationGroup(Lagged)` | 延迟 |
+| `Succession()`     | `AnimationGroup(Sequence)` | 顺序 |
+| `LaggedStart()`    | `AnimationGroup(Lagged)`   | 延迟 |
 
 ### 缓动函数
 
-| Manim | AniMaker | 说明 |
-|-------|----------|------|
-| `linear()` | `linear` | 线性 |
-| `smooth()` | `smooth` | 平滑 |
-| `smoother()` | `smoother` | 更平滑 |
-| `ease_in_sine()` | `easeInSine` | 正弦加速 |
-| `ease_out_sine()` | `easeOutSine` | 正弦减速 |
+| Manim                | Kinema          | 说明       |
+| -------------------- | --------------- | ---------- |
+| `linear()`           | `linear`        | 线性       |
+| `smooth()`           | `smooth`        | 平滑       |
+| `smoother()`         | `smoother`      | 更平滑     |
+| `ease_in_sine()`     | `easeInSine`    | 正弦加速   |
+| `ease_out_sine()`    | `easeOutSine`   | 正弦减速   |
 | `ease_in_out_sine()` | `easeInOutSine` | 正弦加减速 |
-| `ease_in_quad()` | `easeIn` | 二次加速 |
-| `ease_out_quad()` | `easeOut` | 二次减速 |
-| `ease_in_out_quad()` | `easeInOut` | 二次加减速 |
-| `there_and_back()` | `thereAndBack` | 往返 |
+| `ease_in_quad()`     | `easeIn`        | 二次加速   |
+| `ease_out_quad()`    | `easeOut`       | 二次减速   |
+| `ease_in_out_quad()` | `easeInOut`     | 二次加减速 |
+| `there_and_back()`   | `thereAndBack`  | 往返       |
 
 ---
 
@@ -185,6 +183,7 @@ scene.schedule(transform, 2);
 ### 示例 1: 基础动画
 
 **Manim 代码：**
+
 ```python
 from manim import *
 
@@ -207,59 +206,70 @@ class BasicAnimation(Scene):
         self.play(FadeOut(circle))
 ```
 
-**AniMaker 代码：**
+**Kinema 代码：**
+
 ```typescript
-import { createScene, VectorObject } from '@animaker/core';
+import { createScene, VectorObject } from '@kinema/core';
 import {
   FadeInAnimation,
   FadeOutAnimation,
   MoveAnimation,
   RotateAnimation,
-  ScaleAnimation
-} from '@animaker/core/animation';
-import { smooth } from '@animaker/core/easing';
+  ScaleAnimation,
+} from '@kinema/core/animation';
+import { smooth } from '@kinema/core/easing';
 
 const scene = createScene({
   width: 1920,
   height: 1080,
   backgroundColor: '#000000',
-  fps: 60
+  fps: 60,
 });
 
 // 创建圆形
-const circle = VectorObject.circle(2, { x: 0, y: 0, z: 0 })
-  .withStyles(new Map([['fillColor', '#3498db']]));
+const circle = VectorObject.circle(2, { x: 0, y: 0, z: 0 }).withStyles(
+  new Map([['fillColor', '#3498db']]),
+);
 
 // 添加到场景
 let currentScene = scene.addObject(circle);
 
 // 创建动画
 const fadeIn = new FadeInAnimation(circle, { duration: 1, easing: smooth });
-const move = new MoveAnimation(circle, { x: 2, y: 0, z: 0 }, {
-  duration: 1,
-  easing: smooth
-});
+const move = new MoveAnimation(
+  circle,
+  { x: 2, y: 0, z: 0 },
+  {
+    duration: 1,
+    easing: smooth,
+  },
+);
 const rotate = new RotateAnimation(circle, 'z', 90, {
   duration: 1,
-  easing: smooth
+  easing: smooth,
 });
-const scale = new ScaleAnimation(circle, { x: 2, y: 2, z: 1 }, {
-  duration: 1,
-  easing: smooth
-});
+const scale = new ScaleAnimation(
+  circle,
+  { x: 2, y: 2, z: 1 },
+  {
+    duration: 1,
+    easing: smooth,
+  },
+);
 const fadeOut = new FadeOutAnimation(circle, { duration: 1, easing: smooth });
 
 // 调度动画
-currentScene = currentScene.schedule(fadeIn, 0);    // 0-1秒
-currentScene = currentScene.schedule(move, 1);     // 1-2秒
-currentScene = currentScene.schedule(rotate, 2);   // 2-3秒
-currentScene = currentScene.schedule(scale, 3);    // 3-4秒
-currentScene = currentScene.schedule(fadeOut, 4);  // 4-5秒
+currentScene = currentScene.schedule(fadeIn, 0); // 0-1秒
+currentScene = currentScene.schedule(move, 1); // 1-2秒
+currentScene = currentScene.schedule(rotate, 2); // 2-3秒
+currentScene = currentScene.schedule(scale, 3); // 3-4秒
+currentScene = currentScene.schedule(fadeOut, 4); // 4-5秒
 ```
 
 ### 示例 2: 组合动画
 
 **Manim 代码：**
+
 ```python
 class ComposedAnimation(Scene):
     def construct(self):
@@ -288,17 +298,18 @@ class ComposedAnimation(Scene):
         )
 ```
 
-**AniMaker 代码：**
+**Kinema 代码：**
+
 ```typescript
-import { createScene, VectorObject } from '@animaker/core';
+import { createScene, VectorObject } from '@kinema/core';
 import {
   FadeInAnimation,
   MoveAnimation,
   RotateAnimation,
   AnimationGroup,
-  CompositionType
-} from '@animaker/core/animation';
-import { smooth } from '@animaker/core/easing';
+  CompositionType,
+} from '@kinema/core/animation';
+import { smooth } from '@kinema/core/easing';
 
 const scene = createScene();
 
@@ -317,9 +328,9 @@ const parallelCreate = new AnimationGroup(
   circle,
   [
     new FadeInAnimation(circle, { duration: 1, easing: smooth }),
-    new FadeInAnimation(square, { duration: 1, easing: smooth })
+    new FadeInAnimation(square, { duration: 1, easing: smooth }),
   ],
-  CompositionType.Parallel
+  CompositionType.Parallel,
 );
 
 // 顺序动画
@@ -327,9 +338,9 @@ const sequenceMove = new AnimationGroup(
   circle,
   [
     new MoveAnimation(circle, { x: 2, y: 0, z: 0 }, { duration: 1 }),
-    new MoveAnimation(square, { x: -2, y: 0, z: 0 }, { duration: 1 })
+    new MoveAnimation(square, { x: -2, y: 0, z: 0 }, { duration: 1 }),
   ],
-  CompositionType.Sequence
+  CompositionType.Sequence,
 );
 
 // 延迟动画（lag_ratio）
@@ -337,9 +348,9 @@ const laggedRotate = new AnimationGroup(
   circle,
   [
     new RotateAnimation(circle, 'z', 180, { duration: 1 }),
-    new RotateAnimation(square, 'z', 180, { duration: 1 })
+    new RotateAnimation(square, 'z', 180, { duration: 1 }),
   ],
-  CompositionType.Lagged
+  CompositionType.Lagged,
 );
 
 currentScene = currentScene.schedule(parallelCreate, 0);
@@ -350,6 +361,7 @@ currentScene = currentScene.schedule(laggedRotate, 3);
 ### 示例 3: 文本动画
 
 **Manim 代码：**
+
 ```python
 class TextAnimation(Scene):
     def construct(self):
@@ -366,47 +378,50 @@ class TextAnimation(Scene):
         self.play(title.animate.set_color(YELLOW))
 ```
 
-**AniMaker 代码：**
+**Kinema 代码：**
+
 ```typescript
-import { createScene } from '@animaker/core';
-import { TextObject } from '@animaker/core/objects';
-import { FadeInAnimation } from '@animaker/core/animation';
-import { smooth, easeInOut } from '@animaker/core/easing';
+import { createScene } from '@kinema/core';
+import { TextObject } from '@kinema/core/objects';
+import { FadeInAnimation } from '@kinema/core/animation';
+import { smooth, easeInOut } from '@kinema/core/easing';
 
 const scene = createScene();
 
-const title = TextObject.title('Hello AniMaker')
+const title = TextObject.title('Hello Kinema')
   .withPosition({ x: 0, y: 1, z: 0 })
-  .withStyles(new Map([
-    ['fillColor', '#FFFFFF'],
-    ['fontSize', 72 * 0.01]  // 转换为场景单位
-  ]));
+  .withStyles(
+    new Map([
+      ['fillColor', '#FFFFFF'],
+      ['fontSize', 72 * 0.01], // 转换为场景单位
+    ]),
+  );
 
 const subtitle = TextObject.subtitle('Welcome to the show')
   .withPosition({ x: 0, y: 0, z: 0 })
-  .withStyles(new Map([
-    ['fillColor', '#CCCCCC'],
-    ['fontSize', 36 * 0.01]
-  ]));
+  .withStyles(
+    new Map([
+      ['fillColor', '#CCCCCC'],
+      ['fontSize', 36 * 0.01],
+    ]),
+  );
 
 let currentScene = scene.addObjects(title, subtitle);
 
 // 淡入标题
 const titleFadeIn = new FadeInAnimation(title, {
   duration: 1.5,
-  easing: easeInOut
+  easing: easeInOut,
 });
 
 // 淡入副标题
 const subtitleFadeIn = new FadeInAnimation(subtitle, {
   duration: 1,
-  easing: smooth
+  easing: smooth,
 });
 
 // 改变颜色（使用样式更新）
-const changeColor = title.withStyles(
-  new Map([['fillColor', '#f1c40f']])
-);
+const changeColor = title.withStyles(new Map([['fillColor', '#f1c40f']]));
 
 currentScene = currentScene.schedule(titleFadeIn, 0);
 currentScene = currentScene.schedule(subtitleFadeIn, 1.5);
@@ -416,6 +431,7 @@ currentScene = currentScene.addObject(changeColor);
 ### 示例 4: 数学图形
 
 **Manim 代码：**
+
 ```python
 class MathShapes(Scene):
     def construct(self):
@@ -430,11 +446,12 @@ class MathShapes(Scene):
         self.play(Create(graph))
 ```
 
-**AniMaker 代码：**
+**Kinema 代码：**
+
 ```typescript
-import { createScene } from '@animaker/core';
-import { PathObject } from '@animaker/core/objects';
-import { FadeInAnimation } from '@animaker/core/animation';
+import { createScene } from '@kinema/core';
+import { PathObject } from '@kinema/core/objects';
+import { FadeInAnimation } from '@kinema/core/animation';
 
 const scene = createScene();
 
@@ -457,37 +474,40 @@ function generateSinePath(): Point3D[] {
 // 创建路径对象
 const graph = PathObject.fromPoints(generateSinePath())
   .withPosition({ x: 0, y: 0, z: 0 })
-  .withStyles(new Map([
-    ['strokeColor', '#3498db'],
-    ['strokeWidth', 0.02]
-  ]));
+  .withStyles(
+    new Map([
+      ['strokeColor', '#3498db'],
+      ['strokeWidth', 0.02],
+    ]),
+  );
 
 // 添加坐标轴（使用线段）
-const xAxis = VectorObject.line(
-  { x: -4, y: 0, z: 0 },
-  { x: 4, y: 0, z: 0 }
-).withStyles(new Map([['strokeColor', '#666666'], ['strokeWidth', 0.01]]));
+const xAxis = VectorObject.line({ x: -4, y: 0, z: 0 }, { x: 4, y: 0, z: 0 }).withStyles(
+  new Map([
+    ['strokeColor', '#666666'],
+    ['strokeWidth', 0.01],
+  ]),
+);
 
-const yAxis = VectorObject.line(
-  { x: 0, y: -2, z: 0 },
-  { x: 0, y: 2, z: 0 }
-).withStyles(new Map([['strokeColor', '#666666'], ['strokeWidth', 0.01]]));
+const yAxis = VectorObject.line({ x: 0, y: -2, z: 0 }, { x: 0, y: 2, z: 0 }).withStyles(
+  new Map([
+    ['strokeColor', '#666666'],
+    ['strokeWidth', 0.01],
+  ]),
+);
 
 let currentScene = scene.addObjects(xAxis, yAxis, graph);
 
 // 动画
 const createAxes = new AnimationGroup(
   xAxis,
-  [
-    new FadeInAnimation(xAxis, { duration: 0.5 }),
-    new FadeInAnimation(yAxis, { duration: 0.5 })
-  ],
-  CompositionType.Parallel
+  [new FadeInAnimation(xAxis, { duration: 0.5 }), new FadeInAnimation(yAxis, { duration: 0.5 })],
+  CompositionType.Parallel,
 );
 
 const createGraph = new FadeInAnimation(graph, {
   duration: 1.5,
-  easing: smooth
+  easing: smooth,
 });
 
 currentScene = currentScene.schedule(createAxes, 0);
@@ -500,7 +520,7 @@ currentScene = currentScene.schedule(createGraph, 0.5);
 
 ### Q: 如何处理 Manim 的 `add()` 和 `remove()`？
 
-**A:** AniMaker 使用 `addObject()` 和 `removeObject()` 方法：
+**A:** Kinema 使用 `addObject()` 和 `removeObject()` 方法：
 
 ```python
 # Manim
@@ -510,7 +530,7 @@ self.remove(circle)
 ```
 
 ```typescript
-// AniMaker
+// Kinema
 const circle = VectorObject.circle(1);
 let scene = scene.addObject(circle);
 scene = scene.removeObject(circle.getState().id);
@@ -528,12 +548,12 @@ self.play(FadeOut(circle))
 ```
 
 ```typescript
-// AniMaker
+// Kinema
 const create = new FadeInAnimation(circle, { duration: 1 });
 const fadeOut = new FadeOutAnimation(circle, { duration: 1 });
 
 scene.schedule(create, 0);
-scene.schedule(fadeOut, 2);  // 1秒延迟
+scene.schedule(fadeOut, 2); // 1秒延迟
 ```
 
 ### Q: 如何处理 Manim 的 `next_to()` 和 `align_to()`？
@@ -542,19 +562,26 @@ scene.schedule(fadeOut, 2);  // 1秒延迟
 
 ```typescript
 // 辅助函数
-function nextTo(obj: RenderObject, direction: 'left' | 'right' | 'up' | 'down', distance: number = 0.5): Point3D {
+function nextTo(
+  obj: RenderObject,
+  direction: 'left' | 'right' | 'up' | 'down',
+  distance: number = 0.5,
+): Point3D {
   const pos = obj.getState().transform.position;
   switch (direction) {
-    case 'left': return { x: pos.x - distance, y: pos.y, z: pos.z };
-    case 'right': return { x: pos.x + distance, y: pos.y, z: pos.z };
-    case 'up': return { x: pos.x, y: pos.y + distance, z: pos.z };
-    case 'down': return { x: pos.x, y: pos.y - distance, z: pos.z };
+    case 'left':
+      return { x: pos.x - distance, y: pos.y, z: pos.z };
+    case 'right':
+      return { x: pos.x + distance, y: pos.y, z: pos.z };
+    case 'up':
+      return { x: pos.x, y: pos.y + distance, z: pos.z };
+    case 'down':
+      return { x: pos.x, y: pos.y - distance, z: pos.z };
   }
 }
 
 // 使用
-const square = VectorObject.rectangle(1, 1)
-  .withPosition(nextTo(circle, 'right', 1));
+const square = VectorObject.rectangle(1, 1).withPosition(nextTo(circle, 'right', 1));
 ```
 
 ### Q: 如何实现 Manim 的 `UpdateFromFunc`？
@@ -568,7 +595,7 @@ class UpdateAnimation extends Animation {
   constructor(
     target: RenderObject,
     updateFunc: (obj: RenderObject, progress: number) => RenderObject,
-    config: AnimationConfig
+    config: AnimationConfig,
   ) {
     super(target, config);
     this.updateFunc = updateFunc;
@@ -582,7 +609,7 @@ class UpdateAnimation extends Animation {
 
     return {
       object: updatedObj,
-      complete: easedAlpha >= 1
+      complete: easedAlpha >= 1,
     };
   }
 }
@@ -594,7 +621,7 @@ const updateAnim = new UpdateAnimation(
     const newRadius = 1 + progress;
     return obj.withScale({ x: newRadius, y: newRadius, z: 1 });
   },
-  { duration: 2, easing: smooth }
+  { duration: 2, easing: smooth },
 );
 ```
 
@@ -609,7 +636,7 @@ class ValueTracker {
 
   setValue(value: number): void {
     this.value = value;
-    this.listeners.forEach(listener => listener(value));
+    this.listeners.forEach((listener) => listener(value));
   }
 
   getValue(): number {
@@ -667,21 +694,25 @@ scene = scene.schedule(animation, 0);
 const DEFAULT_ANIMATION_CONFIG: AnimationConfig = {
   duration: 1,
   easing: smooth,
-  delay: 0
+  delay: 0,
 };
 
 // 使用配置
-const anim = new MoveAnimation(circle, { x: 1, y: 0, z: 0 }, {
-  ...DEFAULT_ANIMATION_CONFIG,
-  duration: 2  // 覆盖特定属性
-});
+const anim = new MoveAnimation(
+  circle,
+  { x: 1, y: 0, z: 0 },
+  {
+    ...DEFAULT_ANIMATION_CONFIG,
+    duration: 2, // 覆盖特定属性
+  },
+);
 ```
 
 ### 4. 组织代码结构
 
 ```typescript
 // 按功能组织
-import { createScene } from '@animaker/core';
+import { createScene } from '@kinema/core';
 import { CircleObject } from './objects/CircleObject';
 import { createIntroAnimation } from './animations/intro';
 import { createMainAnimation } from './animations/main';
@@ -702,7 +733,7 @@ export function createMyScene(): Scene {
 
 ## 相关文档
 
-- [动画创建入门](../animation-basics.md) - AniMaker 动画基础
-- [核心概念](../concepts.md) - AniMaker 核心概念
+- [动画创建入门](../animation-basics.md) - Kinema 动画基础
+- [核心概念](../concepts.md) - Kinema 核心概念
 - [自定义动画](../custom-animations.md) - 创建自定义动画
 - [API 参考](../../api/) - 完整 API 文档

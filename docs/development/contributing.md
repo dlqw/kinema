@@ -1,6 +1,6 @@
 # 贡献指南
 
-感谢您对 AniMaker 项目的关注！我们欢迎任何形式的贡献。
+感谢您对 Kinema 项目的关注！我们欢迎任何形式的贡献。
 
 ## 如何贡献
 
@@ -8,7 +8,7 @@
 
 如果您发现了 Bug 或有功能建议：
 
-1. 在 [GitHub Issues](https://github.com/your-username/animaker/issues) 搜索现有问题
+1. 在 [GitHub Issues](https://github.com/your-username/kinema/issues) 搜索现有问题
 2. 如果问题不存在，创建新 Issue 并包含：
    - 清晰的标题和描述
    - 复现步骤（针对 Bug）
@@ -21,18 +21,21 @@
 #### 开发流程
 
 1. **Fork 仓库**
+
    ```bash
    # Fork 并克隆您的 fork
-   git clone https://github.com/your-username/animaker.git
-   cd animaker
+   git clone https://github.com/your-username/kinema.git
+   cd kinema
    ```
 
 2. **安装依赖**
+
    ```bash
    pnpm install
    ```
 
 3. **创建功能分支**
+
    ```bash
    git checkout -b feature/your-feature-name
    # 或修复分支
@@ -40,6 +43,7 @@
    ```
 
 4. **进行开发**
+
    ```bash
    # 启动开发模式
    pnpm run dev
@@ -55,12 +59,14 @@
    ```
 
 5. **提交更改**
+
    ```bash
    git add .
    git commit -m "feat: 添加 XXX 功能"
    ```
 
 6. **推送到您的 fork**
+
    ```bash
    git push origin feature/your-feature-name
    ```
@@ -84,6 +90,7 @@
 ```
 
 **类型 (type)**：
+
 - `feat`: 新功能
 - `fix`: Bug 修复
 - `docs`: 文档更新
@@ -94,6 +101,7 @@
 - `chore`: 构建/工具相关
 
 **示例**：
+
 ```
 feat: 添加视频导出功能
 
@@ -170,7 +178,7 @@ describe('Scene', () => {
 ### 项目结构
 
 ```
-AniMaker/
+Kinema/
 ├── packages/
 │   ├── core/           # 核心框架
 │   └── workstation/    # 视频工作站
@@ -182,7 +190,7 @@ AniMaker/
 ## 获取帮助
 
 - 查看 [文档](../guide/getting-started.md)
-- 加入 [Discussions](https://github.com/your-username/animaker/discussions)
+- 加入 [Discussions](https://github.com/your-username/kinema/discussions)
 - 联系维护者
 
 ## 行为准则

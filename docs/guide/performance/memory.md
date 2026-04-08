@@ -1,6 +1,6 @@
 # 内存管理指南
 
-> 本指南介绍 AniMaker 渲染引擎的内存管理最佳实践，帮助您避免内存泄漏并优化内存使用。
+> 本指南介绍 Kinema 渲染引擎的内存管理最佳实践，帮助您避免内存泄漏并优化内存使用。
 
 ## 目录
 
@@ -23,7 +23,7 @@ import {
   GraphicsTexture,
   GraphicsShader,
   RenderPipeline,
-} from '@animaker/render/graphics';
+} from '@kinema/render/graphics';
 
 class ResourceManager {
   private buffers: GraphicsBuffer[] = [];
@@ -84,13 +84,13 @@ class ResourceCache<T extends { destroy(): void }> {
 实现分层释放策略，优先释放不重要的资源。
 
 ```typescript
-import { ResourcePriority } from '@animaker/render/resources';
+import { ResourcePriority } from '@kinema/render/resources';
 
 enum ResourcePriority {
-  CRITICAL,    // 场景必需资源
-  HIGH,        // 当前可见资源
-  MEDIUM,      // 可能可见资源
-  LOW,         // 不可见资源
+  CRITICAL, // 场景必需资源
+  HIGH, // 当前可见资源
+  MEDIUM, // 可能可见资源
+  LOW, // 不可见资源
 }
 
 class PriorityResourceManager {
@@ -125,20 +125,16 @@ class PriorityResourceManager {
 使用 `DisposableGroup` 自动管理一组资源。
 
 ```typescript
-import { DisposableGroup } from '@animaker/utils';
+import { DisposableGroup } from '@kinema/utils';
 
 class Scene {
   private resources = new DisposableGroup();
 
   async load(): Promise<void> {
     // 添加到资源组，自动追踪
-    const texture = await this.resources.add(
-      device.createTexture({ size: [512, 512] })
-    );
+    const texture = await this.resources.add(device.createTexture({ size: [512, 512] }));
 
-    const buffer = this.resources.add(
-      device.createBuffer({ size: 1024 })
-    );
+    const buffer = this.resources.add(device.createBuffer({ size: 1024 }));
 
     // 当场景销毁时，所有资源自动释放
   }
@@ -167,15 +163,13 @@ class AnimationController {
 }
 
 // 推荐：使用 Disposable 管理监听器
-import { EventDisposable } from '@animaker/utils';
+import { EventDisposable } from '@kinema/utils';
 
 class AnimationController {
   private disposables = new DisposableGroup();
 
   start() {
-    this.disposables.add(
-      engine.on('update', this.onUpdate)
-    );
+    this.disposables.add(engine.on('update', this.onUpdate));
   }
 
   stop() {
@@ -195,7 +189,7 @@ function createAnimation(scene: LargeScene) {
     update: () => {
       // 闭包保持对 scene 的引用
       scene.render();
-    }
+    },
   };
 }
 
@@ -204,7 +198,7 @@ function createAnimation(renderer: Renderer) {
   return {
     update: () => {
       renderer.render(); // 只引用需要的部分
-    }
+    },
   };
 }
 ```
@@ -251,11 +245,10 @@ class TextureLoader {
     }
 
     // 加载纹理
-    const promise = device.createTexture_fromImage(url)
-      .finally(() => {
-        // 加载完成后移除 Promise 引用
-        this.loadingPromises.delete(url);
-      });
+    const promise = device.createTexture_fromImage(url).finally(() => {
+      // 加载完成后移除 Promise 引用
+      this.loadingPromises.delete(url);
+    });
 
     this.loadingPromises.set(url, promise);
     return promise;
@@ -342,10 +335,10 @@ for (let i = 0; i < 10000; i++) {
 **性能对比**:
 
 | 操作 | 普通数组 | Float32Array | 提升 |
-|-----|---------|-------------|-----|
-| 创建 | 5ms | 0.5ms | 10x |
-| 遍历 | 12ms | 2ms | 6x |
-| 内存 | 80KB | 30KB | 2.7x |
+| ---- | -------- | ------------ | ---- |
+| 创建 | 5ms      | 0.5ms        | 10x  |
+| 遍历 | 12ms     | 2ms          | 6x   |
+| 内存 | 80KB     | 30KB         | 2.7x |
 
 ### 4. 延迟初始化
 
@@ -389,10 +382,10 @@ if (import.meta.env.DEV) {
 
 ### 2. 使用内置内存追踪
 
-AniMaker 提供内置内存追踪工具。
+Kinema 提供内置内存追踪工具。
 
 ```typescript
-import { MemoryTracker } from '@animaker/utils';
+import { MemoryTracker } from '@kinema/utils';
 
 const tracker = new MemoryTracker();
 
@@ -419,7 +412,7 @@ tracker.stop();
 使用资源泄漏检测工具。
 
 ```typescript
-import { ResourceLeakDetector } from '@animaker/render/debug';
+import { ResourceLeakDetector } from '@kinema/render/debug';
 
 const detector = new ResourceLeakDetector({
   checkInterval: 10000, // 每 10 秒检查一次
@@ -464,8 +457,8 @@ export class MemoryProfiler {
   }
 
   compare(from: string, to: string): MemoryDiff {
-    const start = this.snapshots.find(s => s.label === from);
-    const end = this.snapshots.find(s => s.label === to);
+    const start = this.snapshots.find((s) => s.label === from);
+    const end = this.snapshots.find((s) => s.label === to);
 
     if (!start || !end) {
       throw new Error('Snapshot not found');
@@ -502,8 +495,6 @@ const resourceLimits = {
 
 if (TextureManager.getActiveCount() > resourceLimits.maxTextures) {
   console.warn('Texture limit exceeded, freeing oldest textures');
-  TextureManager.freeOldest(
-    TextureManager.getActiveCount() - resourceLimits.maxTextures
-  );
+  TextureManager.freeOldest(TextureManager.getActiveCount() - resourceLimits.maxTextures);
 }
 ```

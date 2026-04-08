@@ -7,14 +7,7 @@
  * @module core/TextObject
  */
 
-import type {
-  ObjectId,
-  Point3D,
-  BoundingBox,
-  Transform,
-  RenderObjectState,
-  FontConfig
-} from '../types';
+import type { Point3D, BoundingBox, Transform, RenderObjectState, FontConfig } from '../types';
 import { RenderObject } from './RenderObject';
 
 /**
@@ -59,7 +52,7 @@ export class TextObject extends RenderObject {
     state: RenderObjectState,
     public readonly text: string,
     public readonly font: FontConfig,
-    public readonly color: string
+    public readonly color: string,
   ) {
     super(state);
     Object.freeze(font);
@@ -86,11 +79,11 @@ export class TextObject extends RenderObject {
     return new TextObject(
       {
         ...this.state,
-        transform: { ...this.state.transform, ...transform }
+        transform: { ...this.state.transform, ...transform },
       },
       this.text,
       this.font,
-      this.color
+      this.color,
     );
   }
 
@@ -114,14 +107,14 @@ export class TextObject extends RenderObject {
       min: {
         x: position.x - estimatedWidth / 2,
         y: position.y - estimatedHeight / 2,
-        z: position.z
+        z: position.z,
       },
       max: {
         x: position.x + estimatedWidth / 2,
         y: position.y + estimatedHeight / 2,
-        z: position.z
+        z: position.z,
       },
-      center: position
+      center: position,
     };
   }
 
@@ -159,12 +152,7 @@ export class TextObject extends RenderObject {
    * @returns A new TextObject with the updated text
    */
   withText(newText: string): TextObject {
-    return new TextObject(
-      this.state,
-      newText,
-      this.font,
-      this.color
-    );
+    return new TextObject(this.state, newText, this.font, this.color);
   }
 
   /**
@@ -174,12 +162,7 @@ export class TextObject extends RenderObject {
    * @returns A new TextObject with the updated font
    */
   withFont(font: FontConfig): TextObject {
-    return new TextObject(
-      this.state,
-      this.text,
-      font,
-      this.color
-    );
+    return new TextObject(this.state, this.text, font, this.color);
   }
 
   /**
@@ -189,12 +172,7 @@ export class TextObject extends RenderObject {
    * @returns A new TextObject with the updated font size
    */
   withFontSize(size: number): TextObject {
-    return new TextObject(
-      this.state,
-      this.text,
-      { ...this.font, size },
-      this.color
-    );
+    return new TextObject(this.state, this.text, { ...this.font, size }, this.color);
   }
 
   /**
@@ -204,12 +182,7 @@ export class TextObject extends RenderObject {
    * @returns A new TextObject with the updated font family
    */
   withFontFamily(family: string): TextObject {
-    return new TextObject(
-      this.state,
-      this.text,
-      { ...this.font, family },
-      this.color
-    );
+    return new TextObject(this.state, this.text, { ...this.font, family }, this.color);
   }
 
   /**
@@ -219,12 +192,7 @@ export class TextObject extends RenderObject {
    * @returns A new TextObject with the updated font weight
    */
   withFontWeight(weight: string): TextObject {
-    return new TextObject(
-      this.state,
-      this.text,
-      { ...this.font, weight },
-      this.color
-    );
+    return new TextObject(this.state, this.text, { ...this.font, weight }, this.color);
   }
 
   /**
@@ -234,12 +202,7 @@ export class TextObject extends RenderObject {
    * @returns A new TextObject with the updated color
    */
   withColor(color: string): TextObject {
-    return new TextObject(
-      this.state,
-      this.text,
-      this.font,
-      color
-    );
+    return new TextObject(this.state, this.text, this.font, color);
   }
 
   /**
@@ -257,12 +220,7 @@ export class TextObject extends RenderObject {
    * @returns A new TextObject with italic style
    */
   italic(): TextObject {
-    return new TextObject(
-      this.state,
-      this.text,
-      { ...this.font, style: 'italic' },
-      this.color
-    );
+    return new TextObject(this.state, this.text, { ...this.font, style: 'italic' }, this.color);
   }
 
   /**
@@ -302,7 +260,7 @@ export class TextObject extends RenderObject {
     text: string,
     font: FontConfig,
     color: string = '#ffffff',
-    position: Point3D = { x: 0, y: 0, z: 0 }
+    position: Point3D = { x: 0, y: 0, z: 0 },
   ): TextObject {
     return new TextObject(
       RenderObject.createDefaultState({
@@ -310,12 +268,12 @@ export class TextObject extends RenderObject {
           position,
           rotation: { x: 0, y: 0, z: 0 },
           scale: { x: 1, y: 1, z: 1 },
-          opacity: 1
-        }
+          opacity: 1,
+        },
       }),
       text,
       font,
-      color
+      color,
     );
   }
 
@@ -336,19 +294,22 @@ export class TextObject extends RenderObject {
       fontStyle?: 'normal' | 'italic' | 'oblique';
       color?: string;
       position?: Point3D;
-    } = {}
+    } = {},
   ): TextObject {
-    return TextObject.create(
-      text,
-      {
-        family: options.fontFamily ?? 'Arial',
-        size: fontSize,
-        weight: options.fontWeight,
-        style: options.fontStyle ?? 'normal'
-      },
-      options.color ?? '#ffffff',
-      options.position
-    );
+    const font: FontConfig =
+      options.fontWeight !== undefined
+        ? {
+            family: options.fontFamily ?? 'Arial',
+            size: fontSize,
+            style: options.fontStyle ?? 'normal',
+            weight: options.fontWeight,
+          }
+        : {
+            family: options.fontFamily ?? 'Arial',
+            size: fontSize,
+            style: options.fontStyle ?? 'normal',
+          };
+    return TextObject.create(text, font, options.color ?? '#ffffff', options.position);
   }
 
   /**
@@ -366,21 +327,25 @@ export class TextObject extends RenderObject {
       fontFamily?: string;
       color?: string;
       position?: Point3D;
-    } = {}
+    } = {},
   ): TextObject {
-    const sizes = { 1: 48, 2: 40, 3: 32, 4: 24, 5: 18, 6: 14 };
-    const weights = { 1: 'bold', 2: 'bold', 3: 'bold' } as const;
+    const sizes: Record<number, number> = { 1: 48, 2: 40, 3: 32, 4: 24, 5: 18, 6: 14 };
+    const weights: Record<number, string> = { 1: 'bold', 2: 'bold', 3: 'bold' };
 
-    return TextObject.create(
-      text,
-      {
-        family: options.fontFamily ?? 'Arial',
-        size: sizes[level],
-        weight: weights[level]
-      },
-      options.color ?? '#ffffff',
-      options.position
-    );
+    const weight = weights[level];
+    const font: FontConfig =
+      weight !== undefined
+        ? {
+            family: options.fontFamily ?? 'Arial',
+            size: sizes[level] as number,
+            weight,
+          }
+        : {
+            family: options.fontFamily ?? 'Arial',
+            size: sizes[level] as number,
+          };
+
+    return TextObject.create(text, font, options.color ?? '#ffffff', options.position);
   }
 
   /**
@@ -397,16 +362,16 @@ export class TextObject extends RenderObject {
       fontFamily?: string;
       color?: string;
       position?: Point3D;
-    } = {}
+    } = {},
   ): TextObject {
     return TextObject.create(
       text,
       {
         family: options.fontFamily ?? 'Arial',
-        size: options.fontSize ?? 16
+        size: options.fontSize ?? 16,
       },
       options.color ?? '#ffffff',
-      options.position
+      options.position,
     );
   }
 
@@ -424,17 +389,17 @@ export class TextObject extends RenderObject {
     options: {
       color?: string;
       position?: Point3D;
-    } = {}
+    } = {},
   ): TextObject {
     return TextObject.create(
       text,
       {
         family: 'monospace',
         size: fontSize,
-        weight: 'normal'
+        weight: 'normal',
       },
       options.color ?? '#00ff00',
-      options.position
+      options.position,
     );
   }
 
@@ -445,19 +410,19 @@ export class TextObject extends RenderObject {
   /**
    * Get a JSON-serializable representation
    */
-  toJSON(): Record<string, unknown> {
+  override toJSON(): Record<string, unknown> {
     return {
       ...super.toJSON(),
       text: this.text,
       font: this.font,
-      color: this.color
+      color: this.color,
     };
   }
 
   /**
    * Get a string representation
    */
-  toString(): string {
+  override toString(): string {
     return `TextObject(text="${this.text}", font=${this.font.family}, size=${this.font.size})`;
   }
 }

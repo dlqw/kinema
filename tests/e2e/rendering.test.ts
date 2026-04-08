@@ -25,7 +25,7 @@ test.describe('Rendering Workflow', () => {
 
     // Create a simple scene
     await page.evaluate(() => {
-      // This would use the actual AniMaker API
+      // This would use the actual Kinema API
       const canvas = document.querySelector('canvas');
       if (!canvas) return;
 
@@ -129,8 +129,8 @@ test.describe('Rendering Workflow', () => {
     });
 
     // Check for context loss handling
-    const hasContextLossIndicator = await page.locator('[data-testid="context-lost"]')
-      .count() > 0;
+    const hasContextLossIndicator =
+      (await page.locator('[data-testid="context-lost"]').count()) > 0;
 
     expect(hasContextLossIndicator).toBeTruthy();
   });
@@ -285,12 +285,7 @@ test.describe('Rendering Workflow', () => {
       // Draw many objects
       for (let i = 0; i < 100; i++) {
         ctx.fillStyle = `hsl(${i * 3.6}, 70%, 60%)`;
-        ctx.fillRect(
-          Math.random() * canvas.width,
-          Math.random() * canvas.height,
-          50,
-          50
-        );
+        ctx.fillRect(Math.random() * canvas.width, Math.random() * canvas.height, 50, 50);
       }
 
       const endTime = performance.now();
@@ -491,12 +486,7 @@ test.describe('Rendering Workflow', () => {
       // Draw multiple objects
       for (let i = 0; i < 50; i++) {
         ctx.fillStyle = `hsl(${i * 7.2}, 70%, 60%)`;
-        ctx.fillRect(
-          (i % 10) * 80,
-          Math.floor(i / 10) * 60,
-          40,
-          40
-        );
+        ctx.fillRect((i % 10) * 80, Math.floor(i / 10) * 60, 40, 40);
       }
 
       // Return render statistics

@@ -1,4 +1,4 @@
-# AniMaker 文档
+# Kinema 文档
 
 本文档使用 [VitePress](https://vitepress.dev/) 构建。
 
@@ -61,7 +61,7 @@ docs/
 
 ```typescript
 // 正确：有注释，完整示例
-import { Animator } from '@animaker/core';
+import { Animator } from '@kinema/core';
 
 // 创建动画器实例
 const animator = new Animator({ renderer });

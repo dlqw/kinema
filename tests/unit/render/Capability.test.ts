@@ -4,7 +4,7 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { CapabilityDetector, RenderAPI } from '../../../src/render/core/Capability';
+import { CapabilityDetector, RenderAPI } from '../../packages/core/src/render/core/Capability';
 
 // Mock WebGPU adapter
 const mockWebGPUAdapter = {
@@ -256,9 +256,7 @@ describe('CapabilityDetector', () => {
         },
       };
 
-      const hasTextureCompression = await CapabilityDetector.hasFeature(
-        'texture-compression-bc'
-      );
+      const hasTextureCompression = await CapabilityDetector.hasFeature('texture-compression-bc');
 
       expect(hasTextureCompression).toBe(true);
     });
@@ -300,10 +298,7 @@ describe('CapabilityDetector', () => {
         },
       };
 
-      const meetsRequirement = await CapabilityDetector.meetsLimit(
-        'maxTextureDimension2D',
-        4096
-      );
+      const meetsRequirement = await CapabilityDetector.meetsLimit('maxTextureDimension2D', 4096);
 
       expect(meetsRequirement).toBe(true);
     });
@@ -315,10 +310,7 @@ describe('CapabilityDetector', () => {
         },
       };
 
-      const meetsRequirement = await CapabilityDetector.meetsLimit(
-        'maxTextureDimension2D',
-        16384
-      );
+      const meetsRequirement = await CapabilityDetector.meetsLimit('maxTextureDimension2D', 16384);
 
       expect(meetsRequirement).toBe(false);
     });
@@ -330,10 +322,7 @@ describe('CapabilityDetector', () => {
         },
       };
 
-      const meetsRequirement = await CapabilityDetector.meetsLimit(
-        'nonExistentLimit' as any,
-        100
-      );
+      const meetsRequirement = await CapabilityDetector.meetsLimit('nonExistentLimit' as any, 100);
 
       expect(meetsRequirement).toBe(false);
     });
@@ -427,7 +416,7 @@ describe('CapabilityDetector', () => {
       expect(capability.api).not.toBe(RenderAPI.WebGPU);
       expect(console.warn).toHaveBeenCalledWith(
         '[CapabilityDetector] WebGPU detection failed:',
-        expect.any(Error)
+        expect.any(Error),
       );
     });
 
@@ -476,7 +465,7 @@ describe('CapabilityDetector', () => {
         expect.objectContaining({
           vendor: 'nvidia',
           architecture: 'nvidia',
-        })
+        }),
       );
     });
 
@@ -513,7 +502,7 @@ describe('CapabilityDetector', () => {
         expect.objectContaining({
           vendor: 'NVIDIA Corporation',
           renderer: 'NVIDIA GeForce RTX 3080',
-        })
+        }),
       );
     });
   });

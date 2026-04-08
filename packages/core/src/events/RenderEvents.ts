@@ -414,7 +414,7 @@ export type RenderEventEmitter = EventEmitter<RenderEvents>;
  * Helper type for render event handler
  */
 export type RenderEventHandler<K extends keyof RenderEvents> = (
-  data: EventData<RenderEvents[K]>
+  data: EventData<RenderEvents[K]>,
 ) => void | Promise<void>;
 
 /**
@@ -442,17 +442,20 @@ export function createRenderErrorData(
   frameNumber: number,
   object: any | undefined,
   recoverable: boolean,
-  context?: Record<string, any>
+  context?: Record<string, any>,
 ): RenderErrorData {
-  return {
+  const result: RenderErrorData = {
     rendererId,
     error,
     errorType,
     frameNumber,
     object,
-    context,
     recoverable,
   };
+  if (context !== undefined) {
+    result.context = context;
+  }
+  return result;
 }
 
 /**
@@ -467,9 +470,9 @@ export function createRenderPerformanceData(
   objectCount: number,
   animationCount: number,
   memoryUsage?: RenderPerformanceData['memoryUsage'],
-  gpuMemory?: RenderPerformanceData['gpuMemory']
+  gpuMemory?: RenderPerformanceData['gpuMemory'],
 ): RenderPerformanceData {
-  return {
+  const result: RenderPerformanceData = {
     rendererId,
     frameNumber,
     fps,
@@ -477,9 +480,14 @@ export function createRenderPerformanceData(
     renderTime,
     objectCount,
     animationCount,
-    memoryUsage,
-    gpuMemory,
   };
+  if (memoryUsage !== undefined) {
+    result.memoryUsage = memoryUsage;
+  }
+  if (gpuMemory !== undefined) {
+    result.gpuMemory = gpuMemory;
+  }
+  return result;
 }
 
 /**
@@ -490,7 +498,7 @@ export function createRenderResizeData(
   oldSize: { width: number; height: number },
   newSize: { width: number; height: number },
   scale: number,
-  timestamp: number
+  timestamp: number,
 ): RenderResizeData {
   return {
     rendererId,

@@ -7,7 +7,6 @@
  */
 
 import type { RenderObject, BoundingBox } from '../types';
-import type { ExportConfig } from './Exporter';
 
 /**
  * Frame encoding options
@@ -55,7 +54,7 @@ export abstract class FrameEncoder {
       format: 'png',
       quality: 0.9,
       transparent: true,
-      ...options
+      ...options,
     };
   }
 
@@ -70,7 +69,7 @@ export abstract class FrameEncoder {
   abstract encodeFrame(
     objects: ReadonlyArray<RenderObject>,
     timestamp: number,
-    frameNumber: number
+    frameNumber: number,
   ): Promise<EncodedFrame>;
 
   /**
@@ -88,7 +87,7 @@ export abstract class FrameEncoder {
     const mimeTypes: Record<string, string> = {
       png: 'image/png',
       jpeg: 'image/jpeg',
-      webp: 'image/webp'
+      webp: 'image/webp',
     };
     return mimeTypes[format] ?? 'image/png';
   }
@@ -96,8 +95,15 @@ export abstract class FrameEncoder {
   /**
    * Calculate output dimensions
    */
-  protected calculateDimensions(objects: ReadonlyArray<RenderObject>): { width: number; height: number } {
-    if (objects.length === 0) {
+  protected calculateDimensions(objects: ReadonlyArray<RenderObject>): {
+    width: number;
+    height: number;
+  } {
+    if (this.options.width !== undefined && this.options.height !== undefined) {
+      return { width: this.options.width, height: this.options.height };
+    }
+
+    if (objects.length === 0 || objects.some((obj) => typeof obj.getBoundingBox !== 'function')) {
       return { width: this.options.width ?? 1920, height: this.options.height ?? 1080 };
     }
 
@@ -106,7 +112,7 @@ export abstract class FrameEncoder {
 
     return {
       width: this.options.width ?? Math.ceil(boundingBox.max.x - boundingBox.min.x),
-      height: this.options.height ?? Math.ceil(boundingBox.max.y - boundingBox.min.y)
+      height: this.options.height ?? Math.ceil(boundingBox.max.y - boundingBox.min.y),
     };
   }
 
@@ -114,32 +120,36 @@ export abstract class FrameEncoder {
    * Calculate bounding box of objects
    */
   protected calculateBoundingBox(objects: ReadonlyArray<RenderObject>): BoundingBox {
-    if (objects.length === 0) {
+    const measurableObjects = objects.filter(
+      (obj): obj is RenderObject => typeof obj.getBoundingBox === 'function',
+    );
+
+    if (measurableObjects.length === 0) {
       return {
         min: { x: 0, y: 0, z: 0 },
         max: { x: 0, y: 0, z: 0 },
-        center: { x: 0, y: 0, z: 0 }
+        center: { x: 0, y: 0, z: 0 },
       };
     }
 
-    const boxes = objects.map(obj => obj.getBoundingBox());
+    const boxes = measurableObjects.map((obj) => obj.getBoundingBox());
 
     return {
       min: {
-        x: Math.min(...boxes.map(b => b.min.x)),
-        y: Math.min(...boxes.map(b => b.min.y)),
-        z: Math.min(...boxes.map(b => b.min.z))
+        x: Math.min(...boxes.map((b) => b.min.x)),
+        y: Math.min(...boxes.map((b) => b.min.y)),
+        z: Math.min(...boxes.map((b) => b.min.z)),
       },
       max: {
-        x: Math.max(...boxes.map(b => b.max.x)),
-        y: Math.max(...boxes.map(b => b.max.y)),
-        z: Math.max(...boxes.map(b => b.max.z))
+        x: Math.max(...boxes.map((b) => b.max.x)),
+        y: Math.max(...boxes.map((b) => b.max.y)),
+        z: Math.max(...boxes.map((b) => b.max.z)),
       },
       center: {
         x: 0,
         y: 0,
-        z: 0
-      }
+        z: 0,
+      },
     };
   }
 }
@@ -153,12 +163,31 @@ export class CanvasFrameEncoder extends FrameEncoder {
   private canvas: HTMLCanvasElement | null = null;
   private ctx: CanvasRenderingContext2D | null = null;
 
+  private createCanvasElement(): HTMLCanvasElement {
+    const created =
+      typeof document !== 'undefined'
+        ? (document.createElement('canvas') as HTMLCanvasElement)
+        : null;
+
+    if (created && typeof created.getContext === 'function') {
+      return created;
+    }
+
+    const CanvasCtor = globalThis.HTMLCanvasElement as (new () => HTMLCanvasElement) | undefined;
+
+    if (CanvasCtor) {
+      return new CanvasCtor();
+    }
+
+    throw new Error('Failed to create canvas element');
+  }
+
   /**
    * Initialize the canvas
    */
   private ensureCanvas(width: number, height: number): void {
     if (!this.canvas || this.canvas.width !== width || this.canvas.height !== height) {
-      this.canvas = document.createElement('canvas');
+      this.canvas = this.createCanvasElement();
       this.canvas.width = width;
       this.canvas.height = height;
       this.ctx = this.canvas.getContext('2d');
@@ -171,7 +200,7 @@ export class CanvasFrameEncoder extends FrameEncoder {
   async encodeFrame(
     objects: ReadonlyArray<RenderObject>,
     timestamp: number,
-    frameNumber: number
+    frameNumber: number,
   ): Promise<EncodedFrame> {
     const { width, height } = this.calculateDimensions(objects);
 
@@ -204,9 +233,9 @@ export class CanvasFrameEncoder extends FrameEncoder {
 
     const data = await new Promise<Blob>((resolve, reject) => {
       this.canvas!.toBlob(
-        (blob) => blob ? resolve(blob) : reject(new Error('Failed to encode frame')),
+        (blob) => (blob ? resolve(blob) : reject(new Error('Failed to encode frame'))),
         mimeType,
-        quality
+        quality,
       );
     });
 
@@ -215,7 +244,7 @@ export class CanvasFrameEncoder extends FrameEncoder {
       timestamp,
       frameNumber,
       width,
-      height
+      height,
     };
   }
 
@@ -227,7 +256,7 @@ export class CanvasFrameEncoder extends FrameEncoder {
     ctx: CanvasRenderingContext2D,
     obj: RenderObject,
     canvasWidth: number,
-    canvasHeight: number
+    canvasHeight: number,
   ): void {
     // This is a placeholder - actual rendering would be done by
     // the renderer subsystem
@@ -239,9 +268,15 @@ export class CanvasFrameEncoder extends FrameEncoder {
 
     // Draw a simple placeholder
     ctx.fillStyle = '#ffffff';
-    ctx.beginPath();
-    ctx.arc(0, 0, 10, 0, Math.PI * 2);
-    ctx.fill();
+    if (
+      typeof ctx.beginPath === 'function' &&
+      typeof ctx.arc === 'function' &&
+      typeof ctx.fill === 'function'
+    ) {
+      ctx.beginPath();
+      ctx.arc(0, 0, 10, 0, Math.PI * 2);
+      ctx.fill();
+    }
 
     ctx.restore();
   }

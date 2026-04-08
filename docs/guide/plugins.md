@@ -1,6 +1,6 @@
 # 插件开发指南
 
-AniMaker 采用插件化架构，允许开发者扩展框架功能。本指南将详细介绍如何创建、测试和发布插件。
+Kinema 采用插件化架构，允许开发者扩展框架功能。本指南将详细介绍如何创建、测试和发布插件。
 
 ## 目录
 
@@ -49,7 +49,7 @@ interface PluginConfig {
 ## 创建一个简单插件
 
 ```typescript
-import { Plugin, Animator } from '@animaker/core';
+import { Plugin, Animator } from '@kinema/core';
 
 // 定义插件配置
 interface LoggerPluginConfig {
@@ -217,18 +217,18 @@ class GIFExportPlugin implements Plugin {
 
 ## 插件钩子
 
-AniMaker 提供了丰富的钩子函数：
+Kinema 提供了丰富的钩子函数：
 
-| 钩子 | 触发时机 | 用途 |
-|------|----------|------|
-| `install` | 插件安装时 | 初始化插件 |
-| `uninstall` | 插件卸载时 | 清理资源 |
-| `beforeInit` | 动画器初始化前 | 配置动画器 |
-| `afterInit` | 动画器初始化后 | 访问动画器实例 |
-| `beforeRender` | 每帧渲染前 | 预处理场景 |
-| `afterRender` | 每帧渲染后 | 后处理效果 |
-| `beforeUpdate` | 每帧更新前 | 修改动画状态 |
-| `afterUpdate` | 每帧更新后 | 响应状态变化 |
+| 钩子           | 触发时机       | 用途           |
+| -------------- | -------------- | -------------- |
+| `install`      | 插件安装时     | 初始化插件     |
+| `uninstall`    | 插件卸载时     | 清理资源       |
+| `beforeInit`   | 动画器初始化前 | 配置动画器     |
+| `afterInit`    | 动画器初始化后 | 访问动画器实例 |
+| `beforeRender` | 每帧渲染前     | 预处理场景     |
+| `afterRender`  | 每帧渲染后     | 后处理效果     |
+| `beforeUpdate` | 每帧更新前     | 修改动画状态   |
+| `afterUpdate`  | 每帧更新后     | 响应状态变化   |
 
 ## 插件配置
 
@@ -248,9 +248,7 @@ Animator.configure({
 // 实例配置
 const animator = new Animator({
   renderer,
-  plugins: [
-    new MyPlugin({ customOption: true }),
-  ],
+  plugins: [new MyPlugin({ customOption: true })],
 });
 ```
 
@@ -282,10 +280,12 @@ class AdvancedPlugin implements Plugin {
 
 ```typescript
 // 启用插件调试
-animator.use(new DebugPlugin({
-  showPluginStats: true,
-  logPluginLifecycle: true,
-}));
+animator.use(
+  new DebugPlugin({
+    showPluginStats: true,
+    logPluginLifecycle: true,
+  }),
+);
 
 // 查看已安装插件
 console.log(animator.plugins.list());
@@ -294,7 +294,7 @@ console.log(animator.plugins.list());
 
 ## 发布插件
 
-1. 遵循命名规范：`@animaker/plugin-*` 或 `animaker-plugin-*`
+1. 遵循命名规范：`@kinema/plugin-*` 或 `kinema-plugin-*`
 2. 提供完整的 TypeScript 类型定义
 3. 编写使用文档和示例
 4. 添加单元测试
@@ -303,11 +303,11 @@ console.log(animator.plugins.list());
 ```json
 // package.json
 {
-  "name": "@animaker/plugin-my-plugin",
+  "name": "@kinema/plugin-my-plugin",
   "version": "1.0.0",
-  "keywords": ["animaker", "plugin", "animation"],
+  "keywords": ["kinema", "plugin", "animation"],
   "peerDependencies": {
-    "@animaker/core": "^1.0.0"
+    "@kinema/core": "^1.0.0"
   }
 }
 ```
@@ -319,7 +319,7 @@ console.log(animator.plugins.list());
 让我们创建一个完整的插件示例，实现视频导出功能：
 
 ```typescript
-import { Plugin, Scene, Renderer, PluginConfig } from '@animaker/core';
+import { Plugin, Scene, Renderer, PluginConfig } from '@kinema/core';
 
 interface VideoExportConfig extends PluginConfig {
   format?: 'mp4' | 'webm' | 'gif';
@@ -342,7 +342,7 @@ class VideoExportPlugin implements Plugin {
       format: config.format ?? 'mp4',
       quality: config.quality ?? 'medium',
       framerate: config.framerate ?? 60,
-      bitrate: config.bitrate ?? 5000
+      bitrate: config.bitrate ?? 5000,
     };
   }
 
@@ -354,7 +354,7 @@ class VideoExportPlugin implements Plugin {
       video: this.exportVideo.bind(this),
       startRecording: this.startRecording.bind(this),
       stopRecording: this.stopRecording.bind(this),
-      isRecording: () => this.isRecording
+      isRecording: () => this.isRecording,
     };
 
     // 监听渲染完成事件
@@ -442,18 +442,18 @@ class VideoExportPlugin implements Plugin {
 }
 
 // 使用插件
-import { createScene } from '@animaker/core';
+import { createScene } from '@kinema/core';
 
 const scene = createScene({
   width: 1920,
   height: 1080,
-  fps: 60
+  fps: 60,
 });
 
 const videoPlugin = new VideoExportPlugin({
   format: 'mp4',
   quality: 'high',
-  framerate: 60
+  framerate: 60,
 });
 
 videoPlugin.install(scene);
@@ -462,7 +462,7 @@ videoPlugin.install(scene);
 scene.export.startRecording();
 
 // 运行动画
-for (let t = 0; t < 10; t += 1/60) {
+for (let t = 0; t < 10; t += 1 / 60) {
   scene.updateTo(t);
   renderer.render(scene);
 }
@@ -489,7 +489,7 @@ describe('VideoExportPlugin', () => {
   beforeEach(() => {
     plugin = new VideoExportPlugin({
       format: 'mp4',
-      quality: 'medium'
+      quality: 'medium',
     });
     scene = createScene();
   });
@@ -537,9 +537,7 @@ describe('VideoExportPlugin', () => {
   it('should throw error when exporting with no frames', async () => {
     plugin.install(scene);
 
-    await expect(scene.export.video('test.mp4')).rejects.toThrow(
-      'No frames to export'
-    );
+    await expect(scene.export.video('test.mp4')).rejects.toThrow('No frames to export');
   });
 });
 ```
@@ -620,11 +618,11 @@ class CleanPlugin implements Plugin {
 
   uninstall(scene: Scene): void {
     // 清理事件监听
-    this.eventListeners.forEach(unsubscribe => unsubscribe());
+    this.eventListeners.forEach((unsubscribe) => unsubscribe());
     this.eventListeners = [];
 
     // 释放资源
-    this.resources.forEach(resource => resource.release());
+    this.resources.forEach((resource) => resource.release());
     this.resources = [];
   }
 }
@@ -672,17 +670,17 @@ class OptimizedPlugin implements Plugin {
 
 ### 官方插件
 
-- `@animaker/plugin-export` - 导出动画为视频/GIF
-- `@animaker/plugin-particles` - 高级粒子系统
-- `@animaker/plugin-physics` - 物理模拟
-- `@animaker/plugin-audio` - 音频可视化
-- `@animaker/plugin-ui` - UI 组件
+- `@kinema/plugin-export` - 导出动画为视频/GIF
+- `@kinema/plugin-particles` - 高级粒子系统
+- `@kinema/plugin-physics` - 物理模拟
+- `@kinema/plugin-audio` - 音频可视化
+- `@kinema/plugin-ui` - UI 组件
 
 ### 社区插件
 
-- `animaker-plugin-shapes` - 额外的形状对象
-- `animaker-plugin-easing` - 扩展缓动函数
-- `animaker-plugin-text` - 高级文本效果
+- `kinema-plugin-shapes` - 额外的形状对象
+- `kinema-plugin-easing` - 扩展缓动函数
+- `kinema-plugin-text` - 高级文本效果
 
 ---
 

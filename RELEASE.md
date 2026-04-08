@@ -1,10 +1,11 @@
-# AniMaker Release Process
+# Kinema Release Process
 
-This document describes the release process for the AniMaker project.
+This document describes the release process for the Kinema project.
 
 ## Version Convention
 
-AniMaker follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html):
+Kinema follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html):
+
 - **MAJOR**: Breaking changes
 - **MINOR**: New features (backward compatible)
 - **PATCH**: Bug fixes (backward compatible)
@@ -29,6 +30,7 @@ Before creating a release:
 ### 1. Update Version
 
 Update version in `package.json`:
+
 ```bash
 # For major release
 npm version major
@@ -41,6 +43,7 @@ npm version patch
 ```
 
 Or manually update all `package.json` files in the monorepo:
+
 ```json
 {
   "version": "1.0.0"
@@ -50,23 +53,28 @@ Or manually update all `package.json` files in the monorepo:
 ### 2. Update CHANGELOG
 
 Add a new section to `CHANGELOG.md`:
+
 ```markdown
 ## [1.0.0] - 2026-03-19
 
 ### Added
+
 - New feature 1
 - New feature 2
 
 ### Changed
+
 - Updated existing feature
 
 ### Fixed
+
 - Bug fix 1
 ```
 
 ### 3. Create Release Notes
 
 Create a new file `changelogs/v1.0.0.md` with:
+
 - Overview
 - New features
 - Breaking changes
@@ -77,6 +85,7 @@ Create a new file `changelogs/v1.0.0.md` with:
 ### 4. Update Documentation
 
 Ensure documentation reflects the changes:
+
 - Update API reference
 - Add examples for new features
 - Update migration guides
@@ -149,6 +158,7 @@ npm publish --access public
 ### 1. Announce
 
 Announce the release on:
+
 - GitHub Discussions
 - Project website/news
 - Community channels (Discord, Slack, etc.)
@@ -156,6 +166,7 @@ Announce the release on:
 ### 2. Monitor
 
 Monitor for:
+
 - Bug reports
 - Installation issues
 - Documentation gaps
@@ -164,10 +175,12 @@ Monitor for:
 ### 3. Prepare Next Version
 
 Add `[Unreleased]` section to CHANGELOG:
+
 ```markdown
 ## [Unreleased]
 
 ### Added
+
 - (New features being worked on)
 ```
 
@@ -197,17 +210,17 @@ The project follows [Conventional Commits](https://www.conventionalcommits.org/)
 
 ### Types
 
-| Type | Description | Examples |
-|------|-------------|----------|
-| `feat` | New feature | `feat: add keyframe interpolation` |
-| `fix` | Bug fix | `fix: correct easing calculation` |
-| `docs` | Documentation | `docs: update API reference` |
-| `style` | Formatting | `style: format code with prettier` |
-| `refactor` | Refactoring | `refactor: simplify event emitter` |
-| `perf` | Performance | `perf: optimize render loop` |
-| `test` | Tests | `test: add event system tests` |
-| `chore` | Maintenance | `chore: update dependencies` |
-| `ci` | CI/CD | `ci: add workflow for releases` |
+| Type       | Description   | Examples                           |
+| ---------- | ------------- | ---------------------------------- |
+| `feat`     | New feature   | `feat: add keyframe interpolation` |
+| `fix`      | Bug fix       | `fix: correct easing calculation`  |
+| `docs`     | Documentation | `docs: update API reference`       |
+| `style`    | Formatting    | `style: format code with prettier` |
+| `refactor` | Refactoring   | `refactor: simplify event emitter` |
+| `perf`     | Performance   | `perf: optimize render loop`       |
+| `test`     | Tests         | `test: add event system tests`     |
+| `chore`    | Maintenance   | `chore: update dependencies`       |
+| `ci`       | CI/CD         | `ci: add workflow for releases`    |
 
 ### Scopes
 
@@ -224,21 +237,24 @@ docs(events): update event examples
 ### Stable
 
 Released to `npm` as:
-- `@animaker/core@1.0.0`
-- `@animaker/renderer@1.0.0`
+
+- `@kinema/core@1.0.0`
+- `@kinema/renderer@1.0.0`
 - etc.
 
 ### Beta/Pre-release
 
 Pre-release versions use semantic versioning pre-release tags:
+
 - `1.0.0-beta.1`
 - `1.0.0-rc.1`
 - `2.0.0-alpha.1`
 
 Published as:
-- `@animaker/core@beta`
-- `@animaker/core@next`
-- `@animaker/core@canary`
+
+- `@kinema/core@beta`
+- `@kinema/core@next`
+- `@kinema/core@canary`
 
 ## Rollback Procedure
 
@@ -247,7 +263,7 @@ If a critical issue is discovered post-release:
 1. **Deprecate** the npm package version immediately
 2. **Unpublish** if necessary (only for security issues):
    ```bash
-   npm unpublish @animaker/core@1.0.0
+   npm unpublish @kinema/core@1.0.0
    ```
 3. **Yank** from GitHub releases (mark as deprecated)
 4. **Issue security advisory** if applicable
@@ -257,6 +273,7 @@ If a critical issue is discovered post-release:
 ## Automated Release (Future)
 
 Planned automation:
+
 - Automated version bumping
 - Automated CHANGELOG generation from commits
 - Automated release notes from PR descriptions

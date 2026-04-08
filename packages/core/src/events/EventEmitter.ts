@@ -74,7 +74,7 @@ export interface EventEmitterOptions {
   /**
    * Parent emitter for bubbling
    */
-  parent?: EventEmitter;
+  parent?: EventEmitter | undefined;
 }
 
 /**
@@ -139,7 +139,7 @@ class DefaultEventContext implements EventContext {
 export class EventEmitter<TEvents extends EventMap = any> implements IDisposable {
   private listeners: Map<keyof TEvents | '*', Listener[]> = new Map();
   private options: Required<EventEmitterOptions>;
-  private _parent?: EventEmitter;
+  private _parent?: EventEmitter | undefined;
 
   constructor(options: EventEmitterOptions = {}) {
     this.options = {
@@ -147,8 +147,7 @@ export class EventEmitter<TEvents extends EventMap = any> implements IDisposable
       maxListeners: options.maxListeners ?? 100,
       parent: options.parent,
     };
-
-    if (options.parent) {
+    if (options.parent !== undefined) {
       this._parent = options.parent;
     }
   }
@@ -164,7 +163,9 @@ export class EventEmitter<TEvents extends EventMap = any> implements IDisposable
    * Set parent emitter for bubbling
    */
   setParent(parent: EventEmitter | undefined): this {
-    this._parent = parent;
+    if (parent !== undefined) {
+      this._parent = parent;
+    }
     return this;
   }
 
@@ -179,7 +180,7 @@ export class EventEmitter<TEvents extends EventMap = any> implements IDisposable
   on<K extends keyof TEvents | '*'>(
     event: K,
     handler: EventHandler<K extends keyof TEvents ? TEvents[K] : any>,
-    options: { once?: boolean; priority?: number } = {}
+    options: { once?: boolean; priority?: number } = {},
   ): () => void {
     const { once = false, priority = 0 } = options;
 
@@ -198,14 +199,15 @@ export class EventEmitter<TEvents extends EventMap = any> implements IDisposable
     // Check max listeners limit
     if (eventListeners.length >= this.options.maxListeners) {
       console.warn(
-        `Max listeners (${this.options.maxListeners}) reached for event "${String(event)}"`
+        `Max listeners (${this.options.maxListeners}) reached for event "${String(event)}"`,
       );
     }
 
     // Insert listener sorted by priority (higher first)
     let insertIndex = eventListeners.length;
     for (let i = 0; i < eventListeners.length; i++) {
-      if (priority > eventListeners[i].priority) {
+      const listener = eventListeners[i];
+      if (listener && priority > listener.priority) {
         insertIndex = i;
         break;
       }
@@ -224,10 +226,7 @@ export class EventEmitter<TEvents extends EventMap = any> implements IDisposable
    * @param handler - Event handler function
    * @returns Unsubscribe function
    */
-  once<K extends keyof TEvents>(
-    event: K,
-    handler: EventHandler<TEvents[K]>
-  ): () => void {
+  once<K extends keyof TEvents>(event: K, handler: EventHandler<TEvents[K]>): () => void {
     return this.on(event, handler, { once: true });
   }
 
@@ -239,7 +238,7 @@ export class EventEmitter<TEvents extends EventMap = any> implements IDisposable
    */
   off<K extends keyof TEvents | '*'>(
     event: K,
-    handler: EventHandler<K extends keyof TEvents ? TEvents[K] : any>
+    handler: EventHandler<K extends keyof TEvents ? TEvents[K] : any>,
   ): void {
     const eventListeners = this.listeners.get(event);
     if (!eventListeners) return;
@@ -279,7 +278,7 @@ export class EventEmitter<TEvents extends EventMap = any> implements IDisposable
   async emit<K extends keyof TEvents>(
     event: K,
     data: TEvents[K],
-    context?: EventContext
+    context?: EventContext,
   ): Promise<void> {
     const eventListeners = this.listeners.get(event);
     const wildcardListeners = this.listeners.get('*');
@@ -318,11 +317,7 @@ export class EventEmitter<TEvents extends EventMap = any> implements IDisposable
     }
 
     // Bubble to parent if enabled and propagation not stopped
-    if (
-      this.options.bubbling &&
-      this._parent &&
-      !eventContext.propagationStopped
-    ) {
+    if (this.options.bubbling && this._parent && !eventContext.propagationStopped) {
       eventContext.currentTarget = this._parent;
       await this._parent.emit(event, data, eventContext);
     }
@@ -335,11 +330,7 @@ export class EventEmitter<TEvents extends EventMap = any> implements IDisposable
    * @param data - Event data
    * @param context - Event context
    */
-  emitSync<K extends keyof TEvents>(
-    event: K,
-    data: TEvents[K],
-    context?: EventContext
-  ): void {
+  emitSync<K extends keyof TEvents>(event: K, data: TEvents[K], context?: EventContext): void {
     const eventListeners = this.listeners.get(event);
     const wildcardListeners = this.listeners.get('*');
 
@@ -378,11 +369,7 @@ export class EventEmitter<TEvents extends EventMap = any> implements IDisposable
       }
     }
 
-    if (
-      this.options.bubbling &&
-      this._parent &&
-      !eventContext.propagationStopped
-    ) {
+    if (this.options.bubbling && this._parent && !eventContext.propagationStopped) {
       eventContext.currentTarget = this._parent;
       this._parent.emitSync(event, data, eventContext);
     }
@@ -441,10 +428,10 @@ export class SyncEventEmitter<TEvents extends EventMap = any> extends EventEmitt
   /**
    * Override emit to be synchronous
    */
-  emit<K extends keyof TEvents>(
+  override emit<K extends keyof TEvents>(
     event: K,
     data: TEvents[K],
-    context?: EventContext
+    context?: EventContext,
   ): Promise<void> {
     // Call sync version but return empty promise for compatibility
     this.emitSync(event, data, context);

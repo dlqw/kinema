@@ -1,6 +1,6 @@
 # 贡献指南
 
-感谢你对 AniMaker 的关注！我们欢迎各种形式的贡献。
+感谢你对 Kinema 的关注！我们欢迎各种形式的贡献。
 
 ## 如何贡献
 
@@ -8,7 +8,7 @@
 
 如果你发现了 bug 或有功能建议：
 
-1. 检查 [Issues](https://github.com/your-username/animaker/issues) 是否已存在相似问题
+1. 检查 [Issues](https://github.com/your-username/kinema/issues) 是否已存在相似问题
 2. 如果没有，创建新的 Issue，提供详细的信息：
    - 复现步骤
    - 预期行为
@@ -28,8 +28,8 @@
 
 ```bash
 # 克隆仓库
-git clone https://github.com/your-username/animaker.git
-cd animaker
+git clone https://github.com/your-username/kinema.git
+cd kinema
 
 # 安装依赖
 npm install
@@ -54,7 +54,7 @@ npm run docs
 - 类名：PascalCase (`class Animator`)
 - 方法/函数：camelCase (`function playAnimation`)
 - 常量：UPPER_SNAKE_CASE (`const MAX_FPS`)
-- 私有成员：_prefix (`private _update()`)
+- 私有成员：\_prefix (`private _update()`)
 
 ### 文件组织
 
@@ -75,7 +75,7 @@ packages/
 
 使用 JSDoc 注释：
 
-```typescript
+````typescript
 /**
  * 动画器类，负责管理和控制动画播放
  *
@@ -94,7 +94,7 @@ class Animator {
     // ...
   }
 }
-```
+````
 
 ## 测试要求
 
@@ -130,6 +130,7 @@ describe('Animator', () => {
 - `chore:` 构建/工具相关
 
 示例：
+
 ```
 feat: add WebGL renderer support
 fix: correct easing function calculation
@@ -174,7 +175,7 @@ npm publish
 
 - GitHub Issues: 技术问题和 bug 报告
 - GitHub Discussions: 功能讨论和疑问
-- 邮件: support@animaker.dev
+- 邮件: support@kinema.dev
 
 ## 许可证
 

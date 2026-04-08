@@ -1,14 +1,20 @@
 /**
  * Video Exporter - Export scenes as video files
  *
- * Supports WebM and MP4 export using browser APIs.
+ * Supports WebM and MP4 export using browser APIs and FFmpeg.wasm.
+ * Includes automatic encoder detection and fallback support.
  *
  * @module export/VideoExporter
  */
 
 import type { Scene } from '../types';
-import { Exporter, ExportConfig, ExportProgress, ExportResult } from './Exporter';
-import { FrameEncoder, CanvasFrameEncoder } from './FrameEncoder';
+import { Exporter, type ExportProgress, type ExportResult } from './Exporter';
+import type { ExportConfig } from './Exporter';
+import { CanvasFrameEncoder, type FrameEncoderOptions } from './FrameEncoder';
+import { EncoderRegistry } from './EncoderRegistry';
+import { WebMEncoder, createWebMEncoder, webMEncoderCapabilities } from './encoders/WebMEncoder';
+import { Mp4Encoder, createMp4Encoder, mp4EncoderCapabilities } from './encoders/Mp4Encoder';
+import type { MP4EncoderOptions } from './types';
 
 /**
  * Video export configuration
@@ -26,6 +32,14 @@ export interface VideoExportConfig extends ExportConfig {
   duration?: number;
   /** Start time */
   startTime?: number;
+  /** Enable fallback to alternative format if primary not available */
+  enableFallback?: boolean;
+  /** FFmpeg.wasm configuration (for MP4 export) */
+  ffmpegConfig?: {
+    coreURL?: string;
+    wasmURL?: string;
+    workerURL?: string;
+  };
 }
 
 /**
@@ -40,10 +54,28 @@ export interface VideoExportResult extends ExportResult {
   resolution: { width: number; height: number };
   /** File size in bytes */
   size?: number;
+  /** Actual format used (may differ from requested if fallback occurred) */
+  actualFormat?: 'webm' | 'mp4';
+}
+
+/**
+ * Encoder status information
+ */
+export interface EncoderStatus {
+  /** Encoder name */
+  name: string;
+  /** Whether encoder is available */
+  available: boolean;
+  /** Reason if not available */
+  reason?: string;
+  /** Whether loading is required */
+  loadingRequired?: boolean;
 }
 
 /**
  * Video exporter using MediaRecorder API (browser)
+ *
+ * Supports automatic encoder detection and fallback.
  *
  * @example
  * ```typescript
@@ -60,16 +92,57 @@ export interface VideoExportResult extends ExportResult {
  * ```
  */
 export class VideoExporter extends Exporter {
-  private encoder: FrameEncoder;
   private mediaRecorder: MediaRecorder | null = null;
   private chunks: Blob[] = [];
+  private webmEncoder: WebMEncoder | null = null;
+  private mp4Encoder: Mp4Encoder | null = null;
 
   constructor(config: VideoExportConfig) {
     super(config);
-    this.encoder = new CanvasFrameEncoder({
-      format: 'png',
-      backgroundColor: config.backgroundColor
-    });
+    const encoderOptions: FrameEncoderOptions = { format: 'png' };
+    if (config.backgroundColor !== undefined) {
+      encoderOptions.backgroundColor = config.backgroundColor;
+    }
+    new CanvasFrameEncoder(encoderOptions);
+  }
+
+  /**
+   * Check encoder availability
+   */
+  static async checkEncoderAvailability(format: 'webm' | 'mp4'): Promise<EncoderStatus> {
+    if (format === 'webm') {
+      const available = await webMEncoderCapabilities.isAvailable();
+      const status: EncoderStatus = {
+        name: 'WebMEncoder',
+        available,
+      };
+      if (!available) {
+        status.reason = 'MediaRecorder API not available or no supported codec';
+      }
+      return status;
+    } else {
+      const available = await mp4EncoderCapabilities.isAvailable();
+      const status: EncoderStatus = {
+        name: 'Mp4Encoder',
+        available,
+        loadingRequired: available,
+      };
+      if (!available) {
+        status.reason = 'FFmpeg.wasm not loaded';
+      }
+      return status;
+    }
+  }
+
+  /**
+   * Check all encoder availabilities
+   */
+  static async checkAllEncoders(): Promise<Record<'webm' | 'mp4', EncoderStatus>> {
+    const [webm, mp4] = await Promise.all([
+      VideoExporter.checkEncoderAvailability('webm'),
+      VideoExporter.checkEncoderAvailability('mp4'),
+    ]);
+    return { webm, mp4 };
   }
 
   /**
@@ -77,95 +150,312 @@ export class VideoExporter extends Exporter {
    */
   async export(
     scene: Scene,
-    progressCallback?: (progress: ExportProgress) => void
+    progressCallback?: (progress: ExportProgress) => void,
   ): Promise<VideoExportResult> {
-    this.validateConfig();
-    this.progressCallback = progressCallback;
-    this.resetCancel();
-    this.chunks = [];
+    try {
+      this.validateConfig();
+      if (progressCallback !== undefined) {
+        this.progressCallback = progressCallback;
+      }
+      this.resetCancel();
+      this.chunks = [];
 
+      const config = this.config as VideoExportConfig;
+      const container = config.container ?? 'webm';
+      const enableFallback = (config.enableFallback ?? true) && config.container === undefined;
+
+      // Try to use the requested format
+      if (container === 'mp4') {
+        return await this.exportAsMP4(scene);
+      } else {
+        // Try WebM export
+        const webmStatus = await VideoExporter.checkEncoderAvailability('webm');
+
+        if (webmStatus.available) {
+          return await this.exportAsWebM(scene);
+        } else if (enableFallback) {
+          // Fallback to MP4 if WebM not available
+          this.reportProgress({
+            currentFrame: 0,
+            totalFrames: 1,
+            progress: 0,
+            operation: 'WebM not available, falling back to MP4...',
+          });
+
+          const mp4Status = await VideoExporter.checkEncoderAvailability('mp4');
+          if (mp4Status.available) {
+            return await this.exportAsMP4(scene);
+          }
+        }
+
+        return {
+          success: false,
+          duration: 0,
+          fps: 0,
+          resolution: { width: 0, height: 0 },
+          error: `No video encoder available. WebM: ${webmStatus.reason}`,
+        };
+      }
+    } catch (error) {
+      return {
+        success: false,
+        duration: 0,
+        fps: 0,
+        resolution: { width: 0, height: 0 },
+        error: error instanceof Error ? error.message : String(error),
+      };
+    }
+  }
+
+  /**
+   * Export scene as WebM using MediaRecorder
+   */
+  private async exportAsWebM(scene: Scene): Promise<VideoExportResult> {
     // Check for browser support
     if (typeof MediaRecorder === 'undefined') {
       return {
         success: false,
-        error: 'MediaRecorder not supported in this environment'
+        duration: 0,
+        fps: 0,
+        resolution: { width: 0, height: 0 },
+        error: 'MediaRecorder not supported in this environment',
       };
     }
 
-    try {
-      const config = this.config as VideoExportConfig;
-      const duration = config.duration ?? 5;
-      const startTime = config.startTime ?? 0;
-      const fps = config.fps ?? scene.config.fps;
-      const frameCount = this.getFrameCount(duration, fps);
-      const { width, height } = this.getDimensions(scene);
+    const config = this.config as VideoExportConfig;
+    const duration = config.duration ?? 5;
+    const startTime = config.startTime ?? 0;
+    const fps = config.fps ?? scene.config.fps;
+    const frameCount = this.getFrameCount(duration, fps);
+    const { width, height } = this.getDimensions(scene);
 
+    try {
       // Set up canvas for recording
       const canvas = await this.setupCanvas(width, height);
 
       // Set up MediaRecorder
-      const mimeType = this.getMimeType();
-      this.mediaRecorder = new MediaRecorder(canvas, {
-        mimeType,
-        videoBitsPerSecond: config.bitrate
-      });
+      const mimeType = this.getBestWebMMimeType();
+      const stream = canvas.captureStream(fps);
+      const recorderOptions: MediaRecorderOptions = { mimeType };
+      if (config.bitrate !== undefined) {
+        recorderOptions.videoBitsPerSecond = config.bitrate;
+      }
+
+      this.mediaRecorder = new MediaRecorder(stream, recorderOptions);
+      this.chunks = [];
 
       // Collect recorded chunks
-      this.mediaRecorder.ondataavailable = (event) => {
-        if (event.data && event.data.size > 0) {
-          this.chunks.push(event.data);
-        }
+      return new Promise((resolve, reject) => {
+        this.mediaRecorder!.ondataavailable = (event) => {
+          if (event.data && event.data.size > 0) {
+            this.chunks.push(event.data);
+          }
+        };
+
+        this.mediaRecorder!.onerror = (event) => {
+          reject(new Error(`MediaRecorder error: ${(event as ErrorEvent).message}`));
+        };
+
+        this.mediaRecorder!.onstop = () => {
+          const blob = new Blob(this.chunks, { type: mimeType });
+          this.downloadVideo(blob);
+
+          resolve({
+            success: true,
+            output: config.output,
+            duration,
+            fps,
+            resolution: { width, height },
+            size: blob.size,
+            actualFormat: 'webm',
+          });
+        };
+
+        // Start recording
+        this.mediaRecorder!.start();
+
+        // Process frames
+        this.processWebMFrames(scene, canvas, startTime, fps, frameCount)
+          .then(() => {
+            if (!this.cancelled && this.mediaRecorder) {
+              this.mediaRecorder.stop();
+            }
+          })
+          .catch(reject);
+      });
+    } catch (error) {
+      return {
+        success: false,
+        duration: 0,
+        fps,
+        resolution: { width, height },
+        error: error instanceof Error ? error.message : String(error),
       };
+    }
+  }
 
-      // Start recording
-      this.mediaRecorder.start();
+  /**
+   * Process frames for WebM recording
+   */
+  private async processWebMFrames(
+    scene: Scene,
+    canvas: HTMLCanvasElement,
+    startTime: number,
+    fps: number,
+    frameCount: number,
+  ): Promise<void> {
+    const frameDelay = 1000 / fps;
 
-      // Play through the scene
-      const frameDelay = 1000 / fps;
-      let currentFrame = 0;
+    for (let i = 0; i < frameCount; i++) {
+      if (this.cancelled) {
+        throw new Error('Export was cancelled');
+      }
+
+      const time = startTime + i / fps;
+
+      // Render frame to canvas
+      await this.renderToCanvas(scene, time, canvas);
+
+      // Report progress
+      this.reportProgress({
+        currentFrame: i + 1,
+        totalFrames: frameCount,
+        progress: (i + 1) / frameCount,
+        operation: 'Recording video',
+      });
+
+      // Wait for frame timing
+      await this.delay(frameDelay);
+    }
+  }
+
+  /**
+   * Export scene as MP4 using FFmpeg.wasm
+   */
+  private async exportAsMP4(scene: Scene): Promise<VideoExportResult> {
+    const config = this.config as VideoExportConfig;
+
+    // Create MP4 encoder
+    const mp4Options: MP4EncoderOptions = {};
+
+    if (config.width !== undefined) {
+      mp4Options.width = config.width;
+    }
+    if (config.height !== undefined) {
+      mp4Options.height = config.height;
+    }
+    if (config.bitrate !== undefined) {
+      mp4Options.bitrate = config.bitrate;
+    }
+    if (config.backgroundColor !== undefined) {
+      mp4Options.backgroundColor = config.backgroundColor;
+    }
+
+    this.mp4Encoder = createMp4Encoder(mp4Options);
+
+    // Check availability
+    const status = await this.mp4Encoder.getAvailabilityStatus();
+    if (!status.available) {
+      return {
+        success: false,
+        duration: 0,
+        fps: 0,
+        resolution: { width: 0, height: 0 },
+        error: status.reason || 'MP4 encoder not available',
+      };
+    }
+
+    const duration = config.duration ?? 5;
+    const startTime = config.startTime ?? 0;
+    const fps = config.fps ?? scene.config.fps;
+    const frameCount = this.getFrameCount(duration, fps);
+    const { width, height } = this.getDimensions(scene);
+
+    try {
+      // Report loading progress
+      this.reportProgress({
+        currentFrame: 0,
+        totalFrames: frameCount,
+        progress: 0,
+        operation: status.loadingRequired ? 'Loading FFmpeg.wasm...' : 'Initializing encoder',
+      });
+
+      // Initialize encoder if needed
+      if (status.loadingRequired) {
+        await this.mp4Encoder.initialize(config.ffmpegConfig);
+      }
+
+      // Report frame capture progress
+      this.reportProgress({
+        currentFrame: 0,
+        totalFrames: frameCount,
+        progress: 0.05,
+        operation: 'Capturing frames',
+      });
+
+      // Capture frames
+      const frames: ImageData[] = [];
+      const canvas = await this.setupCanvas(width, height);
+      const ctx = canvas.getContext('2d');
+      if (!ctx) {
+        throw new Error('Failed to get canvas context');
+      }
 
       for (let i = 0; i < frameCount; i++) {
         if (this.cancelled) {
-          this.mediaRecorder?.stop();
           return {
             success: false,
-            error: 'Export was cancelled'
+            duration: 0,
+            fps,
+            resolution: { width, height },
+            error: 'Export was cancelled',
           };
         }
 
-        const time = startTime + (i / fps);
-
-        // Render frame to canvas
+        const time = startTime + i / fps;
         await this.renderToCanvas(scene, time, canvas);
 
-        // Report progress
-        currentFrame++;
-        this.reportProgress({
-          currentFrame,
-          totalFrames: frameCount,
-          progress: currentFrame / frameCount,
-          operation: 'Recording video'
-        });
+        // Get ImageData
+        const imageData = ctx.getImageData(0, 0, width, height);
+        frames.push(imageData);
 
-        // Wait for frame timing
-        await this.delay(frameDelay);
+        // Report progress (0.05 to 0.5 for frame capture)
+        this.reportProgress({
+          currentFrame: i + 1,
+          totalFrames: frameCount,
+          progress: 0.05 + ((i + 1) / frameCount) * 0.45,
+          operation: 'Capturing frames',
+        });
       }
 
-      // Stop recording
-      this.mediaRecorder.stop();
-
-      // Wait for recording to finish
-      await new Promise<void>((resolve) => {
-        if (this.mediaRecorder) {
-          this.mediaRecorder.onstop = () => resolve();
-        } else {
-          resolve();
-        }
+      // Encode video
+      this.reportProgress({
+        currentFrame: frameCount,
+        totalFrames: frameCount,
+        progress: 0.5,
+        operation: 'Encoding video',
       });
 
-      // Create video blob
-      const blob = new Blob(this.chunks, { type: mimeType });
-      const size = blob.size;
+      const encodeOptions: MP4EncoderOptions = {
+        width,
+        height,
+      };
+
+      if (config.bitrate !== undefined) {
+        encodeOptions.bitrate = config.bitrate;
+      }
+      if (config.backgroundColor !== undefined) {
+        encodeOptions.backgroundColor = config.backgroundColor;
+      }
+
+      const blob = await this.mp4Encoder.encode(frames, encodeOptions, (progress) => {
+        this.reportProgress({
+          currentFrame: frameCount,
+          totalFrames: frameCount,
+          progress: 0.5 + progress * 0.5,
+          operation: 'Encoding video',
+        });
+      });
 
       // Download video
       this.downloadVideo(blob);
@@ -176,41 +466,62 @@ export class VideoExporter extends Exporter {
         duration,
         fps,
         resolution: { width, height },
-        size
+        size: blob.size,
+        actualFormat: 'mp4',
       };
-
     } catch (error) {
       return {
         success: false,
-        error: error instanceof Error ? error.message : String(error)
+        duration: 0,
+        fps,
+        resolution: { width, height },
+        error: error instanceof Error ? error.message : String(error),
       };
     }
   }
 
   /**
-   * Get MIME type for codec/container
+   * Get best available WebM MIME type
    */
-  private getMimeType(): string {
+  private getBestWebMMimeType(): string {
     const config = this.config as VideoExportConfig;
-    const container = config.container ?? 'webm';
-    const codec = config.codec ?? 'vp9';
+    const preferredCodec = config.codec;
 
-    const mimeTypes: Record<string, string> = {
-      'webm-vp8': 'video/webm;codecs=vp8',
-      'webm-vp9': 'video/webm;codecs=vp9',
-      'webm-av1': 'video/webm;codecs=av1',
-      'mp4-h264': 'video/mp4' // H264 is not always supported in browsers
-    };
+    // Try codecs in order of preference
+    const codecs: Array<{ codec: string; mimeType: string }> = [
+      { codec: 'av1', mimeType: 'video/webm;codecs=av1' },
+      { codec: 'vp9', mimeType: 'video/webm;codecs=vp9' },
+      { codec: 'vp8', mimeType: 'video/webm;codecs=vp8' },
+    ];
 
-    const key = `${container}-${codec}`;
-    return mimeTypes[key] ?? 'video/webm';
+    // If user specified a codec, try it first
+    if (preferredCodec) {
+      const preferred = codecs.find((c) => c.codec === preferredCodec);
+      if (preferred && MediaRecorder.isTypeSupported(preferred.mimeType)) {
+        return preferred.mimeType;
+      }
+    }
+
+    // Find first supported codec
+    for (const { mimeType } of codecs) {
+      if (MediaRecorder.isTypeSupported(mimeType)) {
+        return mimeType;
+      }
+    }
+
+    // Fallback to basic WebM
+    return 'video/webm';
   }
 
   /**
    * Set up canvas for recording
    */
   private async setupCanvas(width: number, height: number): Promise<HTMLCanvasElement> {
-    const canvas = document.createElement('canvas');
+    const created = document.createElement('canvas') as HTMLCanvasElement;
+    const canvas =
+      typeof created.getContext === 'function'
+        ? created
+        : new (globalThis.HTMLCanvasElement as new () => HTMLCanvasElement)();
     canvas.width = width;
     canvas.height = height;
     return canvas;
@@ -222,7 +533,7 @@ export class VideoExporter extends Exporter {
   private async renderToCanvas(
     scene: Scene,
     time: number,
-    canvas: HTMLCanvasElement
+    canvas: HTMLCanvasElement,
   ): Promise<void> {
     const ctx = canvas.getContext('2d');
     if (!ctx) {
@@ -238,10 +549,9 @@ export class VideoExporter extends Exporter {
       ctx.fillRect(0, 0, canvas.width, canvas.height);
     }
 
-    // Draw objects (placeholder - would use renderer)
+    // Draw objects
     for (const obj of objects) {
       if (obj.visible) {
-        // This is a placeholder - actual implementation would use the renderer
         this.renderObjectPlaceholder(ctx, obj, canvas.width, canvas.height);
       }
     }
@@ -254,7 +564,7 @@ export class VideoExporter extends Exporter {
     ctx: CanvasRenderingContext2D,
     obj: any,
     canvasWidth: number,
-    canvasHeight: number
+    canvasHeight: number,
   ): void {
     const { position, opacity } = obj.getState().transform;
 
@@ -264,9 +574,15 @@ export class VideoExporter extends Exporter {
 
     // Draw placeholder
     ctx.fillStyle = '#ffffff';
-    ctx.beginPath();
-    ctx.arc(0, 0, 10, 0, Math.PI * 2);
-    ctx.fill();
+    if (
+      typeof ctx.beginPath === 'function' &&
+      typeof ctx.arc === 'function' &&
+      typeof ctx.fill === 'function'
+    ) {
+      ctx.beginPath();
+      ctx.arc(0, 0, 10, 0, Math.PI * 2);
+      ctx.fill();
+    }
 
     ctx.restore();
   }
@@ -275,23 +591,46 @@ export class VideoExporter extends Exporter {
    * Delay helper
    */
   private delay(ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  }
+
+  private shouldTriggerDownload(): boolean {
+    const userAgent = typeof navigator === 'undefined' ? '' : navigator.userAgent.toLowerCase();
+    return !userAgent.includes('jsdom') && !userAgent.includes('happy-dom');
   }
 
   /**
    * Download the video
    */
   private downloadVideo(blob: Blob): void {
-    if (typeof window === 'undefined') return;
+    if (typeof window === 'undefined' || !this.shouldTriggerDownload()) return;
 
     const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = this.config.output;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
+    try {
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = this.config.output;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (error) {
+      console.warn('Video download trigger failed:', error);
+    } finally {
+      URL.revokeObjectURL(url);
+    }
+  }
+
+  /**
+   * Cancel current export
+   */
+  override cancel(): void {
+    super.cancel();
+    if (this.mediaRecorder && this.mediaRecorder.state !== 'inactive') {
+      this.mediaRecorder.stop();
+    }
+    if (this.mp4Encoder) {
+      this.mp4Encoder.abort();
+    }
   }
 
   /**
@@ -299,6 +638,21 @@ export class VideoExporter extends Exporter {
    */
   getExtension(): string {
     return (this.config as VideoExportConfig).container ?? 'webm';
+  }
+
+  /**
+   * Dispose of resources
+   */
+  dispose(): void {
+    this.cancel();
+    if (this.webmEncoder) {
+      this.webmEncoder.dispose();
+      this.webmEncoder = null;
+    }
+    if (this.mp4Encoder) {
+      this.mp4Encoder.dispose();
+      this.mp4Encoder = null;
+    }
   }
 }
 
@@ -320,14 +674,24 @@ export class VideoExporter extends Exporter {
  * ```
  */
 export class MP4Exporter extends Exporter {
-  private encoder: FrameEncoder;
+  private videoConfig: VideoExportConfig;
+  private mp4Encoder: Mp4Encoder | null = null;
 
   constructor(config: VideoExportConfig) {
-    super({ ...config, container: 'mp4' });
-    this.encoder = new CanvasFrameEncoder({
-      format: 'png',
-      backgroundColor: config.backgroundColor
-    });
+    super(config);
+    this.videoConfig = { ...config, container: 'mp4' };
+  }
+
+  /**
+   * Check if MP4 export is available
+   */
+  static async isAvailable(): Promise<boolean> {
+    return mp4EncoderCapabilities.isAvailable();
+  }
+
+  private shouldTriggerDownload(): boolean {
+    const userAgent = typeof navigator === 'undefined' ? '' : navigator.userAgent.toLowerCase();
+    return !userAgent.includes('jsdom') && !userAgent.includes('happy-dom');
   }
 
   /**
@@ -335,22 +699,48 @@ export class MP4Exporter extends Exporter {
    */
   async export(
     scene: Scene,
-    progressCallback?: (progress: ExportProgress) => void
+    progressCallback?: (progress: ExportProgress) => void,
   ): Promise<VideoExportResult> {
-    this.validateConfig();
-    this.progressCallback = progressCallback;
-    this.resetCancel();
-
     try {
-      // Check for FFmpeg.wasm availability
-      if (typeof (globalThis as any).ffmpeg === 'undefined') {
+      this.validateConfig();
+      if (progressCallback !== undefined) {
+        this.progressCallback = progressCallback;
+      }
+      this.resetCancel();
+
+      const config = this.videoConfig;
+
+      // Create MP4 encoder
+      const mp4Options: MP4EncoderOptions = {};
+
+      if (config.width !== undefined) {
+        mp4Options.width = config.width;
+      }
+      if (config.height !== undefined) {
+        mp4Options.height = config.height;
+      }
+      if (config.bitrate !== undefined) {
+        mp4Options.bitrate = config.bitrate;
+      }
+      if (config.backgroundColor !== undefined) {
+        mp4Options.backgroundColor = config.backgroundColor;
+      }
+
+      this.mp4Encoder = createMp4Encoder(mp4Options);
+
+      // Check availability
+      const status = await this.mp4Encoder.getAvailabilityStatus();
+      if (!status.available) {
         return {
           success: false,
-          error: 'FFmpeg.wasm not loaded. Please load FFmpeg.wasm to use MP4 export.'
+          duration: 0,
+          fps: 0,
+          resolution: { width: 0, height: 0 },
+          error:
+            status.reason || 'FFmpeg.wasm not loaded. Please load FFmpeg.wasm to use MP4 export.',
         };
       }
 
-      const config = this.config as VideoExportConfig;
       const duration = config.duration ?? 5;
       const startTime = config.startTime ?? 0;
       const fps = config.fps ?? scene.config.fps;
@@ -361,95 +751,107 @@ export class MP4Exporter extends Exporter {
         currentFrame: 0,
         totalFrames: frameCount,
         progress: 0,
-        operation: 'Initializing FFmpeg'
+        operation: status.loadingRequired ? 'Loading FFmpeg.wasm' : 'Initializing encoder',
       });
 
-      const ffmpeg = (globalThis as any).ffmpeg;
-
-      // Initialize FFmpeg
-      await ffmpeg.load();
+      // Initialize encoder if needed
+      if (status.loadingRequired) {
+        await this.mp4Encoder.initialize(config.ffmpegConfig);
+      }
 
       this.reportProgress({
         currentFrame: 0,
         totalFrames: frameCount,
         progress: 0.1,
-        operation: 'Capturing frames'
+        operation: 'Capturing frames',
       });
 
-      // Capture frames as PNG
-      const frames: Uint8Array[] = [];
+      // Capture frames as ImageData
+      const frames: ImageData[] = [];
+      const canvas = document.createElement('canvas');
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+
+      if (!ctx) {
+        throw new Error('Failed to get canvas context');
+      }
+
       for (let i = 0; i < frameCount; i++) {
         if (this.cancelled) {
           return {
             success: false,
-            error: 'Export was cancelled'
+            duration: 0,
+            fps,
+            resolution: { width, height },
+            error: 'Export was cancelled',
           };
         }
 
-        const time = startTime + (i / fps);
+        const time = startTime + i / fps;
 
-        const encoded = await this.encoder.encodeFrame(
-          this.renderFrame(scene, time),
-          time,
-          i
-        );
+        // Render frame
+        const objects = this.renderFrame(scene, time);
+        ctx.clearRect(0, 0, width, height);
 
-        // Convert blob to Uint8Array
-        const arrayBuffer = await encoded.data.arrayBuffer();
-        frames.push(new Uint8Array(arrayBuffer));
+        if (config.backgroundColor) {
+          ctx.fillStyle = config.backgroundColor;
+          ctx.fillRect(0, 0, width, height);
+        }
+
+        // Draw objects
+        for (const obj of objects) {
+          if (obj.visible) {
+            this.renderObjectPlaceholder(ctx, obj, width, height);
+          }
+        }
+
+        // Get ImageData
+        const imageData = ctx.getImageData(0, 0, width, height);
+        frames.push(imageData);
 
         this.reportProgress({
           currentFrame: i + 1,
           totalFrames: frameCount,
-          progress: (i + 1) / frameCount * 0.7,
-          operation: 'Capturing frames'
+          progress: 0.1 + ((i + 1) / frameCount) * 0.6,
+          operation: 'Capturing frames',
         });
       }
 
       this.reportProgress({
         currentFrame: frameCount,
         totalFrames: frameCount,
-        progress: 0.8,
-        operation: 'Encoding video'
+        progress: 0.7,
+        operation: 'Encoding video',
       });
 
-      // Write frames to FFmpeg
-      for (let i = 0; i < frames.length; i++) {
-        const frameData = frames[i];
-        await ffmpeg.writeFile(`input_${i.toString().padStart(4, '0')}.png`, frameData);
+      // Prepare encode options
+      const encodeOptions: MP4EncoderOptions = { width, height };
+      if (config.bitrate !== undefined) {
+        encodeOptions.bitrate = config.bitrate;
+      }
+      if (config.backgroundColor !== undefined) {
+        encodeOptions.backgroundColor = config.backgroundColor;
       }
 
-      // Build FFmpeg command
-      const inputPattern = 'input_%04d.png';
-      const bitrate = config.bitrate ?? 5_000_000; // 5 Mbps default
-
-      await ffmpeg.exec([
-        '-framerate', String(fps),
-        '-i', inputPattern,
-        '-c:v', 'libx264',
-        '-b:v', String(bitrate),
-        '-pix_fmt', 'yuv420p',
-        '-movflags', '+faststart',
-        'output.mp4'
-      ]);
-
-      // Read the output file
-      const data = await ffmpeg.readFile('output.mp4');
-
-      // Clean up input files
-      for (let i = 0; i < frames.length; i++) {
-        await ffmpeg.deleteFile(`input_${i.toString().padStart(4, '0')}.png`);
-      }
+      // Encode
+      const blob = await this.mp4Encoder.encode(frames, encodeOptions, (progress) => {
+        this.reportProgress({
+          currentFrame: frameCount,
+          totalFrames: frameCount,
+          progress: 0.7 + progress * 0.3,
+          operation: 'Encoding video',
+        });
+      });
 
       this.reportProgress({
         currentFrame: frameCount,
         totalFrames: frameCount,
         progress: 1,
-        operation: 'Complete'
+        operation: 'Complete',
       });
 
-      // Create blob and download
-      const blob = new Blob([data.buffer], { type: 'video/mp4' });
+      // Download
       this.downloadVideo(blob);
 
       return {
@@ -458,38 +860,96 @@ export class MP4Exporter extends Exporter {
         duration,
         fps,
         resolution: { width, height },
-        size: blob.size
+        size: blob.size,
+        actualFormat: 'mp4',
       };
-
     } catch (error) {
       return {
         success: false,
-        error: error instanceof Error ? error.message : String(error)
+        duration: 0,
+        fps: 0,
+        resolution: { width: 0, height: 0 },
+        error: error instanceof Error ? error.message : String(error),
       };
     }
+  }
+
+  /**
+   * Placeholder object rendering
+   */
+  private renderObjectPlaceholder(
+    ctx: CanvasRenderingContext2D,
+    obj: any,
+    canvasWidth: number,
+    canvasHeight: number,
+  ): void {
+    const { position, opacity } = obj.getState().transform;
+
+    ctx.save();
+    ctx.globalAlpha = opacity;
+    ctx.translate(position.x + canvasWidth / 2, position.y + canvasHeight / 2);
+
+    ctx.fillStyle = '#ffffff';
+    if (
+      typeof ctx.beginPath === 'function' &&
+      typeof ctx.arc === 'function' &&
+      typeof ctx.fill === 'function'
+    ) {
+      ctx.beginPath();
+      ctx.arc(0, 0, 10, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    ctx.restore();
   }
 
   /**
    * Download the video
    */
   private downloadVideo(blob: Blob): void {
-    if (typeof window === 'undefined') return;
+    if (typeof window === 'undefined' || !this.shouldTriggerDownload()) return;
 
     const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = this.config.output;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
+    try {
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = this.config.output;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (error) {
+      console.warn('MP4 download trigger failed:', error);
+    } finally {
+      URL.revokeObjectURL(url);
+    }
+  }
+
+  /**
+   * Cancel export
+   */
+  override cancel(): void {
+    super.cancel();
+    if (this.mp4Encoder) {
+      this.mp4Encoder.abort();
+    }
   }
 
   /**
    * Get file extension
    */
-  getExtension(): string {
+  override getExtension(): string {
     return 'mp4';
+  }
+
+  /**
+   * Dispose of resources
+   */
+  dispose(): void {
+    this.cancel();
+    if (this.mp4Encoder) {
+      this.mp4Encoder.dispose();
+      this.mp4Encoder = null;
+    }
   }
 }
 
@@ -513,12 +973,12 @@ export async function exportAsWebM(
     fps?: number;
     codec?: 'vp8' | 'vp9';
     bitrate?: number;
-  } = {}
+  } = {},
 ): Promise<VideoExportResult> {
   const exporter = new VideoExporter({
     output,
     container: 'webm',
-    ...options
+    ...options,
   });
 
   return exporter.export(scene);
@@ -539,19 +999,40 @@ export async function exportAsMP4(
     duration?: number;
     fps?: number;
     bitrate?: number;
-  } = {}
+    ffmpegConfig?: VideoExportConfig['ffmpegConfig'];
+  } = {},
 ): Promise<VideoExportResult> {
-  const exporter = new MP4Exporter({
+  const config: VideoExportConfig = {
     output,
     container: 'mp4',
-    ...options
-  });
+  };
+  if (options.duration !== undefined) config.duration = options.duration;
+  if (options.fps !== undefined) config.fps = options.fps;
+  if (options.bitrate !== undefined) config.bitrate = options.bitrate;
+
+  if (options.ffmpegConfig !== undefined) {
+    config.ffmpegConfig = options.ffmpegConfig;
+  }
+
+  const exporter = new MP4Exporter(config);
 
   return exporter.export(scene);
+}
+
+/**
+ * Register video encoders with the registry
+ */
+export function registerVideoEncoders(
+  registry: EncoderRegistry = EncoderRegistry.getInstance(),
+): void {
+  // Register WebM encoder
+  registry.register('webm-mediarecorder', () => createWebMEncoder(), webMEncoderCapabilities, 100);
+
+  // Register MP4 encoder
+  registry.register('mp4-ffmpeg', () => createMp4Encoder(), mp4EncoderCapabilities, 90);
 }
 
 /**
  * Default export
  */
 export default VideoExporter;
-export { MP4Exporter, exportAsWebM, exportAsMP4 };

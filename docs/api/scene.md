@@ -1,6 +1,6 @@
 # 场景 API
 
-本节介绍 AniMaker 框架的场景管理 API。Scene 是动画的容器和编排器，负责管理对象和动画的播放。
+本节介绍 Kinema 框架的场景管理 API。Scene 是动画的容器和编排器，负责管理对象和动画的播放。
 
 ## 目录
 
@@ -28,10 +28,10 @@ class Scene {
 
 ### 属性
 
-| 属性 | 类型 | 说明 |
-|------|------|------|
+| 属性     | 类型          | 说明             |
+| -------- | ------------- | ---------------- |
 | `config` | `SceneConfig` | 场景配置（只读） |
-| `id` | `string` | 场景唯一标识符 |
+| `id`     | `string`      | 场景唯一标识符   |
 
 ### 方法
 
@@ -44,12 +44,15 @@ getObject(id: ObjectId): RenderObject | undefined
 ```
 
 **参数：**
+
 - `id` - 对象 ID
 
 **返回：**
+
 - 对象实例，如果不存在返回 `undefined`
 
 **示例：**
+
 ```typescript
 const obj = scene.getObject('circle-123');
 if (obj) {
@@ -66,12 +69,14 @@ getObjects(): ReadonlyArray<RenderObject>
 ```
 
 **返回：**
+
 - 排序后的对象数组
 
 **示例：**
+
 ```typescript
 const objects = scene.getObjects();
-objects.forEach(obj => {
+objects.forEach((obj) => {
   console.log(`${obj.getState().id}: z-index=${obj.getState().z_index}`);
 });
 ```
@@ -85,12 +90,15 @@ addObject(object: RenderObject): Scene
 ```
 
 **参数：**
+
 - `object` - 要添加的对象
 
 **返回：**
+
 - 新的 Scene 实例（不可变更新）
 
 **示例：**
+
 ```typescript
 let scene = createScene();
 const circle = VectorObject.circle(1, { x: 0, y: 0, z: 0 });
@@ -107,12 +115,15 @@ addObjects(...objects: RenderObject[]): Scene
 ```
 
 **参数：**
+
 - `objects` - 要添加的对象列表
 
 **返回：**
+
 - 新的 Scene 实例
 
 **示例：**
+
 ```typescript
 const circle = VectorObject.circle(1, { x: 0, y: 0, z: 0 });
 const rect = VectorObject.rectangle(2, 1, { x: 2, y: 0, z: 0 });
@@ -129,12 +140,15 @@ removeObject(objectId: ObjectId): Scene
 ```
 
 **参数：**
+
 - `objectId` - 要移除的对象 ID
 
 **返回：**
+
 - 新的 Scene 实例
 
 **示例：**
+
 ```typescript
 const obj = scene.getObjects()[0];
 scene = scene.removeObject(obj.getState().id);
@@ -149,9 +163,10 @@ removeObjects(...objectIds: ObjectId[]): Scene
 ```
 
 **示例：**
+
 ```typescript
 const objects = scene.getObjects();
-const ids = objects.map(o => o.getState().id);
+const ids = objects.map((o) => o.getState().id);
 scene = scene.removeObjects(...ids);
 ```
 
@@ -164,9 +179,11 @@ clear(): Scene
 ```
 
 **返回：**
+
 - 新的空 Scene 实例
 
 **示例：**
+
 ```typescript
 scene = scene.clear();
 console.log(scene.getObjects().length); // 0
@@ -181,13 +198,16 @@ schedule(animation: Animation, delay?: number): Scene
 ```
 
 **参数：**
+
 - `animation` - 要调度的动画
 - `delay` - 开始延迟（秒），默认 0
 
 **返回：**
+
 - 新的 Scene 实例
 
 **示例：**
+
 ```typescript
 const fadeIn = new FadeInAnimation(circle, { duration: 1 });
 const move = new MoveAnimation(circle, { x: 2, y: 0, z: 0 }, { duration: 2 });
@@ -208,19 +228,25 @@ scheduleAll(animations: ReadonlyArray<Animation>, delay?: number): Scene
 ```
 
 **参数：**
+
 - `animations` - 动画数组
 - `delay` - 开始延迟
 
 **返回：**
+
 - 新的 Scene 实例
 
 **示例：**
+
 ```typescript
-scene = scene.scheduleAll([
-  new FadeInAnimation(circle, { duration: 1 }),
-  new FadeInAnimation(rect, { duration: 1 }),
-  new FadeInAnimation(triangle, { duration: 1 })
-], 0);
+scene = scene.scheduleAll(
+  [
+    new FadeInAnimation(circle, { duration: 1 }),
+    new FadeInAnimation(rect, { duration: 1 }),
+    new FadeInAnimation(triangle, { duration: 1 }),
+  ],
+  0,
+);
 ```
 
 #### getTime()
@@ -232,6 +258,7 @@ getTime(): number
 ```
 
 **返回：**
+
 - 当前时间（秒）
 
 #### updateTo()
@@ -243,12 +270,15 @@ updateTo(targetTime: number): Scene
 ```
 
 **参数：**
+
 - `targetTime` - 目标时间（秒）
 
 **返回：**
+
 - 更新后的 Scene 实例
 
 **示例：**
+
 ```typescript
 // 获取第 1 秒的场景状态
 const frame1 = scene.updateTo(1.0);
@@ -257,7 +287,7 @@ const frame1 = scene.updateTo(1.0);
 const frame2 = scene.updateTo(2.0);
 
 // 渲染每一帧
-for (let t = 0; t <= totalDuration; t += 1/fps) {
+for (let t = 0; t <= totalDuration; t += 1 / fps) {
   const frame = scene.updateTo(t);
   renderer.render(frame);
 }
@@ -272,6 +302,7 @@ createSnapshot(): SceneSnapshot
 ```
 
 **返回：**
+
 - 场景快照对象
 
 #### restoreFromSnapshot()
@@ -283,12 +314,15 @@ restoreFromSnapshot(snapshot: SceneSnapshot): Scene
 ```
 
 **参数：**
+
 - `snapshot` - 要恢复的快照
 
 **返回：**
+
 - 恢复后的 Scene 实例
 
 **示例：**
+
 ```typescript
 // 保存状态
 const snapshot = scene.createSnapshot();
@@ -308,9 +342,11 @@ findObjectsAtPoint(point: Point3D): ReadonlyArray<RenderObject>
 ```
 
 **参数：**
+
 - `point` - 要检查的点
 
 **返回：**
+
 - 包含该点的对象数组（按 z-index 排序，最前面的最后）
 
 #### getObjectAtPoint()
@@ -329,10 +365,10 @@ getObjectAtPoint(point: Point3D): RenderObject | undefined
 
 ```typescript
 interface SceneConfig {
-  readonly width: number;               // 场景宽度（像素）
-  readonly height: number;              // 场景高度（像素）
-  readonly backgroundColor?: string;    // 背景色
-  readonly fps: number;                 // 帧率
+  readonly width: number; // 场景宽度（像素）
+  readonly height: number; // 场景高度（像素）
+  readonly backgroundColor?: string; // 背景色
+  readonly fps: number; // 帧率
 }
 ```
 
@@ -343,14 +379,14 @@ const DEFAULT_SCENE_CONFIG: SceneConfig = {
   width: 1920,
   height: 1080,
   backgroundColor: '#000000',
-  fps: 60
+  fps: 60,
 };
 ```
 
 ### 示例
 
 ```typescript
-import { createScene } from '@animaker/core';
+import { createScene } from '@kinema/core';
 
 // 使用默认配置
 const scene1 = createScene();
@@ -360,7 +396,7 @@ const scene2 = createScene({
   width: 1280,
   height: 720,
   backgroundColor: '#1a1a2e',
-  fps: 30
+  fps: 30,
 });
 
 // 全高清配置
@@ -368,7 +404,7 @@ const scene3 = createScene({
   width: 3840,
   height: 2160,
   backgroundColor: '#000000',
-  fps: 60
+  fps: 60,
 });
 ```
 
@@ -382,23 +418,23 @@ const scene3 = createScene({
 
 ```typescript
 class SceneBuilder {
-  constructor()
+  constructor();
 }
 ```
 
 ### 方法
 
-| 方法 | 参数 | 返回 | 说明 |
-|------|------|------|------|
+| 方法                            | 参数       | 返回           | 说明         |
+| ------------------------------- | ---------- | -------------- | ------------ |
 | `withDimensions(width, height)` | 宽度、高度 | `SceneBuilder` | 设置场景尺寸 |
-| `withBackgroundColor(color)` | 背景色 | `SceneBuilder` | 设置背景颜色 |
-| `withFps(fps)` | 帧率 | `SceneBuilder` | 设置帧率 |
-| `build(id?)` | 可选 ID | `Scene` | 构建场景实例 |
+| `withBackgroundColor(color)`    | 背景色     | `SceneBuilder` | 设置背景颜色 |
+| `withFps(fps)`                  | 帧率       | `SceneBuilder` | 设置帧率     |
+| `build(id?)`                    | 可选 ID    | `Scene`        | 构建场景实例 |
 
 ### 示例
 
 ```typescript
-import { sceneBuilder } from '@animaker/core';
+import { sceneBuilder } from '@kinema/core';
 
 const scene = sceneBuilder()
   .withDimensions(1920, 1080)
@@ -411,7 +447,7 @@ const scene = createScene({
   width: 1920,
   height: 1080,
   backgroundColor: '#1a1a2e',
-  fps: 60
+  fps: 60,
 });
 ```
 
@@ -424,18 +460,21 @@ const scene = createScene({
 创建新场景的便捷函数。
 
 ```typescript
-function createScene(config?: Partial<SceneConfig>): Scene
+function createScene(config?: Partial<SceneConfig>): Scene;
 ```
 
 **参数：**
+
 - `config` - 部分配置（与默认配置合并）
 
 **返回：**
+
 - 新的 Scene 实例
 
 **示例：**
+
 ```typescript
-import { createScene } from '@animaker/core';
+import { createScene } from '@kinema/core';
 
 // 使用默认配置
 const scene1 = createScene();
@@ -443,7 +482,7 @@ const scene1 = createScene();
 // 部分自定义
 const scene2 = createScene({
   width: 1280,
-  height: 720
+  height: 720,
 });
 
 // 完全自定义
@@ -451,7 +490,7 @@ const scene3 = createScene({
   width: 1920,
   height: 1080,
   backgroundColor: '#000000',
-  fps: 60
+  fps: 60,
 });
 ```
 
@@ -460,7 +499,7 @@ const scene3 = createScene({
 创建场景构建器。
 
 ```typescript
-function sceneBuilder(): SceneBuilder
+function sceneBuilder(): SceneBuilder;
 ```
 
 ---
@@ -471,13 +510,14 @@ function sceneBuilder(): SceneBuilder
 
 ```typescript
 interface SceneSnapshot {
-  readonly time: number;                           // 快照时间
+  readonly time: number; // 快照时间
   readonly objects: ReadonlyArray<RenderObject>; // 对象列表
   readonly metadata?: ReadonlyMap<string, unknown>; // 元数据
 }
 ```
 
 **用途：**
+
 - 保存场景状态
 - 实现撤销/重做功能
 - 缓存场景状态
@@ -489,23 +529,16 @@ interface SceneSnapshot {
 ### 创建完整动画场景
 
 ```typescript
-import {
-  createScene,
-  VectorObject
-} from '@animaker/core';
-import {
-  FadeInAnimation,
-  MoveAnimation,
-  RotateAnimation
-} from '@animaker/core/animation';
-import { smooth } from '@animaker/core/easing';
+import { createScene, VectorObject } from '@kinema/core';
+import { FadeInAnimation, MoveAnimation, RotateAnimation } from '@kinema/core/animation';
+import { smooth } from '@kinema/core/easing';
 
 // 1. 创建场景
 const scene = createScene({
   width: 1280,
   height: 720,
   backgroundColor: '#1a1a2e',
-  fps: 60
+  fps: 60,
 });
 
 // 2. 创建对象
@@ -513,7 +546,7 @@ const circle = VectorObject.circle(
   0.5,
   { x: -2, y: 0, z: 0 },
   { color: '#3498db', width: 0.05 },
-  { color: '#2980b9', opacity: 1 }
+  { color: '#2980b9', opacity: 1 },
 );
 
 // 3. 添加到场景
@@ -522,21 +555,25 @@ let currentScene = scene.addObject(circle);
 // 4. 创建动画
 const fadeIn = new FadeInAnimation(circle, {
   duration: 1,
-  easing: smooth
+  easing: smooth,
 });
 
-const moveRight = new MoveAnimation(circle, {
-  x: 2,
-  y: 0,
-  z: 0
-}, {
-  duration: 2,
-  easing: smooth
-});
+const moveRight = new MoveAnimation(
+  circle,
+  {
+    x: 2,
+    y: 0,
+    z: 0,
+  },
+  {
+    duration: 2,
+    easing: smooth,
+  },
+);
 
 const rotate = new RotateAnimation(circle, 'z', 360, {
   duration: 2,
-  easing: smooth
+  easing: smooth,
 });
 
 // 5. 调度动画
@@ -547,7 +584,7 @@ currentScene = currentScene.schedule(rotate, 1);
 // 6. 渲染帧
 const fps = currentScene.config.fps;
 const duration = 3; // 总时长
-for (let t = 0; t <= duration; t += 1/fps) {
+for (let t = 0; t <= duration; t += 1 / fps) {
   const frame = currentScene.updateTo(t);
   renderer.render(frame.getObjects());
 }
